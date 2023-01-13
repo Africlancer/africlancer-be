@@ -1,14 +1,34 @@
-import { Controller, Get, Param } from "@nestjs/common";
-import { get } from "http";
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { get } from 'http';
+import { User } from './user.schema';
+import { UserService } from './user.service';
 
+@Controller('/user')
+export class UserController {
+  constructor(private readonly userSvc: UserService) {}
 
-@Controller("/user")
-export class UserController{
+  @Post()
+  public create(@Body() user: User): Promise<User> {
+    return this.userSvc.create(user);
+  }
 
+  @Put()
+  public async update(_id: string, user: User): Promise<void> {
+    this.userSvc.update(_id, user);
+  }
 
-    @Get(":id")
-    public getUserById (@Param() id: string){
+  @Get('retrieve/:id')
+  public async findOne(@Param() id: string): Promise<User> {
+    return this.userSvc.findOne({ _id: id } as any);
+  }
 
-        return id;
-    }
+  @Get('/all')
+  public async find(): Promise<User[]> {
+    return this.userSvc.find({} as any);
+  }
+
+  @Delete(':id')
+  public async delete(@Param() id: string): Promise<void> {
+    await this.userSvc.delete(id);
+  }
 }
