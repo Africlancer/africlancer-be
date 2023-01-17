@@ -1,0 +1,48 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  _id: String
+  firstName: String
+  otherName: String
+  lastName: String
+  email: String
+  username: String
+  books: [String!]
+}
+
+type Query {
+  findOneUser(query: UserQueryInput!): User!
+  findUsers(query: UserQueryInput!): [User!]!
+  deleteUser(_id: String!): Boolean!
+}
+
+input UserQueryInput {
+  firstName: String
+  otherName: String
+  lastName: String
+  email: String
+  username: String
+}
+
+type Mutation {
+  createUser(user: CreateUserInput!): User!
+  updateUser(_id: String!, user: UpdateUserInput!): Boolean!
+}
+
+input CreateUserInput {
+  firstName: String!
+  otherName: String
+  lastName: String!
+  email: String!
+  username: String!
+}
+
+input UpdateUserInput {
+  firstName: String
+  otherName: String
+  lastName: String
+  email: String
+  username: String
+}
