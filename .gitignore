@@ -1,6 +1,7 @@
 # compiled output
 /dist
 /node_modules
+/src/schema.gql
 
 # Logs
 logs
@@ -36,3 +37,6 @@ lerna-debug.log*
 yarn.lock
 .gitignore
 package-lock.json
+
+#other
+profile.txt

@@ -2,6 +2,18 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Profile {
+  _id: String!
+  userID: String!
+  avatar: String
+  hourlyRate: Float
+  professionalHeadline: String
+  summary: String
+  recommendations: Float
+  createdAt: String
+  updatedAt: String
+}
+
 type User {
   _id: String
   firstName: String
@@ -16,6 +28,9 @@ type Query {
   findOneUser(query: UserQueryInput!): User!
   findUsers(query: UserQueryInput!): [User!]!
   deleteUser(_id: String!): Boolean!
+  findProfileByID(profileID: String!): Profile!
+  findProfileByQuery(query: QueryProfileInput!): [Profile!]!
+  deleteProfile(id: String!): Boolean!
 }
 
 input UserQueryInput {
@@ -26,9 +41,21 @@ input UserQueryInput {
   username: String
 }
 
+input QueryProfileInput {
+  _id: String
+  userID: String
+  avatar: String
+  hourlyRate: Float
+  professionalHeadline: String
+  summary: String
+  recommendations: Float
+}
+
 type Mutation {
   createUser(user: CreateUserInput!): User!
   updateUser(_id: String!, user: UpdateUserInput!): Boolean!
+  createProfile(profile: CreateProfileInput!): Profile!
+  updateProfile(profileID: String!, profile: QueryProfileInput!): Boolean!
 }
 
 input CreateUserInput {
@@ -45,4 +72,15 @@ input UpdateUserInput {
   lastName: String
   email: String
   username: String
+}
+
+input CreateProfileInput {
+  userID: String!
+  avatar: String
+  hourlyRate: Float
+  professionalHeadline: String
+  summary: String
+  recommendations: Float
+  createdAt: String
+  updatedAt: String
 }
