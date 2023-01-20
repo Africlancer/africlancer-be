@@ -7,6 +7,7 @@ import { UserModule } from './modules/user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { ProjectModule } from './modules/projects/project.module';
 
 @Module({
   imports: [
@@ -17,8 +18,9 @@ import { join } from 'path';
       playground: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
-    MongooseModule.forRoot(process.env.mongodb_url),
+    MongooseModule.forRoot(`mongodb://localhost/${process.env.DB_NAME}`),
     UserModule,
+    ProjectModule,
   ],
   controllers: [AppController],
   providers: [AppService],

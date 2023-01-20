@@ -12,10 +12,28 @@ type User {
   books: [String!]
 }
 
+type Project {
+  _id: String
+  title: String
+  budget: Float
+  summary: String
+  details: String
+  startDate: DateTime
+  endDate: DateTime
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Query {
   findOneUser(query: UserQueryInput!): User!
   findUsers(query: UserQueryInput!): [User!]!
   deleteUser(_id: String!): Boolean!
+  findOneProject(query: ProjectQueryInput!): Project!
+  findProjects(query: ProjectQueryInput!): [Project!]!
+  deleteProject(_id: String!): Boolean!
 }
 
 input UserQueryInput {
@@ -26,9 +44,20 @@ input UserQueryInput {
   username: String
 }
 
+input ProjectQueryInput {
+  title: String
+  budget: Float
+  summary: String
+  details: String
+  startDate: DateTime
+  endDate: DateTime
+}
+
 type Mutation {
   createUser(user: CreateUserInput!): User!
   updateUser(_id: String!, user: UpdateUserInput!): Boolean!
+  createProject(project: CreateProjectInput!): Project!
+  updateProject(_id: String!, project: UpdateProjectInput!): Boolean!
 }
 
 input CreateUserInput {
@@ -45,4 +74,23 @@ input UpdateUserInput {
   lastName: String
   email: String
   username: String
+}
+
+input CreateProjectInput {
+  title: String
+  budget: Float
+  summary: String
+  details: String
+  startDate: DateTime
+  endDate: DateTime
+  _id: String
+}
+
+input UpdateProjectInput {
+  title: String
+  budget: Float
+  summary: String
+  details: String
+  startDate: DateTime
+  endDate: DateTime
 }
