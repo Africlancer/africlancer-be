@@ -34,9 +34,9 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-yarn.lock
 .gitignore
 package-lock.json
+yarn.lock
 
 #other
 profile.txt

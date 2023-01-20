@@ -25,7 +25,7 @@ import { classes } from '@automapper/classes';
       strategyInitializer: classes(),
     }),
     UserModule,
-    ProfileModule
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
