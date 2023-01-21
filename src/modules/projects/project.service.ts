@@ -14,11 +14,11 @@ export class ProjectService {
     this.ProjectRepo.updateOne(_id, project);
   }
 
-  public async findOne(project: Project): Promise<Project> {
+  public async findOne(project: Partial<Project>): Promise<Project> {
     return this.ProjectRepo.findOne(project);
   }
 
-  public async find(project: Project): Promise<Project[]> {
+  public async find(project: Partial<Project>): Promise<Project[]> {
     return this.ProjectRepo.find(project);
   }
 

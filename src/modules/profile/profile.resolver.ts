@@ -1,13 +1,9 @@
-import { MapInterceptor } from "@automapper/nestjs";
-import { UseInterceptors } from "@nestjs/common";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { CreateProfileInput, Profile, QueryProfileInput, QueryInput } from "./profile.model";
-import { ProfileService } from "./profile.service";
-import { Profile as ProfileSchema } from "./profile.schema";
-
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
-
+import { CreateProfileInput, Profile, QueryProfileInput } from "./profile.model";
+import { ProfileService } from "./profile.service";
+import { Profile as ProfileSchema } from "./profile.schema";
 
 
 @Resolver(of => Profile)
@@ -16,22 +12,23 @@ export class ProfileResolver{
 
 
     @Query(returns => Profile, {name:"findProfileByID"})
-    //@UseInterceptors(MapInterceptor(ProfileSchema, Profile))
     async findProfileByID(@Args("profileID") profileID:string):Promise<Profile>{
         return this.classMapper.mapAsync(await this.profileService.findOne(profileID), ProfileSchema, Profile);
-        //return this.profileService.findOne(profileID)
+        //BEFORE MAPPING: return this.profileService.findOne(profileID)
     }
 
     @Query(returns => [Profile], {name:"findProfileByQuery"})
     async findProfileByQuery(@Args("query") query:QueryProfileInput):Promise<Profile[]>{
-        const queryMap = await this.classMapper.mapAsync(query, QueryProfileInput, ProfileSchema)
-        return this.classMapper.mapArrayAsync(await this.profileService.find(queryMap), ProfileSchema, Profile);
-        //return (this.profileService.find(query as any)) as any
+        //const queryMap = await this.classMapper.mapAsync(query, QueryProfileInput, ProfileSchema)
+        return this.classMapper.mapArrayAsync(await this.profileService.find(query as unknown), ProfileSchema, Profile);
+        //BEFORE MAPPING: return (this.profileService.find(query as any)) as any
     }
 
     @Mutation(returns => Profile, {name:"createProfile"})
     async createProfile(@Args("profile") profile:CreateProfileInput):Promise<Profile>{
-        return (await this.profileService.create(profile as any)) as any
+        const queryMap = await this.classMapper.mapAsync(profile, CreateProfileInput, ProfileSchema)
+        return await this.classMapper.mapAsync(await this.profileService.create(queryMap), ProfileSchema, Profile);
+        //BEFORE MAPPING: return (await this.profileService.create(profile as any)) as any
     }
 
     @Mutation(returns => Boolean, {name:"updateProfile"})
@@ -41,7 +38,9 @@ export class ProfileResolver{
         @Args("profile")
         profile:QueryProfileInput
     ){
-        await this.profileService.updateOne(profileID, profile as any)
+        const queryMap = await this.classMapper.mapAsync(profile, QueryProfileInput, ProfileSchema)
+        await this.profileService.updateOne(profileID, queryMap)
+        //BEFORE MAPPING: await this.profileService.updateOne(profileID, profile as any)
         return true;
     }
 
