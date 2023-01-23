@@ -7,8 +7,8 @@ export class ProjectService {
   constructor(private readonly ProjectRepo: ProjectRepository) {}
 
   public create(project: Project): Promise<Project> {
-    // var digits = Math.floor(Math.random() * 9000000000) + 1;
-    // project.projectId = digits
+    var digits = Math.floor(Math.random() * 9000000000) + 1;
+    project.projectId = digits
     return this.ProjectRepo.create(project);
   }
 
