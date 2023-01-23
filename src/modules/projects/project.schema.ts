@@ -19,6 +19,9 @@ export class Project {
   startDate: string;
   @Prop({})
   endDate: string;
+
+  @Prop({})
+  projectId: number;
 }
 
 

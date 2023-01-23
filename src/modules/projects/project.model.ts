@@ -17,6 +17,9 @@ export class Project {
   startDate: Date;
   @Field({ nullable: true })
   endDate: Date;
+
+  @Field({ nullable: true })
+  projectId: string;
 }
 
 @InputType()
