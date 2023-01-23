@@ -13,13 +13,13 @@ type User {
 }
 
 type Project {
-  _id: String
-  title: String
-  budget: Float
-  summary: String
-  details: String
-  startDate: DateTime
-  endDate: DateTime
+  _id: String!
+  title: String!
+  budget: Float!
+  summary: String!
+  details: String!
+  startDate: DateTime!
+  endDate: DateTime!
 }
 
 """
@@ -35,16 +35,16 @@ type Profile {
   professionalHeadline: String
   summary: String
   recommendations: Float
-  createdAt: String
-  updatedAt: String
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 type Query {
   findOneUser(query: UserQueryInput!): User!
   findUsers(query: UserQueryInput!): [User!]!
   deleteUser(_id: String!): Boolean!
-  findOneProject(query: ProjectQueryInput!): Project!
-  findProjects(query: ProjectQueryInput!): [Project!]!
+  findOneProject(query: QueryProjectInput!): Project!
+  findProjects(query: QueryProjectInput!): [Project!]!
   deleteProject(_id: String!): Boolean!
   findProfileByID(profileID: String!): Profile!
   findProfileByQuery(query: QueryProfileInput!): [Profile!]!
@@ -59,7 +59,7 @@ input UserQueryInput {
   username: String
 }
 
-input ProjectQueryInput {
+input QueryProjectInput {
   title: String
   budget: Float
   summary: String
@@ -67,6 +67,7 @@ input ProjectQueryInput {
   startDate: DateTime
   endDate: DateTime
 }
+
 input QueryProfileInput {
   _id: String
   userID: String
@@ -81,7 +82,7 @@ type Mutation {
   createUser(user: CreateUserInput!): User!
   updateUser(_id: String!, user: UpdateUserInput!): Boolean!
   createProject(project: CreateProjectInput!): Project!
-  updateProject(_id: String!, project: UpdateProjectInput!): Boolean!
+  updateProject(_id: String!, project: QueryProjectInput!): Boolean!
   createProfile(profile: CreateProfileInput!): Profile!
   updateProfile(profileID: String!, profile: QueryProfileInput!): Boolean!
 }
@@ -103,23 +104,14 @@ input UpdateUserInput {
 }
 
 input CreateProjectInput {
-  title: String
-  budget: Float
-  summary: String
-  details: String
-  startDate: DateTime
-  endDate: DateTime
-  _id: String
+  title: String!
+  budget: Float!
+  summary: String!
+  details: String!
+  startDate: DateTime!
+  endDate: DateTime!
 }
 
-input UpdateProjectInput {
-  title: String
-  budget: Float
-  summary: String
-  details: String
-  startDate: DateTime
-  endDate: DateTime
-}
 input CreateProfileInput {
   userID: String!
   avatar: String
@@ -127,6 +119,4 @@ input CreateProfileInput {
   professionalHeadline: String
   summary: String
   recommendations: Float
-  createdAt: String
-  updatedAt: String
 }

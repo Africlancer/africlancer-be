@@ -32,41 +32,41 @@ export class Profile{
     recommendations?:number;
 
     @Field({ nullable: true })
-    createdAt?:string;
+    createdAt?:Date;
 
     @Field({ nullable: true })
-    updatedAt?:string;
+    updatedAt?:Date;
 }
 
 @InputType()
 export class CreateProfileInput{
+    @AutoMap()
     @Field()
     userID:string;
 
+    @AutoMap()
     @Field({ nullable: true })
     avatar?:string;
 
+    @AutoMap()
     @Field({ nullable: true })
     hourlyRate?:number;
 
+    @AutoMap()
     @Field({ nullable: true })
     professionalHeadline?:string;
 
+    @AutoMap()
     @Field({ nullable: true })
     summary?:string;
 
+    @AutoMap()
     @Field({ nullable: true })
     recommendations?:number;
-
-    @Field({ nullable: true })
-    createdAt?:string;
-
-    @Field({ nullable: true })
-    updatedAt?:string;
 }
 
 @InputType()
-export class QueryInput{
+export class CommonProfileInput{
     @AutoMap()
     @Field({ nullable: true })
     _id?:string;
@@ -97,4 +97,4 @@ export class QueryInput{
 }
 
 @InputType()
-export class QueryProfileInput extends QueryInput{}
+export class QueryProfileInput extends CommonProfileInput{}

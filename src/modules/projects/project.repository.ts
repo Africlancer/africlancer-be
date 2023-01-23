@@ -17,12 +17,12 @@ export class ProjectRepository {
     await this.projectModel.updateOne({ _id: new Types.ObjectId(_id)},project);
   }
 
-  public async findOne(project: Project): Promise<Project> {
+  public async findOne(project: Partial<Project>): Promise<Project> {
     if (project._id) project._id = new Types.ObjectId(project._id);
     return await this.projectModel.findOne(project);
   }
 
-  public async find(project: Project): Promise<Project[]> {
+  public async find(project: Partial<Project>): Promise<Project[]> {
 
     return await this.projectModel.find(project);
   }

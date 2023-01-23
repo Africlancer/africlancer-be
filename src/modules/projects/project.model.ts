@@ -1,21 +1,36 @@
+import { AutoMap } from '@automapper/classes';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
+
+//Damilola: made some type changes and added support for mapping 
 
 @ObjectType()
 export class Project {
-  @Field({ nullable: true })
+  @AutoMap()
+  @Field()
   _id: string;
 
-  @Field({ nullable: true })
+  @AutoMap()
+  @Field()
   title: string;
-  @Field({ nullable: true })
+
+  @AutoMap()
+  @Field()
   budget: number;
-  @Field({ nullable: true })
+
+  @AutoMap()
+  @Field()
   summary: string;
-  @Field({ nullable: true })
+
+  @AutoMap()
+  @Field()
   details: string;
-  @Field({ nullable: true })
+
+  @AutoMap()
+  @Field()
   startDate: Date;
-  @Field({ nullable: true })
+
+  @AutoMap()
+  @Field()
   endDate: Date;
 
   @Field({ nullable: true })
@@ -24,38 +39,57 @@ export class Project {
 
 @InputType()
 export class CommonProjectInput {
-  
-    @Field({ nullable: true })
-    title: string;
-    @Field({ nullable: true })
-    budget: number;
-    @Field({ nullable: true })
-    summary: string;
-    @Field({ nullable: true })
-    details: string;
-    @Field({ nullable: true })
-    startDate: Date;
-    @Field({ nullable: true })
-    endDate: Date;
+  @AutoMap()
+  @Field({ nullable: true })
+  title?: string;
+
+  @AutoMap()
+  @Field({ nullable: true })
+  budget?: number;
+
+  @AutoMap()
+  @Field({ nullable: true })
+  summary?: string;
+
+  @AutoMap()
+  @Field({ nullable: true })
+  details?: string;
+
+  @AutoMap()
+  @Field({ nullable: true })
+  startDate?: Date;
+
+  @AutoMap()
+  @Field({ nullable: true })
+  endDate?: Date;
 }
 
 @InputType()
-export class CreateProjectInput extends CommonProjectInput {
-    @Field({ nullable: true })
-    _id: string;
-  
-    @Field({ nullable: true })
-    title: string;
-    @Field({ nullable: true })
-    budget: number;
-    @Field({ nullable: true })
-    summary: string;
-    @Field({ nullable: true })
-    details: string;
-    @Field({ nullable: true })
-    startDate: Date;
-    @Field({ nullable: true })
-    endDate: Date;
+export class CreateProjectInput {
+
+  @AutoMap()
+  @Field()
+  title: string;
+
+  @AutoMap()
+  @Field()
+  budget: number;
+
+  @AutoMap()
+  @Field()
+  summary: string;
+
+  @AutoMap()
+  @Field()
+  details: string;
+
+  @AutoMap()
+  @Field()
+  startDate: Date;
+
+  @AutoMap()
+  @Field()
+  endDate: Date;
 }
 
 @InputType()
@@ -63,3 +97,6 @@ export class UpdateProjectInput extends CommonProjectInput {}
 
 @InputType()
 export class ProjectQueryInput extends CommonProjectInput {}
+
+@InputType()
+export class QueryProjectInput extends CommonProjectInput {}

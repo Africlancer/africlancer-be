@@ -11,7 +11,7 @@ export class ProfileMapper extends AutomapperProfile {
         super(mapper);
     }
 
-    get profile(): MappingProfile {
+    get profile() {
         return (mapper) => {
             createMap(mapper, ProfileSchema, ProfileModel, 
                 //typeConverter(String, Types.ObjectId, (String) => new Types.ObjectId(String)),
@@ -22,11 +22,8 @@ export class ProfileMapper extends AutomapperProfile {
                 mapFrom(src => src.userID.toString())
                 )
             )
-            createMap(mapper, ProfileSchema, QueryProfileInput, 
-                forMember((dest) => dest.userID, 
-                mapFrom(src => src.userID.toString())
-                )
-            )
+            createMap(mapper, QueryProfileInput, ProfileSchema)
+            createMap(mapper, CreateProfileInput, ProfileSchema)
         };
     }
 }

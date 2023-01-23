@@ -22,6 +22,7 @@ import { classes } from '@automapper/classes';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
     MongooseModule.forRoot(`mongodb://localhost/${process.env.DB_NAME}`),
+    AutomapperModule.forRoot({strategyInitializer:classes()}),
     UserModule,
     ProjectModule,
     ProfileModule
