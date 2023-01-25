@@ -10,15 +10,19 @@ export class UserService {
     return this.userRepo.create(user);
   }
 
-  public async update(_id: string, user: User): Promise<void> {
+  public async update(_id: string, user: Partial<User>): Promise<void> {
     this.userRepo.update(_id, user);
   }
 
-  public async findOne(user: User): Promise<User> {
+  public async findOne(user: Partial<User>): Promise<User> {
     return this.userRepo.findOne(user);
   }
 
-  public async find(user: User): Promise<User[]> {
+  public async findOneAuth(user: Partial<User>): Promise<User> {
+    return this.userRepo.findOneAuth(user);
+  }
+
+  public async find(user: Partial<User>): Promise<User[]> {
     return this.userRepo.find(user);
   }
 

@@ -1,51 +1,52 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType, PartialType } from '@nestjs/graphql';
 
+//TODO: Add Validation
 @ObjectType()
 export class User {
-  @Field({ nullable: true })
+  @Field()
   _id: string;
-  @Field({ nullable: true })
-  firstName: string;
-  @Field({ nullable: true })
-  otherName: string;
-  @Field({ nullable: true })
-  lastName: string;
-  @Field({ nullable: true })
-  email: string;
-  @Field({ nullable: true })
-  username: string;
-  @Field((type) => [String], { nullable: true })
-  books: String[];
-}
-
-@InputType()
-export class CommonUserInput {
-  @Field({ nullable: true })
-  firstName: string;
-  @Field({ nullable: true })
-  otherName: string;
-  @Field({ nullable: true })
-  lastName: string;
-  @Field({ nullable: true })
-  email: string;
-  @Field({ nullable: true })
-  username: string;
-}
-
-@InputType()
-export class CreateUserInput extends CommonUserInput {
   @Field()
   firstName: string;
   @Field()
   lastName: string;
   @Field()
   email: string;
+  @Field({ nullable: true })
+  username: string;
+
+}
+
+//TODO: Add Validation
+@InputType()
+export class CreateUserInput {
+  @Field()
+  firstName: string;
+  @Field()
+  lastName: string;
+  @Field()
+  email: string;
+  @Field({ nullable: true })
+  username: string;
+  @Field()
+  password:string;
+}
+
+
+@InputType()
+class UserInput {
+  @Field()
+  firstName: string;
+  @Field()
+  lastName: string;
+  @Field()
+  email: string;
   @Field()
   username: string;
 }
 
-@InputType()
-export class UpdateUserInput extends CommonUserInput {}
+//TO BE REMOVED
+//@InputType()
+//export class UpdateUserInput extends PartialType(CreateUserInput) {}
 
 @InputType()
-export class UserQueryInput extends CommonUserInput {}
+export class UserQueryInput extends PartialType(UserInput) {}
