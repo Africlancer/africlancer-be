@@ -10,7 +10,7 @@ export class UserService {
     return this.userRepo.create(user);
   }
 
-  public async update(_id: string, user: User): Promise<void> {
+  public async update(_id: string, user: Partial<User>): Promise<void> {
     this.userRepo.update(_id, user);
   }
 

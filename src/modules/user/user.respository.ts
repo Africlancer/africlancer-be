@@ -12,9 +12,9 @@ export class UserRepository {
     return createUser.save();
   }
 
-  public async update(_id: string, user: User): Promise<void> {
+  public async update(_id: string, user: Partial<User>): Promise<void> {
     delete user._id;
-    await this.userModel.updateOne({ _id: new Types.ObjectId(_id), user });
+    await this.userModel.updateOne({ _id: new Types.ObjectId(_id)}, user);
   }
 
   public async findOne(user: Partial<User>): Promise<User> {

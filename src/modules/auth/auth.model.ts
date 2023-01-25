@@ -22,11 +22,13 @@ export class LoginResponse{
 @InputType()
 export class UserSignUp {
     @Field()
-    email:string;
-
-    @Field({nullable:true})
-    username:string;
-
+    firstName: string;
+    @Field()
+    lastName: string;
+    @Field()
+    email: string;
+    @Field({ nullable: true })
+    username: string;
     @Field()
     password:string;
 }
@@ -38,4 +40,13 @@ export class UserSignIn{
 
     @Field()
     password:string;
+}
+
+@InputType()
+export class UserChangePassword{
+    @Field()
+    oldPassword:string;
+
+    @Field()
+    newPassword:string;
 }

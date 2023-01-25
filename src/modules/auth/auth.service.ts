@@ -2,13 +2,15 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt/dist';
 import { User as UserSchema } from '../user/user.schema';
 import { UserService } from '../user/user.service';
-import { LoginResponse, UserSignIn, UserSignUp } from './auth.model';
+import { LoginResponse, UserChangePassword, UserSignIn, UserSignUp } from './auth.model';
 import * as argon from 'argon2';
 import { Response } from 'express';
+import { Types } from 'mongoose';
 
 //TODO: Mapping
 //TODO: user Faceboook OAuth: signup and login
-//TODO: Sessions
+//TODO: user Google OAuth: signup and login
+
 @Injectable()
 export class AuthService {
     constructor(private readonly userService:UserService, private jwt:JwtService){}
@@ -52,17 +54,43 @@ export class AuthService {
             expiresIn: "7d",
             secret: process.env.REFRESH_TOKEN_SECRET
         })
-        // res.cookie("refresh_token", refresh_token, {
-        //     httpOnly: true,
-        //     //path:"/",
-        //     secure: true
-        // })
+        res.cookie("refresh_token", refresh_token, {
+            httpOnly: true,
+            //path:"/",
+            secure: true
+        })
         return {access_token, refresh_token, details:user}
     }
 
-    async signout(res:Response){
+    async signout(res:Response):Promise<void>{
         res.cookie("refresh_token", "", {maxAge : 1})
-        //req.session.destroy();
+    }
+
+    
+    async resetPassword(id:string, resetData:UserChangePassword):Promise<void>{
+        const user = await this.userService.findOne({_id: new Types.ObjectId(id)})
+
+        if(!user){
+            throw new ForbiddenException("Invalid User")
+        }
+
+        if(await argon.verify(user.password, resetData.oldPassword)){
+            const hashPassword = await argon.hash(resetData.newPassword)
+            return await this.userService.update(id, {password: hashPassword})
+        }else{
+            throw new ForbiddenException("Invalid Password")
+        }
+    }
+
+    async deleteAccount(id:string):Promise<void>{
+        const user = await this.userService.findOne({_id: new Types.ObjectId(id)})
+
+        if(!user){
+            throw new ForbiddenException("Invalid User")
+        }
+
+        await this.userService.delete(id)
+
     }
 
     async refresh(){}

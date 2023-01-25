@@ -4,9 +4,8 @@
 
 type User {
   _id: String!
-  firstName: String
-  otherName: String
-  lastName: String
+  firstName: String!
+  lastName: String!
   email: String!
   username: String
 }
@@ -42,7 +41,6 @@ type Profile {
 type Details {
   _id: String
   firstName: String
-  otherName: String
   lastName: String
   email: String
   username: String
@@ -57,22 +55,20 @@ type LoginResponse {
 type Query {
   findOneUser(query: UserQueryInput!): User!
   findUsers(query: UserQueryInput!): [User!]!
-  deleteUser(_id: String!): Boolean!
   findOneProject(query: QueryProjectInput!): Project!
   findProjects(query: QueryProjectInput!): [Project!]!
   deleteProject(_id: String!): Boolean!
   findProfileByID(profileID: String!): Profile!
   findProfileByQuery(query: QueryProfileInput!): [Profile!]!
   deleteProfile(id: String!): Boolean!
+  deleteUser(id: String!): Boolean!
 }
 
 input UserQueryInput {
   firstName: String
   lastName: String
-  otherName: String
   email: String
   username: String
-  password: String
 }
 
 input QueryProjectInput {
@@ -95,7 +91,7 @@ input QueryProfileInput {
 }
 
 type Mutation {
-  updateUser(_id: String!, user: UpdateUserInput!): Boolean!
+  updateUser(_id: String!, user: UserQueryInput!): Boolean!
   createProject(project: CreateProjectInput!): Project!
   updateProject(_id: String!, project: QueryProjectInput!): Boolean!
   createProfile(profile: CreateProfileInput!): Profile!
@@ -103,15 +99,7 @@ type Mutation {
   userSignUp(user: UserSignUp!): User!
   userSignIn(user: UserSignIn!): LoginResponse!
   userSignOut: Boolean!
-}
-
-input UpdateUserInput {
-  firstName: String
-  lastName: String
-  otherName: String
-  email: String
-  username: String
-  password: String
+  userResetPassword(id: String!, resetData: UserChangePassword!): Boolean!
 }
 
 input CreateProjectInput {
@@ -133,6 +121,8 @@ input CreateProfileInput {
 }
 
 input UserSignUp {
+  firstName: String!
+  lastName: String!
   email: String!
   username: String
   password: String!
@@ -141,4 +131,9 @@ input UserSignUp {
 input UserSignIn {
   username: String!
   password: String!
+}
+
+input UserChangePassword {
+  oldPassword: String!
+  newPassword: String!
 }
