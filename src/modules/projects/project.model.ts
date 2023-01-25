@@ -32,6 +32,9 @@ export class Project {
   @AutoMap()
   @Field()
   endDate: Date;
+
+  @Field({ nullable: true })
+  projectId: string;
 }
 
 @InputType()

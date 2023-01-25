@@ -32,6 +32,9 @@ export class Project {
   @AutoMap()
   @Prop({ required: true })
   endDate: Date;
+
+  @Prop({})
+  projectId: number;
 }
 
 
