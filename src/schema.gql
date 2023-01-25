@@ -3,13 +3,12 @@
 # ------------------------------------------------------
 
 type User {
-  _id: String
+  _id: String!
   firstName: String
   otherName: String
   lastName: String
-  email: String
+  email: String!
   username: String
-  books: [String!]
 }
 
 type Project {
@@ -39,6 +38,21 @@ type Profile {
   updatedAt: DateTime
 }
 
+type Details {
+  _id: String
+  firstName: String
+  otherName: String
+  lastName: String
+  email: String
+  username: String
+}
+
+type LoginResponse {
+  access_token: String!
+  refresh_token: String!
+  details: Details!
+}
+
 type Query {
   findOneUser(query: UserQueryInput!): User!
   findUsers(query: UserQueryInput!): [User!]!
@@ -53,10 +67,11 @@ type Query {
 
 input UserQueryInput {
   firstName: String
-  otherName: String
   lastName: String
+  otherName: String
   email: String
   username: String
+  password: String
 }
 
 input QueryProjectInput {
@@ -79,28 +94,23 @@ input QueryProfileInput {
 }
 
 type Mutation {
-  createUser(user: CreateUserInput!): User!
   updateUser(_id: String!, user: UpdateUserInput!): Boolean!
   createProject(project: CreateProjectInput!): Project!
   updateProject(_id: String!, project: QueryProjectInput!): Boolean!
   createProfile(profile: CreateProfileInput!): Profile!
   updateProfile(profileID: String!, profile: QueryProfileInput!): Boolean!
-}
-
-input CreateUserInput {
-  firstName: String!
-  otherName: String
-  lastName: String!
-  email: String!
-  username: String!
+  userSignUp(user: UserSignUp!): User!
+  userSignIn(user: UserSignIn!): LoginResponse!
+  userSignOut: Boolean!
 }
 
 input UpdateUserInput {
   firstName: String
-  otherName: String
   lastName: String
+  otherName: String
   email: String
   username: String
+  password: String
 }
 
 input CreateProjectInput {
@@ -119,4 +129,15 @@ input CreateProfileInput {
   professionalHeadline: String
   summary: String
   recommendations: Float
+}
+
+input UserSignUp {
+  email: String!
+  username: String
+  password: String!
+}
+
+input UserSignIn {
+  username: String!
+  password: String!
 }

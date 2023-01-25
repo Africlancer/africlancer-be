@@ -3,21 +3,28 @@ import { HydratedDocument, Types } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
 
+//TODO: Add Mapping 
 @Schema()
 export class User {
   _id: Types.ObjectId;
 
-  @Prop({ required: true })
+  @Prop()
   firstName: string;
+
   @Prop()
   otherName: string;
+
   @Prop()
-  lastname: string;
+  lastName: string;
 
   @Prop({ required: true, unique: true })
   email: string;
-  @Prop({ required: true, unique: true })
+
+  @Prop({ unique: true })
   username: string;
+
+  @Prop({required:true})
+  password: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

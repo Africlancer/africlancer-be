@@ -1,5 +1,6 @@
-import { Param } from '@nestjs/common';
+import { Param, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { JwtGuard } from '../auth/guards/jwt.guard';
 import {
   CreateUserInput,
   UpdateUserInput,
@@ -9,24 +10,18 @@ import {
 
 import { UserService } from './user.service';
 
-const bookes = [
-  { userId: '63c6889e7b0d771f909248ca', books: ['book 1', 'book 2', 'book 3'] },
-];
-
 @Resolver((of) => User)
 export class UserResolver {
   constructor(private readonly userSvc: UserService) {}
 
-  @ResolveField()
-  public books(user: User): String[] {
-    return bookes.find((u) => u.userId === user._id.toString())?.books;
-  }
+  //TODO: Add Mapping
+  // @Mutation((returns) => User, { name: 'createUser' })
+  // public async create(@Args('user') user: CreateUserInput): Promise<User> {
+  //   return (await this.userSvc.create(user as any)) as any;
+  // }
 
-  @Mutation((returns) => User, { name: 'createUser' })
-  public async create(@Args('user') user: CreateUserInput): Promise<User> {
-    return (await this.userSvc.create(user as any)) as any;
-  }
-
+  //TODO: Add Mapping
+  @UseGuards(JwtGuard)
   @Mutation((returns) => Boolean, { name: 'updateUser' })
   public async update(
     @Args('_id') _id: string,
@@ -36,16 +31,20 @@ export class UserResolver {
     return true;
   }
 
+  //TODO: Add Mapping
   @Query((returns) => User, { name: 'findOneUser' })
   public async findOne(@Args('query') query: UserQueryInput): Promise<User> {
     return (await this.userSvc.findOne(query as any)) as any;
   }
 
+  //TODO: Add Mapping
   @Query((returns) => [User], { name: 'findUsers' })
   public async find(@Args('query') query: UserQueryInput): Promise<User[]> {
     return (await this.userSvc.find(query as any)) as any;
   }
 
+  //TODO: Add Mapping
+  @UseGuards(JwtGuard)
   @Query((returns) => Boolean, { name: 'deleteUser' })
   public async delete(@Args('_id') _id: string): Promise<true> {
     await this.userSvc.delete(_id);

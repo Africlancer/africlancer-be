@@ -11,6 +11,7 @@ import { ProjectModule } from './modules/projects/project.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { AutomapperModule } from '@automapper/nestjs';
 import { classes } from '@automapper/classes';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -18,14 +19,21 @@ import { classes } from '@automapper/classes';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       debug: false,
-      playground: true,
+      playground: {
+        settings: {
+        "request.credentials": "include",
+        }
+      },
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      cors: { origin: true, credentials: true },
+      context: ({ req, res }) => ({ req, res })
     }),
     MongooseModule.forRoot(`mongodb://localhost/${process.env.DB_NAME}`),
     AutomapperModule.forRoot({strategyInitializer:classes()}),
     UserModule,
     ProjectModule,
-    ProfileModule
+    ProfileModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
