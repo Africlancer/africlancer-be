@@ -39,6 +39,14 @@ type Profile {
   updatedAt: DateTime
 }
 
+type Portfolio {
+  _id: String!
+  title: String!
+  summary: String!
+  url: String!
+  stack: String!
+}
+
 type Details {
   _id: String
   firstName: String
@@ -68,7 +76,10 @@ type Query {
   findProfileByID(profileID: String!): Profile!
   findProfileByQuery(query: QueryProfileInput!): [Profile!]!
   deleteProfile(id: String!): Boolean!
-  deleteUser: Boolean!
+  findOnePortfolio(query: QueryPortfolioInput!): Portfolio!
+  findPortfolios(query: QueryPortfolioInput!): [Portfolio!]!
+  deletePortfolio(_id: String!): Boolean!
+  deleteUser(id: String!): Boolean!
 }
 
 input UserQueryInput {
@@ -97,12 +108,21 @@ input QueryProfileInput {
   recommendations: Float
 }
 
+input QueryPortfolioInput {
+  title: String
+  summary: String
+  url: String
+  stack: String
+}
+
 type Mutation {
   updateUser(_id: String!, user: UserQueryInput!): Boolean!
   createProject(project: CreateProjectInput!): Project!
   updateProject(_id: String!, project: QueryProjectInput!): Boolean!
   createProfile(profile: CreateProfileInput!): Profile!
   updateProfile(profileID: String!, profile: QueryProfileInput!): Boolean!
+  createPortfolio(portfolio: CreatePortfolioInput!): Portfolio!
+  updatePortfolio(_id: String!, portfolio: QueryPortfolioInput!): Boolean!
   userSignUp(user: UserSignUp!): User!
   userSignIn(user: UserSignIn!): LoginResponse!
   userSignOut: Boolean!
@@ -126,6 +146,13 @@ input CreateProfileInput {
   professionalHeadline: String
   summary: String
   recommendations: Float
+}
+
+input CreatePortfolioInput {
+  title: String!
+  summary: String!
+  url: String!
+  stack: String!
 }
 
 input UserSignUp {

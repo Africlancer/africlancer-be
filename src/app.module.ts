@@ -9,6 +9,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { ProjectModule } from './modules/projects/project.module';
 import { ProfileModule } from './modules/profile/profile.module';
+import { PortfolioModule } from './modules/portfolio/portfolio.module';
 import { AutomapperModule } from '@automapper/nestjs';
 import { classes } from '@automapper/classes';
 import { AuthModule } from './modules/auth/auth.module';
@@ -33,6 +34,7 @@ import { AuthModule } from './modules/auth/auth.module';
     UserModule,
     ProjectModule,
     ProfileModule,
+    PortfolioModule,
     AuthModule
   ],
   controllers: [AppController],

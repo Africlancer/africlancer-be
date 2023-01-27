@@ -14,4 +14,4 @@ import { PortfolioMapper } from './portfolio.mapper';
   controllers: [PortfolioController],
   providers: [PortfolioResolver, PortfolioService, PortfolioRepository, PortfolioMapper],
 })
-export class portfolioModule {}
+export class PortfolioModule {}
