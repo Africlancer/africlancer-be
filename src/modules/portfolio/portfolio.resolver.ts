@@ -47,7 +47,7 @@ export class PortfolioResolver {
   @Query((returns) => [Portfolio], { name: 'findPortfolios' })
   //BEFORE MAPPING: public async find(@Args('query') query: PortfolioQueryInput): Promise<Portfolio[]> {
   public async find(@Args('query') query: QueryPortfolioInput): Promise<Portfolio[]> {
-    return this.classMapper.mapArrayAsync(await this.portfolioService.find(query), PortfolioSchema, Portfolio);
+    return this.classMapper.mapArrayAsync(await this.portfolioService.find(query as unknown), PortfolioSchema, Portfolio);
     //BEFORE MAPPING: return (await this.PortfolioService.find(query as any)) as any;
   }
 

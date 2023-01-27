@@ -15,7 +15,7 @@ export class Portfolio {
 
   @AutoMap()
   @Prop({ required: true })
-  summary: number;
+  summary: string;
 
   @AutoMap()
   @Prop({ required: true })

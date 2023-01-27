@@ -15,7 +15,7 @@ export class Portfolio {
 
   @AutoMap()
   @Field({})
-  summary: number;
+  summary: string;
 
   @AutoMap()
   @Field({})
@@ -35,7 +35,7 @@ export class CommonPortfolioInput {
 
   @AutoMap()
   @Field({ nullable:true })
-  summary?: number;
+  summary?: string;
 
   @AutoMap()
   @Field({ nullable:true })
@@ -55,7 +55,7 @@ export class CreatePortfolioInput {
 
   @AutoMap()
   @Field({})
-  summary: number;
+  summary: string;
 
   @AutoMap()
   @Field({})
