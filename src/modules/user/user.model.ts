@@ -1,4 +1,5 @@
 import { Field, InputType, ObjectType, PartialType } from '@nestjs/graphql';
+import { Role } from '../auth/roles.enum';
 
 //TODO: Add Validation
 @ObjectType()
@@ -15,6 +16,8 @@ export class User {
   username: string;
   @Field(type => [String], {nullable: true})
   refreshToken: String[];
+  @Field(type => [String], {defaultValue: [Role.USER]})
+  roles: String[];
 
 }
 
@@ -33,6 +36,8 @@ export class CreateUserInput {
   password:string;
   @Field(type => [String], {nullable: true})
   refreshToken: String[];
+  @Field(type => [String], {defaultValue: [Role.USER]})
+  roles: String[];
 }
 
 
@@ -48,9 +53,5 @@ class UserInput {
   username: string;
 }
 
-//TO BE REMOVED
-//@InputType()
-//export class UpdateUserInput extends PartialType(CreateUserInput) {}
-
 @InputType()
-export class UserQueryInput extends PartialType(UserInput) {}
+export class QueryUserInput extends PartialType(UserInput) {}

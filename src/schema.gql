@@ -9,6 +9,7 @@ type User {
   email: String!
   username: String
   refreshToken: [String!]
+  roles: [String!]!
 }
 
 type Project {
@@ -54,6 +55,7 @@ type Details {
   email: String
   username: String
   refreshToken: [String!]
+  roles: [String!]
 }
 
 type LoginResponse {
@@ -68,8 +70,8 @@ type Tokens {
 }
 
 type Query {
-  findOneUser(query: UserQueryInput!): User!
-  findUsers(query: UserQueryInput!): [User!]!
+  findOneUser(query: QueryUserInput!): User!
+  findUsers(query: QueryUserInput!): [User!]!
   findOneProject(query: QueryProjectInput!): Project!
   findProjects(query: QueryProjectInput!): [Project!]!
   deleteProject(_id: String!): Boolean!
@@ -79,10 +81,10 @@ type Query {
   findOnePortfolio(query: QueryPortfolioInput!): Portfolio!
   findPortfolios(query: QueryPortfolioInput!): [Portfolio!]!
   deletePortfolio(_id: String!): Boolean!
-  deleteUser(id: String!): Boolean!
+  deleteUser: Boolean!
 }
 
-input UserQueryInput {
+input QueryUserInput {
   firstName: String
   lastName: String
   email: String
@@ -116,7 +118,7 @@ input QueryPortfolioInput {
 }
 
 type Mutation {
-  updateUser(_id: String!, user: UserQueryInput!): Boolean!
+  updateUser(_id: String!, user: QueryUserInput!): Boolean!
   createProject(project: CreateProjectInput!): Project!
   updateProject(_id: String!, project: QueryProjectInput!): Boolean!
   createProfile(profile: CreateProfileInput!): Profile!
@@ -128,6 +130,7 @@ type Mutation {
   userSignOut: Boolean!
   userChangePassword(resetData: UserChangePassword!): Boolean!
   getNewTokens: Tokens!
+  googleAuth: Boolean!
 }
 
 input CreateProjectInput {
@@ -161,6 +164,7 @@ input UserSignUp {
   email: String!
   username: String
   password: String!
+  roles: [String!]! = ["user"]
 }
 
 input UserSignIn {

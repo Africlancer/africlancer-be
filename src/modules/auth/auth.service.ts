@@ -10,7 +10,6 @@ import { Types } from 'mongoose';
 //TODO: Mapping
 //TODO: user Faceboook OAuth: signup and login
 //TODO: user Google OAuth: signup and login
-//TODO: Role based Authorization
 
 @Injectable()
 export class AuthService {
@@ -50,12 +49,12 @@ export class AuthService {
         const cookies = req.cookies
         const checkUser = await this.userService.findOneAuth({username:user.username, email:user.username})
 
-        const access_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id}, {
+        const access_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
             expiresIn: "15m",
             secret: process.env.ACCESS_TOKEN_SECRET
         })
 
-        const refresh_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id}, {
+        const refresh_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
             expiresIn: "7d",
             secret: process.env.REFRESH_TOKEN_SECRET
         })
@@ -73,7 +72,8 @@ export class AuthService {
         res.cookie("refresh_token", refresh_token, {
             httpOnly: true,
             sameSite:"none",
-            secure: true
+            secure: true,
+            maxAge: 60*60*24*7
         })
 
         return {access_token, refresh_token, details:user}
@@ -145,7 +145,7 @@ export class AuthService {
                 secret: process.env.REFRESH_TOKEN_SECRET
             }).catch(error => {throw new ForbiddenException()})
             const invalidUser = await this.userService.findOneAuth({username:token.usernameOrEmail, email:token.usernameOrEmail})
-            console.log(invalidUser)
+
             if(!invalidUser){
                 throw new ForbiddenException()
             }
@@ -169,11 +169,11 @@ export class AuthService {
 
         //everything checks out, send access and refresh token again
 
-        const access_token = await this.jwt.signAsync({usernameOrEmail:user.username}, {
+        const access_token = await this.jwt.signAsync({usernameOrEmail:user.username, sub:user._id, roles:user.roles}, {
             expiresIn: "15m",
             secret: process.env.ACCESS_TOKEN_SECRET
         })
-        const refresh_token = await this.jwt.signAsync({usernameOrEmail:user.username}, {
+        const refresh_token = await this.jwt.signAsync({usernameOrEmail:user.username, sub:user._id, roles:user.roles}, {
             expiresIn: "7d",
             secret: process.env.REFRESH_TOKEN_SECRET
         })
@@ -181,8 +181,16 @@ export class AuthService {
         res.cookie("refresh_token", refresh_token, {
             httpOnly: true,
             sameSite:"none",
-            secure: true
+            secure: true,
+            maxAge: 60*60*24*7
         })
         return {access_token, refresh_token}
+    }
+
+    async googleAuth(req:Request):Promise<any>{
+        if(!req.user){
+            throw new ForbiddenException("No User From Google")
+        }
+        return req.user
     }
 }

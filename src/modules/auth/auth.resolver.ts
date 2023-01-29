@@ -5,6 +5,7 @@ import { User } from '../user/user.model';
 import { LoginResponse, Tokens, UserChangePassword, UserSignIn, UserSignUp } from './auth.model';
 import { AuthService } from './auth.service';
 import { GqlCurrentUser } from './decorators/gql.user.decorator';
+import { GqlGoogleGuard } from './guards/gql.google.guard';
 import { JwtGuard } from './guards/jwt.guard';
 import { LocalGuard } from './guards/local.guard';
 
@@ -36,7 +37,7 @@ export class AuthResolver {
 
     @Mutation(returns => Boolean, {name:"userChangePassword"})
     @UseGuards(JwtGuard)
-    async change(@GqlCurrentUser() user:any, @Args("resetData") resetData:UserChangePassword): Promise<Boolean>{
+    async change(@GqlCurrentUser() user:any, @Args("resetData") resetData:UserChangePassword): Promise<boolean>{
         await this.authService.changePassword(user.sub, resetData)
         return true;
     }
@@ -44,13 +45,19 @@ export class AuthResolver {
     
     @Query((returns) => Boolean, { name: "deleteUser" })
     @UseGuards(JwtGuard)
-    async delete(@GqlCurrentUser() user:any): Promise<Boolean> {
+    async delete(@GqlCurrentUser() user:any): Promise<boolean> {
         await this.authService.deleteAccount(user.sub);
         return true;
     }
 
     @Mutation((returns) => Tokens, { name: "getNewTokens" })
-    async refresh(@Context("req") req:Request, @Context("res") res:Response){
+    async refresh(@Context("req") req:Request, @Context("res") res:Response):Promise<Tokens>{
         return await this.authService.refresh(req, res);
+    }
+
+    @Mutation(returns => Boolean, {name: "googleAuth"})
+    @UseGuards(GqlGoogleGuard)
+    async googleAuth(){
+        //return this.authService.googleAuth(loginDetails, req, res)
     }
 }
