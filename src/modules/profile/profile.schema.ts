@@ -42,7 +42,35 @@ export class Profile{
     @Prop({required:true, default:0})
     recommendations:number;
 
+    @Prop()
+    educations: Array<Education>
+
 }
+
+
+export class Education{
+
+    _id: Types.ObjectId;
+    @AutoMap()
+    @Prop({})
+    schoolName:string
+
+    @AutoMap()
+    @Prop({})
+    major:string
+    
+    @AutoMap()
+    @Prop({})
+    startDate:number;
+
+    @AutoMap()
+    @Prop({})
+    endDate:number;
+
+    profileId:string;
+}
+
+
 
 export const ProfileSchema = SchemaFactory.createForClass(Profile)
 
