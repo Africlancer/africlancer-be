@@ -43,29 +43,34 @@ export class Profile{
     recommendations:number;
 
     @Prop()
-    educations: Array<Education>
+    education: Array<Education>
 
 }
 
 
 export class Education{
-
+    @AutoMap()
     _id: Types.ObjectId;
-    @AutoMap()
-    @Prop({})
-    schoolName:string
 
     @AutoMap()
     @Prop({})
-    major:string
+    country:string;
+
+    @AutoMap()
+    @Prop({})
+    insitution:string;
+
+    @AutoMap()
+    @Prop({})
+    degree:string;
     
     @AutoMap()
     @Prop({})
-    startDate:number;
+    startYear:number;
 
     @AutoMap()
     @Prop({})
-    endDate:number;
+    endYear:number;
 
     profileId:string;
 }
