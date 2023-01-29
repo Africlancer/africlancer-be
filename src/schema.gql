@@ -8,6 +8,7 @@ type User {
   lastName: String!
   email: String!
   username: String
+  refreshToken: [String!]
 }
 
 type Project {
@@ -52,12 +53,18 @@ type Details {
   lastName: String
   email: String
   username: String
+  refreshToken: [String!]
 }
 
 type LoginResponse {
   access_token: String!
   refresh_token: String!
   details: Details!
+}
+
+type Tokens {
+  access_token: String!
+  refresh_token: String!
 }
 
 type Query {
@@ -119,7 +126,8 @@ type Mutation {
   userSignUp(user: UserSignUp!): User!
   userSignIn(user: UserSignIn!): LoginResponse!
   userSignOut: Boolean!
-  userResetPassword(id: String!, resetData: UserChangePassword!): Boolean!
+  userChangePassword(resetData: UserChangePassword!): Boolean!
+  getNewTokens: Tokens!
 }
 
 input CreateProjectInput {

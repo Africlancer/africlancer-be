@@ -13,6 +13,8 @@ export class User {
   email: string;
   @Field({ nullable: true })
   username: string;
+  @Field(type => [String], {nullable: true})
+  refreshToken: String[];
 
 }
 
@@ -29,6 +31,8 @@ export class CreateUserInput {
   username: string;
   @Field()
   password:string;
+  @Field(type => [String], {nullable: true})
+  refreshToken: String[];
 }
 
 
