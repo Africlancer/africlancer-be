@@ -1,6 +1,170 @@
 import { Field, InputType, ObjectType } from "@nestjs/graphql";
 import { AutoMap } from "@automapper/classes";
 
+
+@ObjectType()
+export class Qualification{
+    @AutoMap()
+    @Field({ nullable: true })
+    title?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    conferringOrganization?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    summary?:string;
+    
+    @AutoMap()
+    @Field({ nullable: true })
+    startYear?:number;
+
+    @AutoMap()
+    @Field()
+    profileId:string;
+}
+
+@InputType()
+export class QualificationInput{
+    @AutoMap()
+    @Field({ nullable: true })
+    title?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    conferringOrganization?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    summary?:string;
+    
+    @AutoMap()
+    @Field({ nullable: true })
+    startYear?:number;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    profileId:string;
+}
+
+@ObjectType()
+export class Experience{
+    @AutoMap()
+    @Field({ nullable: true })
+    title?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    company?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    startMonth?:string;
+    
+    @AutoMap()
+    @Field({ nullable: true })
+    startYear?:number;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    endMonth?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    endYear?:number;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    working?:boolean;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    summary?:string;
+
+    @AutoMap()
+    @Field()
+    profileId:string;
+}
+
+@InputType()
+export class ExperienceInput{
+    @AutoMap()
+    @Field({ nullable: true })
+    title?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    company?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    startMonth?:string;
+    
+    @AutoMap()
+    @Field({ nullable: true })
+    startYear?:number;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    endMonth?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    endYear?:number;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    working?:boolean;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    summary?:string;
+
+    @AutoMap()
+    @Field()
+    profileId:string;
+}
+
+
+@ObjectType()
+export class Publications{
+    @AutoMap()
+    @Field({ nullable: true })
+    title?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    publisher?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    summary?:string;
+
+    @AutoMap()
+    @Field()
+    profileId:string;
+}
+
+@InputType()
+export class PublicationsInput{
+    @AutoMap()
+    @Field({ nullable: true })
+    title?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    publisher?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    summary?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    profileId:string;
+}
+
 @ObjectType()
 export class Education{
     @AutoMap()
@@ -22,6 +186,10 @@ export class Education{
     @AutoMap()
     @Field({ nullable: true })
     endYear?:number;
+
+    @AutoMap()
+    @Field()
+    profileId:string;
 }
 
 @InputType()
@@ -45,6 +213,10 @@ export class EducationInput{
     @AutoMap()
     @Field({ nullable: true })
     endYear?:number;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    profileId:string;
 }
 
 @ObjectType()
@@ -86,6 +258,18 @@ export class Profile{
     @AutoMap()
     @Field(type=>[Education], { nullable: true })
     education?:Education[];
+
+    @AutoMap()
+    @Field(type=>[Experience], { nullable: true })
+    experience?:Experience[];
+
+    @AutoMap()
+    @Field(type=>[Qualification], { nullable: true })
+    qualification?:Qualification[];
+
+    @AutoMap()
+    @Field(type=>[Publications], { nullable: true })
+    publications?:Publications[];
 }
 
 @InputType()

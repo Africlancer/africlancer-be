@@ -1,9 +1,9 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
-import { CreateProfileInput, Profile, QueryProfileInput } from "./profile.model";
+import { CreateProfileInput, EducationInput, ExperienceInput, Profile, PublicationsInput, QualificationInput, QueryProfileInput } from "./profile.model";
 import { ProfileService } from "./profile.service";
-import { Profile as ProfileSchema } from "./profile.schema";
+import { Education, Profile as ProfileSchema } from "./profile.schema";
 
 
 @Resolver(of => Profile)
@@ -47,6 +47,30 @@ export class ProfileResolver{
     @Query(returns => Boolean, {name: "deleteProfile"})
     async deleteProfile(@Args("id") id:string):Promise<Boolean>{
         await this.profileService.deleteOne(id)
+        return true;
+    }
+
+    @Mutation(returns => Boolean, {name:"addOrUpdateEducation"})
+    async addOrUpdateEducation(@Args("education") education:EducationInput){
+        await this.profileService.addOrUpdateEducation(education as any)
+        return true;
+    }
+
+    @Mutation(returns => Boolean, {name:"addOrUpdateExperience"})
+    async addOrUpdateExperience(@Args("experience") experience:ExperienceInput){
+        await this.profileService.addOrUpdateExperience(experience as any)
+        return true;
+    }
+
+    @Mutation(returns => Boolean, {name:"addOrUpdateQualification"})
+    async addOrUpdateQualification(@Args("qualification") qualification:QualificationInput){
+        await this.profileService.addOrUpdateQualification(qualification as any)
+        return true;
+    }
+
+    @Mutation(returns => Boolean, {name:"addOrUpdatePublications"})
+    async addOrUpdatePublications(@Args("publication") publication:PublicationsInput){
+        await this.profileService.addOrUpdatePublications(publication as any)
         return true;
     }
 }

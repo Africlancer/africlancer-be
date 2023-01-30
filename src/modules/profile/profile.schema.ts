@@ -45,6 +45,15 @@ export class Profile{
     @Prop()
     education: Array<Education>
 
+    @Prop()
+    publications: Array<Publications>
+
+    @Prop()
+    experience: Array<Experience>
+
+    @Prop()
+    qualification: Array<Qualification>
+
 }
 
 
@@ -72,10 +81,97 @@ export class Education{
     @Prop({})
     endYear:number;
 
+    @AutoMap()
+    @Prop({})
     profileId:string;
 }
 
+export class Experience{
+    @AutoMap()
+    _id: Types.ObjectId;
 
+    @AutoMap()
+    @Prop({})
+    title:string;
+
+    @AutoMap()
+    @Prop({})
+    company:string;
+
+    @AutoMap()
+    @Prop({})
+    startMonth:string;
+    
+    @AutoMap()
+    @Prop({})
+    startYear:number;
+
+    @AutoMap()
+    @Prop({})
+    endMonth:string;
+
+    @AutoMap()
+    @Prop({})
+    endYear:number;
+
+    @AutoMap()
+    @Prop({})
+    working:boolean;
+
+    @AutoMap()
+    @Prop({})
+    summary:string;
+
+    @AutoMap()
+    @Prop({})
+    profileId:string;
+}
+
+export class Qualification{
+    @AutoMap()
+    _id: Types.ObjectId;
+
+    @AutoMap()
+    @Prop({})
+    title:string;
+
+    @AutoMap()
+    @Prop({})
+    conferringOrganization:string;
+
+    @AutoMap()
+    @Prop({})
+    summary:string;
+    
+    @AutoMap()
+    @Prop({})
+    startYear:number;
+
+    @AutoMap()
+    @Prop({})
+    profileId:string;
+}
+
+export class Publications{
+    @AutoMap()
+    _id: Types.ObjectId;
+
+    @AutoMap()
+    @Prop({})
+    title:string;
+
+    @AutoMap()
+    @Prop({})
+    publisher:string;
+
+    @AutoMap()
+    @Prop({})
+    summary:string;
+    
+    @AutoMap()
+    @Prop({})
+    profileId:string;
+}
 
 export const ProfileSchema = SchemaFactory.createForClass(Profile)
 
