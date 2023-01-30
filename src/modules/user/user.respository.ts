@@ -24,7 +24,7 @@ export class UserRepository {
 
   public async findOneAuth(user: Partial<User>): Promise<User> {
     if (user._id) user._id = new Types.ObjectId(user._id);
-    return await this.userModel.findOne({$or:[{username: user.username}, {email:user.email}]});
+    return await this.userModel.findOne({$or:[{userName: user.userName}, {email:user.email}]});
   }
 
   public async find(user: Partial<User>): Promise<User[]> {

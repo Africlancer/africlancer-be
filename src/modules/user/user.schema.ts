@@ -1,32 +1,43 @@
+import { AutoMap } from '@automapper/classes';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { Role } from '../auth/roles.enum';
 
 export type UserDocument = HydratedDocument<User>;
 
-//TODO: Add Mapping 
 @Schema()
 export class User {
+  @AutoMap()
   _id: Types.ObjectId;
 
-  @Prop({ required: true})
+  @AutoMap()
+  @Prop()
+  profileID: Types.ObjectId;
+
+  @AutoMap()
+  @Prop()
   firstName: string;
 
-  @Prop({ required: true})
+  @AutoMap()
+  @Prop()
   lastName: string;
-
+  
+  @AutoMap()
   @Prop({ required: true, unique: true })
   email: string;
 
+  @AutoMap()
   @Prop({ required: true, unique: true })
-  username: string;
+  userName: string;
 
-  @Prop({required:true})
+  @AutoMap()
+  @Prop()
   password: string;
 
   @Prop()
   refreshToken: Array<String>;
 
-  @Prop()
+  @Prop({required:true, default:[Role.USER]})
   roles: Array<String>;
 }
 

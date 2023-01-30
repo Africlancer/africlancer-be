@@ -1,4 +1,5 @@
-import { Controller, Get, Req, UseGuards } from "@nestjs/common";
+import { Controller, Get, Req, Res, UseGuards } from "@nestjs/common";
+import { resolve } from "node:path/win32";
 import { AuthService } from "./auth.service";
 import { GoogleGuard } from "./guards/google.guard";
 
@@ -15,7 +16,6 @@ export class AuthController{
 
     @Get("/auth/google/callback")
     @UseGuards(GoogleGuard)
-    //@UseGuards(AuthGuard("google"))
     async googleAuthRedirect(@Req() req):Promise<any>{
         return this.authService.googleAuth(req)
     }

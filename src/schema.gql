@@ -4,12 +4,13 @@
 
 type User {
   _id: String!
+  profileID: String
   firstName: String!
   lastName: String!
   email: String!
-  username: String
+  userName: String!
   refreshToken: [String!]
-  roles: [String!]!
+  roles: [String!]
 }
 
 type Project {
@@ -28,6 +29,14 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Education {
+  country: String
+  insitution: String
+  degree: String
+  startYear: Float
+  endYear: Float
+}
+
 type Profile {
   _id: String!
   userID: String!
@@ -38,6 +47,7 @@ type Profile {
   recommendations: Float
   createdAt: DateTime
   updatedAt: DateTime
+  education: [Education!]
 }
 
 type Portfolio {
@@ -50,10 +60,11 @@ type Portfolio {
 
 type Details {
   _id: String
+  profileID: String
   firstName: String
   lastName: String
   email: String
-  username: String
+  userName: String
   refreshToken: [String!]
   roles: [String!]
 }
@@ -85,10 +96,11 @@ type Query {
 }
 
 input QueryUserInput {
+  profileID: String
   firstName: String
   lastName: String
   email: String
-  username: String
+  userName: String
 }
 
 input QueryProjectInput {
@@ -108,6 +120,15 @@ input QueryProfileInput {
   professionalHeadline: String
   summary: String
   recommendations: Float
+  education: [EducationInput!]
+}
+
+input EducationInput {
+  country: String
+  insitution: String
+  degree: String
+  startYear: Float
+  endYear: Float
 }
 
 input QueryPortfolioInput {
@@ -149,6 +170,7 @@ input CreateProfileInput {
   professionalHeadline: String
   summary: String
   recommendations: Float
+  education: [EducationInput!]
 }
 
 input CreatePortfolioInput {
@@ -162,13 +184,13 @@ input UserSignUp {
   firstName: String!
   lastName: String!
   email: String!
-  username: String
+  userName: String
   password: String!
-  roles: [String!]! = ["user"]
+  roles: [String!]
 }
 
 input UserSignIn {
-  username: String!
+  userName: String!
   password: String!
 }
 

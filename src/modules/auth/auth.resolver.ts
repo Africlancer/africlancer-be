@@ -9,9 +9,8 @@ import { GqlGoogleGuard } from './guards/gql.google.guard';
 import { JwtGuard } from './guards/jwt.guard';
 import { LocalGuard } from './guards/local.guard';
 
-//TODO: Mapping
+
 //TODO: user Faceboook OAuth: signup and login
-//TODO: user Google OAuth: signup and login
 
 @Resolver()
 export class AuthResolver {
@@ -58,6 +57,6 @@ export class AuthResolver {
     @Mutation(returns => Boolean, {name: "googleAuth"})
     @UseGuards(GqlGoogleGuard)
     async googleAuth(){
-        //return this.authService.googleAuth(loginDetails, req, res)
+        return true
     }
 }

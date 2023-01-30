@@ -2,7 +2,6 @@
 
 import { Field, InputType, ObjectType, PartialType } from "@nestjs/graphql";
 import { User } from "../user/user.model";
-import { Role } from "./roles.enum";
 
 @ObjectType()
 export class Details extends PartialType(User){}
@@ -29,17 +28,17 @@ export class UserSignUp {
     @Field()
     email: string;
     @Field({ nullable: true })
-    username: string;
+    userName: string;
     @Field()
     password:string;
-    @Field(type => [String], {defaultValue: [Role.USER]})
+    @Field(type => [String], { nullable: true })
     roles: String[];
 }
 
 @InputType()
 export class UserSignIn{
     @Field()
-    username:string;
+    userName:string;
 
     @Field()
     password:string;

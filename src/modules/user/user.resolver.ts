@@ -35,7 +35,7 @@ export class UserResolver {
 
   @Query((returns) => [User], { name: 'findUsers' })
   public async find(@Args('query') query: QueryUserInput): Promise<User[]> {
-    return this.classMapper.mapArrayAsync(await this.userSvc.find(query), UserSchema, User);
+    return this.classMapper.mapArrayAsync(await this.userSvc.find(query as unknown), UserSchema, User);
     //return (await this.userSvc.find(query as any)) as any;
   }
 
