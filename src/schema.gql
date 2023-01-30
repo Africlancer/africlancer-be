@@ -28,6 +28,42 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Qualification {
+  title: String
+  conferringOrganization: String
+  summary: String
+  startYear: Float
+  profileId: String!
+}
+
+type Experience {
+  title: String
+  company: String
+  startMonth: String
+  startYear: Float
+  endMonth: String
+  endYear: Float
+  working: Boolean
+  summary: String
+  profileId: String!
+}
+
+type Publications {
+  title: String
+  publisher: String
+  summary: String
+  profileId: String!
+}
+
+type Education {
+  country: String
+  insitution: String
+  degree: String
+  startYear: Float
+  endYear: Float
+  profileId: String!
+}
+
 type Profile {
   _id: String!
   userID: String!
@@ -38,6 +74,10 @@ type Profile {
   recommendations: Float
   createdAt: DateTime
   updatedAt: DateTime
+  education: [Education!]
+  experience: [Experience!]
+  qualification: [Qualification!]
+  publications: [Publications!]
 }
 
 type Portfolio {
@@ -108,6 +148,16 @@ input QueryProfileInput {
   professionalHeadline: String
   summary: String
   recommendations: Float
+  education: [EducationInput!]
+}
+
+input EducationInput {
+  country: String
+  insitution: String
+  degree: String
+  startYear: Float
+  endYear: Float
+  profileId: String
 }
 
 input QueryPortfolioInput {
@@ -123,6 +173,10 @@ type Mutation {
   updateProject(_id: String!, project: QueryProjectInput!): Boolean!
   createProfile(profile: CreateProfileInput!): Profile!
   updateProfile(profileID: String!, profile: QueryProfileInput!): Boolean!
+  addOrUpdateEducation(education: EducationInput!): Boolean!
+  addOrUpdateExperience(experience: ExperienceInput!): Boolean!
+  addOrUpdateQualification(qualification: QualificationInput!): Boolean!
+  addOrUpdatePublications(publication: PublicationsInput!): Boolean!
   createPortfolio(portfolio: CreatePortfolioInput!): Portfolio!
   updatePortfolio(_id: String!, portfolio: QueryPortfolioInput!): Boolean!
   userSignUp(user: UserSignUp!): User!
@@ -149,6 +203,34 @@ input CreateProfileInput {
   professionalHeadline: String
   summary: String
   recommendations: Float
+  education: [EducationInput!]
+}
+
+input ExperienceInput {
+  title: String
+  company: String
+  startMonth: String
+  startYear: Float
+  endMonth: String
+  endYear: Float
+  working: Boolean
+  summary: String
+  profileId: String!
+}
+
+input QualificationInput {
+  title: String
+  conferringOrganization: String
+  summary: String
+  startYear: Float
+  profileId: String
+}
+
+input PublicationsInput {
+  title: String
+  publisher: String
+  summary: String
+  profileId: String
 }
 
 input CreatePortfolioInput {
