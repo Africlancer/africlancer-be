@@ -14,7 +14,7 @@ import { AutomapperModule } from '@automapper/nestjs';
 import { classes } from '@automapper/classes';
 import { AuthModule } from './modules/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './modules/auth/guards/roles.guard';
+import { GqlRolesGuard } from './modules/auth/guards/gql.roles.guard';
 
 @Module({
   imports: [
@@ -40,6 +40,6 @@ import { RolesGuard } from './modules/auth/guards/roles.guard';
     AuthModule
   ],
   controllers: [AppController],
-  providers: [AppService, {provide: APP_GUARD, useClass: RolesGuard}],
+  providers: [AppService, {provide: APP_GUARD, useClass: GqlRolesGuard}],
 })
 export class AppModule {}

@@ -28,7 +28,7 @@ export class UserSignUp {
     @Field()
     email: string;
     @Field({ nullable: true })
-    userName: string;
+    username: string;
     @Field()
     password:string;
     @Field(type => [String], { nullable: true })
@@ -38,7 +38,7 @@ export class UserSignUp {
 @InputType()
 export class UserSignIn{
     @Field()
-    userName:string;
+    username:string;
 
     @Field()
     password:string;

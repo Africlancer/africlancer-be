@@ -7,36 +7,36 @@ import { User as UserSchema } from './user.schema';
 import { UserService } from './user.service';
 
 import { Roles } from '../auth/decorators/roles.decorator';
-import { JwtGuard } from '../auth/guards/jwt.guard';
 import { Role } from '../auth/roles.enum';
+import { GqlJwtGuard } from '../auth/guards/gql.jwt.guard';
+import { GqlCurrentUser } from '../auth/decorators/gql.user.decorator';
+
 
 @Resolver((of) => User)
 export class UserResolver {
   constructor(private readonly userSvc: UserService, @InjectMapper() private readonly classMapper:Mapper) {}
 
-  @UseGuards(JwtGuard)
+  
+  @UseGuards(GqlJwtGuard)
   @Roles(Role.USER)
   @Mutation((returns) => Boolean, { name: 'updateUser' })
   public async update(
-    @Args('_id') _id: string,
     @Args('user') user: QueryUserInput,
+    @GqlCurrentUser() userID:any,
   ): Promise<boolean> {
     const queryMap = await this.classMapper.mapAsync(user, QueryUserInput, UserSchema);
-    await this.userSvc.update(_id, queryMap);
-    //await this.userSvc.update(_id, user as any);
+    await this.userSvc.update(userID.sub, queryMap);
     return true;
   }
 
   @Query((returns) => User, { name: 'findOneUser' })
   public async findOne(@Args('query') query: QueryUserInput): Promise<User> {
     return await this.classMapper.mapAsync(await this.userSvc.findOne(query as unknown), UserSchema, User);
-    //return (await this.userSvc.findOne(query as any)) as any;
   }
 
   @Query((returns) => [User], { name: 'findUsers' })
   public async find(@Args('query') query: QueryUserInput): Promise<User[]> {
     return this.classMapper.mapArrayAsync(await this.userSvc.find(query as unknown), UserSchema, User);
-    //return (await this.userSvc.find(query as any)) as any;
   }
 
 }

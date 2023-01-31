@@ -9,6 +9,6 @@ import { ProfileService } from "./profile.service";
 @Module({
     imports:[MongooseModule.forFeature([{name:Profile.name, schema:ProfileSchema}])],
     providers:[ProfileService,ProfileResolver,ProfileRepository, ProfileMapper],
-    exports:[ProfileService]
+    exports:[ProfileService, ProfileRepository]
 })
 export class ProfileModule{}

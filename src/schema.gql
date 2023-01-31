@@ -4,12 +4,13 @@
 
 type User {
   _id: String!
+  profileID: String
   firstName: String!
   lastName: String!
   email: String!
-  username: String
+  username: String!
   refreshToken: [String!]
-  roles: [String!]!
+  roles: [String!]
 }
 
 type Project {
@@ -90,6 +91,7 @@ type Portfolio {
 
 type Details {
   _id: String
+  profileID: String
   firstName: String
   lastName: String
   email: String
@@ -117,7 +119,6 @@ type Query {
   deleteProject(_id: String!): Boolean!
   findProfileByID(profileID: String!): Profile!
   findProfileByQuery(query: QueryProfileInput!): [Profile!]!
-  deleteProfile(id: String!): Boolean!
   findOnePortfolio(query: QueryPortfolioInput!): Portfolio!
   findPortfolios(query: QueryPortfolioInput!): [Portfolio!]!
   deletePortfolio(_id: String!): Boolean!
@@ -125,6 +126,7 @@ type Query {
 }
 
 input QueryUserInput {
+  profileID: String
   firstName: String
   lastName: String
   email: String
@@ -168,11 +170,10 @@ input QueryPortfolioInput {
 }
 
 type Mutation {
-  updateUser(_id: String!, user: QueryUserInput!): Boolean!
+  updateUser(user: QueryUserInput!): Boolean!
   createProject(project: CreateProjectInput!): Project!
   updateProject(_id: String!, project: QueryProjectInput!): Boolean!
-  createProfile(profile: CreateProfileInput!): Profile!
-  updateProfile(profileID: String!, profile: QueryProfileInput!): Boolean!
+  updateProfile(profile: QueryProfileInput!): Boolean!
   addOrUpdateEducation(education: EducationInput!): Boolean!
   addOrUpdateExperience(experience: ExperienceInput!): Boolean!
   addOrUpdateQualification(qualification: QualificationInput!): Boolean!
@@ -184,7 +185,6 @@ type Mutation {
   userSignOut: Boolean!
   userChangePassword(resetData: UserChangePassword!): Boolean!
   getNewTokens: Tokens!
-  googleAuth: Boolean!
 }
 
 input CreateProjectInput {
@@ -194,16 +194,6 @@ input CreateProjectInput {
   details: String!
   startDate: DateTime!
   endDate: DateTime!
-}
-
-input CreateProfileInput {
-  userID: String!
-  avatar: String
-  hourlyRate: Float
-  professionalHeadline: String
-  summary: String
-  recommendations: Float
-  education: [EducationInput!]
 }
 
 input ExperienceInput {
@@ -246,7 +236,7 @@ input UserSignUp {
   email: String!
   username: String
   password: String!
-  roles: [String!]! = ["user"]
+  roles: [String!]
 }
 
 input UserSignIn {

@@ -5,7 +5,7 @@ import { GetContext } from "../get.user.context";
 import { Role } from "../roles.enum";
 
 @Injectable()
-export class RolesGuard implements CanActivate{
+export class GqlRolesGuard implements CanActivate{
     constructor(private reflector:Reflector, private getctx:GetContext){}
 
     async canActivate(context: ExecutionContext):Promise<boolean>{

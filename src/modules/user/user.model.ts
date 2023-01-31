@@ -26,7 +26,7 @@ export class User {
 
   @AutoMap()
   @Field()
-  userName: string;
+  username: string;
 
   @Field(type => [String], {nullable: true})
   refreshToken: String[];
@@ -56,7 +56,7 @@ export class CreateUserInput {
 
   @AutoMap()
   @Field()
-  userName: string;
+  username: string;
 
   @AutoMap()
   @Field()
@@ -72,25 +72,25 @@ export class CreateUserInput {
 @InputType()
 class UserInput {
   @AutoMap()
-  @Field()
+  @Field({nullable: true})
   profileID: string;
   
   @AutoMap()
-  @Field()
+  @Field({nullable: true})
   firstName: string;
 
   @AutoMap()
-  @Field()
+  @Field({nullable: true})
   lastName: string;
 
   @AutoMap()
-  @Field()
+  @Field({nullable: true})
   email: string;
 
   @AutoMap()
-  @Field()
-  userName: string;
+  @Field({nullable: true})
+  username: string;
 }
 
 @InputType()
-export class QueryUserInput extends PartialType(UserInput) {}
+export class QueryUserInput extends UserInput {}

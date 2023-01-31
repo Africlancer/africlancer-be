@@ -6,15 +6,15 @@ import { LoginResponse, Tokens, UserChangePassword, UserSignIn, UserSignUp } fro
 import * as argon from 'argon2';
 import { Response, Request } from 'express';
 import { Types } from 'mongoose';
+import { ProfileService } from '../profile/profile.service';
 
-//TODO: user Faceboook OAuth: signup and login
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly userService:UserService, private jwt:JwtService){}
+    constructor(private readonly userService:UserService, private readonly profileService:ProfileService, private jwt:JwtService){}
 
     async validateUser(username:string, password: string):Promise<UserSchema>{
-        const checkUser = await this.userService.findOneAuth({userName:username, email:username})
+        const checkUser = await this.userService.findOneAuth({username:username, email:username})
         if(!checkUser){
             throw new ForbiddenException("Invalid Username Or Password")
         }
@@ -29,27 +29,28 @@ export class AuthService {
     }
 
     async signup(user:UserSignUp):Promise<UserSchema>{
-        const checkUser = await this.userService.findOneAuth({userName:user.userName, email:user.email})
+        const checkUser = await this.userService.findOneAuth({username:user.username, email:user.email})
         if(checkUser){
             throw new ForbiddenException("User Already Exists")
         }
         
         user.password = await argon.hash(user.password)
         const newUser = await this.userService.create(user as any)
-
-       return newUser
+        const newProfile = await this.profileService.create({userID:newUser._id} as any)
+        await this.userService.update(newUser._id.toString(), {profileID:newProfile._id})
+        return newUser
     }
 
     async signin(user:UserSignIn, req:Request, res:Response):Promise<LoginResponse>{
         const cookies = req.cookies
-        const checkUser = await this.userService.findOneAuth({userName:user.userName, email:user.userName})
+        const checkUser = await this.userService.findOneAuth({username:user.username, email:user.username})
 
-        const access_token = await this.jwt.signAsync({usernameOrEmail:checkUser.userName, sub:checkUser._id, roles:checkUser.roles}, {
+        const access_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
             expiresIn: "15m",
             secret: process.env.ACCESS_TOKEN_SECRET
         })
 
-        const refresh_token = await this.jwt.signAsync({usernameOrEmail:checkUser.userName, sub:checkUser._id, roles:checkUser.roles}, {
+        const refresh_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
             expiresIn: "7d",
             secret: process.env.REFRESH_TOKEN_SECRET
         })
@@ -120,6 +121,8 @@ export class AuthService {
             throw new ForbiddenException("Invalid User")
         }
 
+        await this.profileService.deleteOne(user.profileID.toString())
+
         await this.userService.delete(id)
 
     }
@@ -139,7 +142,7 @@ export class AuthService {
             const token = await this.jwt.verifyAsync(oldRefreshToken, {
                 secret: process.env.REFRESH_TOKEN_SECRET
             }).catch(error => {throw new ForbiddenException()})
-            const invalidUser = await this.userService.findOneAuth({userName:token.usernameOrEmail, email:token.usernameOrEmail})
+            const invalidUser = await this.userService.findOneAuth({username:token.usernameOrEmail, email:token.usernameOrEmail})
 
             if(!invalidUser){
                 throw new ForbiddenException()
@@ -164,11 +167,11 @@ export class AuthService {
 
         //everything checks out, send access and refresh token again
 
-        const access_token = await this.jwt.signAsync({usernameOrEmail:user.userName, sub:user._id, roles:user.roles}, {
+        const access_token = await this.jwt.signAsync({usernameOrEmail:user.username, sub:user._id, profile:user.profileID, roles:user.roles}, {
             expiresIn: "15m",
             secret: process.env.ACCESS_TOKEN_SECRET
         })
-        const refresh_token = await this.jwt.signAsync({usernameOrEmail:user.userName, sub:user._id, roles:user.roles}, {
+        const refresh_token = await this.jwt.signAsync({usernameOrEmail:user.username, sub:user._id, profile:user.profileID, roles:user.roles}, {
             expiresIn: "7d",
             secret: process.env.REFRESH_TOKEN_SECRET
         })
@@ -182,7 +185,7 @@ export class AuthService {
         return {access_token, refresh_token}
     }
 
-    async googleAuth(req):Promise<any>{
+    async googleAuth(req, res):Promise<any>{
         const cookies = req.cookies
         if(!req.user){
             throw new ForbiddenException("No User From Google")
@@ -192,12 +195,12 @@ export class AuthService {
         if(checkUser){
 
             //issue new access and refresh token
-            const access_token = await this.jwt.signAsync({usernameOrEmail:checkUser.userName, sub:checkUser._id, roles:checkUser.roles}, {
+            const access_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
                 expiresIn: "15m",
                 secret: process.env.ACCESS_TOKEN_SECRET
             })
     
-            const refresh_token = await this.jwt.signAsync({usernameOrEmail:checkUser.userName, sub:checkUser._id, roles:checkUser.roles}, {
+            const refresh_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
                 expiresIn: "7d",
                 secret: process.env.REFRESH_TOKEN_SECRET
             })
@@ -211,17 +214,79 @@ export class AuthService {
                 await this.userService.update(checkUser._id.toString(), {refreshToken: [...checkUser.refreshToken, refresh_token]})
             }
 
+            res.cookie("refresh_token", refresh_token, {
+                httpOnly: true,
+                sameSite:"none",
+                secure: true,
+                maxAge: 60*60*24*7
+            })
+
             return {access_token, refresh_token}
         }
 
         //sign up user
-        const newUser = {
+        const userData = {
             email,
             firstName,
             lastName,
             userName
         }
+        console.log(userData)
+        const newUser = await this.userService.create(userData as any)
+        const newProfile = await this.profileService.create({userID:newUser._id, avatar} as any)
+        await this.userService.update(newUser._id.toString(), {profileID:newProfile._id})
+        return newUser
+    }
 
-        return this.userService.create(newUser as any)
+    async facebookAuth(req, res):Promise<any>{
+        const cookies = req.cookies
+        if(!req.user){
+            throw new ForbiddenException("No User From Facebook")
+        }
+        const {email, firstName, lastName, userName, avatar} = req.user
+        const checkUser = await this.userService.findOne({email})
+        if(checkUser){
+
+            //issue new access and refresh token
+            const access_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, profile:checkUser.profileID,roles:checkUser.roles}, {
+                expiresIn: "15m",
+                secret: process.env.ACCESS_TOKEN_SECRET
+            })
+    
+            const refresh_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, profile:checkUser.profileID,roles:checkUser.roles}, {
+                expiresIn: "7d",
+                secret: process.env.REFRESH_TOKEN_SECRET
+            })
+    
+            if(cookies.refresh_token){
+                const oldRefreshToken = req.cookies.refresh_token
+                const newRefreshTokenArray = checkUser.refreshToken.filter(rt => rt !== oldRefreshToken)
+                await this.userService.update(checkUser._id.toString(), {refreshToken: [...newRefreshTokenArray, refresh_token]})
+            }else{
+    
+                await this.userService.update(checkUser._id.toString(), {refreshToken: [...checkUser.refreshToken, refresh_token]})
+            }
+
+            res.cookie("refresh_token", refresh_token, {
+                httpOnly: true,
+                sameSite:"none",
+                secure: true,
+                maxAge: 60*60*24*7
+            })
+
+            return {access_token, refresh_token}
+        }
+
+        //sign up user
+        const userData = {
+            email,
+            firstName,
+            lastName,
+            userName
+        }
+        const newUser = await this.userService.create(userData as any)
+        const newProfile = await this.profileService.create({userID:newUser._id, avatar} as any)
+        await this.userService.update(newUser._id.toString(), {profileID:newProfile._id})
+        return newUser
     }
 }

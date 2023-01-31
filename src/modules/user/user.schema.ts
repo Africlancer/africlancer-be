@@ -28,7 +28,7 @@ export class User {
 
   @AutoMap()
   @Prop({ required: true, unique: true })
-  userName: string;
+  username: string;
 
   @AutoMap()
   @Prop()

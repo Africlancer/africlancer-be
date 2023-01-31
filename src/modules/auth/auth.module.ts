@@ -9,10 +9,12 @@ import { LocalStrategy } from './strategy/local.strategy';
 import { GetContext } from './get.user.context';
 import { GoogleStrategy } from './strategy/google.strategy';
 import { AuthController } from './auth.controller';
+import { FacebookStrategy } from './strategy/facebook.strategy';
+import { ProfileModule } from '../profile/profile.module';
 
 @Module({
-  imports:[UserModule,PassportModule, JwtModule.register({})],
-  providers: [AuthService, AuthResolver, LocalStrategy, JwtStrategy, GoogleStrategy, GetContext],
+  imports:[UserModule, ProfileModule, PassportModule, JwtModule.register({})],
+  providers: [AuthService, AuthResolver, LocalStrategy, JwtStrategy, GoogleStrategy, FacebookStrategy , GetContext],
   controllers:[AuthController],
   exports: [GetContext]
 })

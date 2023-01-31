@@ -1,6 +1,6 @@
 import { Controller, Get, Req, Res, UseGuards } from "@nestjs/common";
-import { resolve } from "node:path/win32";
 import { AuthService } from "./auth.service";
+import { FacebookGuard } from "./guards/facebook.guard";
 import { GoogleGuard } from "./guards/google.guard";
 
 
@@ -16,7 +16,18 @@ export class AuthController{
 
     @Get("/auth/google/callback")
     @UseGuards(GoogleGuard)
-    async googleAuthRedirect(@Req() req):Promise<any>{
-        return this.authService.googleAuth(req)
+    async googleAuthRedirect(@Req() req, @Res({passthrough:true}) res):Promise<any>{
+        return this.authService.googleAuth(req, res)
+    }
+
+    @Get("/auth/facebook")
+    @UseGuards(FacebookGuard)
+    async facebookAuth(@Req() req):Promise<any>{
+    }
+
+    @Get("/auth/facebook/callback")
+    @UseGuards(FacebookGuard)
+    async facebookAuthRedirect(@Req() req, @Res({passthrough:true}) res):Promise<any>{
+        return this.authService.facebookAuth(req, res)
     }
 }

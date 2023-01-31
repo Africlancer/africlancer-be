@@ -4,15 +4,14 @@ import { AuthGuard } from "@nestjs/passport";
 
 
 @Injectable()
-export class GqlGoogleGuard extends AuthGuard("google"){
+export class GqlJwtGuard extends AuthGuard("jwt"){
     constructor(){
         super()
     }
 
-    async getRequest(context:ExecutionContext){
+    getRequest(context:ExecutionContext){
         const graphqlContext = GqlExecutionContext.create(context);
         const request = graphqlContext.getContext().req;
         return request;
     }
-
 }
