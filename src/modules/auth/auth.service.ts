@@ -190,7 +190,7 @@ export class AuthService {
         if(!req.user){
             throw new ForbiddenException("No User From Google")
         }
-        const {email, firstName, lastName, userName, avatar} = req.user
+        const {email, firstName, lastName, username, avatar} = req.user
         const checkUser = await this.userService.findOne({email})
         if(checkUser){
 
@@ -229,7 +229,7 @@ export class AuthService {
             email,
             firstName,
             lastName,
-            userName
+            username
         }
         console.log(userData)
         const newUser = await this.userService.create(userData as any)
@@ -243,7 +243,7 @@ export class AuthService {
         if(!req.user){
             throw new ForbiddenException("No User From Facebook")
         }
-        const {email, firstName, lastName, userName, avatar} = req.user
+        const {email, firstName, lastName, username, avatar} = req.user
         const checkUser = await this.userService.findOne({email})
         if(checkUser){
 
@@ -282,7 +282,7 @@ export class AuthService {
             email,
             firstName,
             lastName,
-            userName
+            username
         }
         const newUser = await this.userService.create(userData as any)
         const newProfile = await this.profileService.create({userID:newUser._id, avatar} as any)

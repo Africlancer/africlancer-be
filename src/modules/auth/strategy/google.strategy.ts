@@ -16,7 +16,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy){
         const {name, emails, photos, displayName} = profile
         const user = {
             email:emails[0].value,
-            userName:displayName,
+            username:displayName,
             firstName:name.givenName,
             lastName: name.familyName,
             avatar: photos[0].value,
