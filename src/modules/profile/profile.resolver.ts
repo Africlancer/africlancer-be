@@ -18,8 +18,8 @@ export class ProfileResolver{
 
     @Query(returns => Profile, {name:"findProfileByID"})
     async findProfileByID(@Args("profileID") profileID:string):Promise<Profile>{
-        // return this.classMapper.mapAsync(await this.profileService.findOne(profileID as any), ProfileSchema, Profile);
-        return (await this.profileService.findOne(profileID as any)) as any;
+        return this.classMapper.mapAsync(await this.profileService.findOne(profileID as any), ProfileSchema, Profile);
+        // return (await this.profileService.findOne(profileID as any)) as any;
         
     }
 
