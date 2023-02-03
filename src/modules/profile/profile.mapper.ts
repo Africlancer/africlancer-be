@@ -1,8 +1,8 @@
 import { AutomapperProfile, InjectMapper } from '@automapper/nestjs';
 import { createMap, forMember, ignore, mapFrom, Mapper, MappingProfile, typeConverter } from '@automapper/core';
 import { Injectable } from '@nestjs/common';
-import { CreateProfileInput, QueryProfileInput, Profile as ProfileModel } from './profile.model';
-import { Profile as ProfileSchema } from './profile.schema';
+import { CreateProfileInput, QueryProfileInput, Profile as ProfileModel, EducationInput } from './profile.model';
+import { Profile as ProfileSchema , Education as EducationSchema} from './profile.schema';
 import { Types } from 'mongoose';
 
 @Injectable()
@@ -24,6 +24,7 @@ export class ProfileMapper extends AutomapperProfile {
             )
             createMap(mapper, QueryProfileInput, ProfileSchema)
             createMap(mapper, CreateProfileInput, ProfileSchema)
+            createMap(mapper, EducationInput, EducationSchema)
         };
     }
 }
