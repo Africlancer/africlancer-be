@@ -300,7 +300,7 @@ export class CreateProfileInput{
 
     @AutoMap()
     @Field(type=>[EducationInput], { nullable: true })
-    education?:EducationInput[];
+    education?:Education[];
 }
 
 @InputType()

@@ -3,7 +3,7 @@ import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
 import { CreateProfileInput, EducationInput, ExperienceInput, Profile, PublicationsInput, QualificationInput, QueryProfileInput } from "./profile.model";
 import { ProfileService } from "./profile.service";
-import { Education, Profile as ProfileSchema } from "./profile.schema";
+import { Education as EducationSchema, Profile as ProfileSchema } from "./profile.schema";
 import { GqlCurrentUser } from "../auth/decorators/gql.user.decorator";
 import { GqlJwtGuard } from "../auth/guards/gql.jwt.guard";
 import { UseGuards } from "@nestjs/common";
@@ -19,6 +19,8 @@ export class ProfileResolver{
     @Query(returns => Profile, {name:"findProfileByID"})
     async findProfileByID(@Args("profileID") profileID:string):Promise<Profile>{
         return this.classMapper.mapAsync(await this.profileService.findOne(profileID as any), ProfileSchema, Profile);
+        // return (await this.profileService.findOne(profileID as any)) as any;
+        
     }
 
     @Query(returns => [Profile], {name:"findProfileByQuery"})
