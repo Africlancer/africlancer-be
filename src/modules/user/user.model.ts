@@ -1,7 +1,6 @@
 import { AutoMap } from '@automapper/classes';
 import { Field, InputType, ObjectType, PartialType } from '@nestjs/graphql';
 
-//TODO: Add Validation
 @ObjectType()
 export class User {
   @AutoMap()
@@ -35,7 +34,6 @@ export class User {
 
 }
 
-//TODO: Add Validation
 @InputType()
 export class CreateUserInput {
   @AutoMap()

@@ -55,4 +55,10 @@ export class AuthResolver {
     async refresh(@Context("req") req:Request, @Context("res") res:Response):Promise<Tokens>{
         return await this.authService.refresh(req, res);
     }
+
+    @Mutation((returns) => Boolean, { name: "userResetPassword" })
+    async reset(@Args("email") email:string):Promise<boolean>{
+        await this.authService.generateResetLink(email);
+        return true;
+    }
 }

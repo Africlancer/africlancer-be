@@ -7,11 +7,12 @@ import * as argon from 'argon2';
 import { Response, Request } from 'express';
 import { Types } from 'mongoose';
 import { ProfileService } from '../profile/profile.service';
+import { MailService } from '../mail/mail.service';
 
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly userService:UserService, private readonly profileService:ProfileService, private jwt:JwtService){}
+    constructor(private readonly userService:UserService, private readonly profileService:ProfileService, private jwt:JwtService, private mailService: MailService){}
 
     async validateUser(username:string, password: string):Promise<UserSchema>{
         const checkUser = await this.userService.findOneAuth({username:username, email:username})
@@ -36,8 +37,17 @@ export class AuthService {
         
         user.password = await argon.hash(user.password)
         const newUser = await this.userService.create(user as any)
-        const newProfile = await this.profileService.create({userID:newUser._id} as any)
+        const newProfile = await this.profileService.create({_id: newUser._id, userID:newUser._id} as any)
         await this.userService.update(newUser._id.toString(), {profileID:newProfile._id})
+
+        const confirmation_token = await this.jwt.signAsync({email:user.email},{
+        expiresIn:"15m",
+        secret:process.env.CONFIRM_EMAIL_SECRET
+        })
+
+        const url = `${process.env.BASE_URL}/auth/confirm-email/${confirmation_token}`
+
+        await this.mailService.sendConfirmEmail(url, user.email)
         return newUser
     }
 
@@ -45,12 +55,12 @@ export class AuthService {
         const cookies = req.cookies
         const checkUser = await this.userService.findOneAuth({username:user.username, email:user.username})
 
-        const access_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
+        const access_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
             expiresIn: "15m",
             secret: process.env.ACCESS_TOKEN_SECRET
         })
 
-        const refresh_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
+        const refresh_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
             expiresIn: "7d",
             secret: process.env.REFRESH_TOKEN_SECRET
         })
@@ -141,8 +151,8 @@ export class AuthService {
         if(!user){
             const token = await this.jwt.verifyAsync(oldRefreshToken, {
                 secret: process.env.REFRESH_TOKEN_SECRET
-            }).catch(error => {throw new ForbiddenException()})
-            const invalidUser = await this.userService.findOneAuth({username:token.usernameOrEmail, email:token.usernameOrEmail})
+            }).catch(() => {throw new ForbiddenException()})
+            const invalidUser = await this.userService.findOneAuth({username:token.user, email:token.user})
 
             if(!invalidUser){
                 throw new ForbiddenException()
@@ -167,11 +177,11 @@ export class AuthService {
 
         //everything checks out, send access and refresh token again
 
-        const access_token = await this.jwt.signAsync({usernameOrEmail:user.username, sub:user._id, profile:user.profileID, roles:user.roles}, {
+        const access_token = await this.jwt.signAsync({user:user.username, sub:user._id, profile:user.profileID, roles:user.roles}, {
             expiresIn: "15m",
             secret: process.env.ACCESS_TOKEN_SECRET
         })
-        const refresh_token = await this.jwt.signAsync({usernameOrEmail:user.username, sub:user._id, profile:user.profileID, roles:user.roles}, {
+        const refresh_token = await this.jwt.signAsync({user:user.username, sub:user._id, profile:user.profileID, roles:user.roles}, {
             expiresIn: "7d",
             secret: process.env.REFRESH_TOKEN_SECRET
         })
@@ -195,12 +205,12 @@ export class AuthService {
         if(checkUser){
 
             //issue new access and refresh token
-            const access_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
+            const access_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
                 expiresIn: "15m",
                 secret: process.env.ACCESS_TOKEN_SECRET
             })
     
-            const refresh_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
+            const refresh_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
                 expiresIn: "7d",
                 secret: process.env.REFRESH_TOKEN_SECRET
             })
@@ -231,7 +241,6 @@ export class AuthService {
             lastName,
             username
         }
-        console.log(userData)
         const newUser = await this.userService.create(userData as any)
         const newProfile = await this.profileService.create({userID:newUser._id, avatar} as any)
         await this.userService.update(newUser._id.toString(), {profileID:newProfile._id})
@@ -248,12 +257,12 @@ export class AuthService {
         if(checkUser){
 
             //issue new access and refresh token
-            const access_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, profile:checkUser.profileID,roles:checkUser.roles}, {
+            const access_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, profile:checkUser.profileID,roles:checkUser.roles}, {
                 expiresIn: "15m",
                 secret: process.env.ACCESS_TOKEN_SECRET
             })
     
-            const refresh_token = await this.jwt.signAsync({usernameOrEmail:checkUser.username, sub:checkUser._id, profile:checkUser.profileID,roles:checkUser.roles}, {
+            const refresh_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, profile:checkUser.profileID,roles:checkUser.roles}, {
                 expiresIn: "7d",
                 secret: process.env.REFRESH_TOKEN_SECRET
             })
@@ -288,5 +297,64 @@ export class AuthService {
         const newProfile = await this.profileService.create({userID:newUser._id, avatar} as any)
         await this.userService.update(newUser._id.toString(), {profileID:newProfile._id})
         return newUser
+    }
+
+    async confirmEmail(token:string):Promise<any>{
+        const decode = await this.jwt.verifyAsync(token, {
+            secret: process.env.CONFIRM_EMAIL_SECRET
+        }).catch(() =>{throw new ForbiddenException("Invalid Token")})
+
+        const user = await this.userService.findOne({email:decode.email})
+
+        if(!user){
+            throw new ForbiddenException("Invalid User")
+        }else if(user.isEmailConfirmed){
+            throw new ForbiddenException("Email Already Activated")
+        }
+
+        await this.userService.update(user._id.toString(), {isEmailConfirmed:true})
+        .then(()=>{
+            this.mailService.sendWelcomeEmail(user.firstName, user.email)
+            return user.isEmailConfirmed
+        })
+        .catch(()=>{
+            throw new ForbiddenException("Could not activate email")
+        })
+    }
+
+    async generateResetLink(email:string):Promise<any>{
+        const user = await this.userService.findOne({email})
+
+        if(!user){
+            throw new ForbiddenException("Invalid User")
+        }
+
+        const secret = process.env.RESET_PASSWORD_SECRET + user.password
+
+        const token = await this.jwt.signAsync({email:user.email, sub:user._id}, {
+            expiresIn:"15m",
+            secret
+        })
+
+        const url = `${process.env.BASE_URL}/auth/reset/${user._id}/${token}`
+
+        await this.mailService.sendResetPassword(url, user.firstName, user.email)
+    }
+
+    async resetPassword(id:string, token:string, newPassword:string):Promise<any>{
+        const user = await this.userService.findOne({_id:new Types.ObjectId(id)})
+
+        if(!user){
+            throw new ForbiddenException("Invalid User")
+        }
+
+        this.jwt.verifyAsync(token, {
+            secret: process.env.RESET_PASSWORD_SECRET + user.password
+        }).catch(() =>{throw new ForbiddenException("Invalid Token")})
+
+        const newHashPassword = await argon.hash(newPassword)
+
+        return this.userService.update(user._id.toString(), {password:newHashPassword})
+
     }
 }

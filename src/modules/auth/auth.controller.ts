@@ -1,33 +1,68 @@
-import { Controller, Get, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { Request, Response } from "express";
+import { LoginResponse, UserSignIn, UserSignUp } from "./auth.model";
 import { AuthService } from "./auth.service";
+import { Roles } from "./decorators/roles.decorator";
 import { FacebookGuard } from "./guards/facebook.guard";
 import { GoogleGuard } from "./guards/google.guard";
+import { JwtGuard } from "./guards/jwt.guard";
+import { LocalGuard } from "./guards/local.guard";
+import { Role } from "./roles.enum";
 
 
-@Controller()
+@Controller("auth")
 export class AuthController{
     constructor(private readonly authService: AuthService) {}
 
 
-    @Get("/auth/google")
+    @Get("/google")
     @UseGuards(GoogleGuard)
-    async googleAuth(@Req() req):Promise<any>{
+    async googleAuth(@Req() req:Request):Promise<any>{
     }
 
-    @Get("/auth/google/callback")
+    @Get("/google/callback")
     @UseGuards(GoogleGuard)
-    async googleAuthRedirect(@Req() req, @Res({passthrough:true}) res):Promise<any>{
+    async googleAuthRedirect(@Req() req:Request, @Res({passthrough:true}) res:Response):Promise<any>{
         return this.authService.googleAuth(req, res)
     }
 
-    @Get("/auth/facebook")
+    @Get("/facebook")
     @UseGuards(FacebookGuard)
-    async facebookAuth(@Req() req):Promise<any>{
+    async facebookAuth(@Req() req:Request):Promise<any>{
     }
 
-    @Get("/auth/facebook/callback")
+    @Get("/facebook/callback")
     @UseGuards(FacebookGuard)
-    async facebookAuthRedirect(@Req() req, @Res({passthrough:true}) res):Promise<any>{
+    async facebookAuthRedirect(@Req() req:Request, @Res({passthrough:true}) res:Response):Promise<any>{
         return this.authService.facebookAuth(req, res)
+    }
+
+    @Get("/confirm-email/:token")
+    async confirmEmail(@Param("token") getToken:any):Promise<any>{
+        return this.authService.confirmEmail(getToken)
+    }
+
+    @Post("/reset/:id/:token")
+    async resetPasswordGet(@Param("id") id:any, @Param("token") token:any, @Body("newPassword") newPassword:string):Promise<any>{
+        return this.authService.resetPassword(id, token, newPassword)
+    }
+
+    @Post("/signup")
+    async signup(@Body() signupDetails:UserSignUp):Promise<any>{
+        return this.authService.signup(signupDetails)
+    }
+
+    @Post("/signin")
+    @UseGuards(LocalGuard)
+    async signin(@Body() loginDetails:UserSignIn, @Req() req:Request, @Res({passthrough:true}) res:Response):Promise<LoginResponse>{
+        return this.authService.signin(loginDetails, req, res)
+    }
+
+    @Post("/signout")
+    @UseGuards(JwtGuard)
+    @Roles(Role.USER)
+    async signout(@Req() req:Request, @Res({passthrough:true}) res:Response):Promise<any>{
+        await this.authService.signout(req, res)
+        return true;
     }
 }

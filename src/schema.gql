@@ -185,6 +185,7 @@ type Mutation {
   userSignOut: Boolean!
   userChangePassword(resetData: UserChangePassword!): Boolean!
   getNewTokens: Tokens!
+  userResetPassword(email: String!): Boolean!
 }
 
 input CreateProjectInput {

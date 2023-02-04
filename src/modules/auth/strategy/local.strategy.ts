@@ -14,7 +14,10 @@ export class LocalStrategy extends PassportStrategy(Strategy){
         const user = await this.authService.validateUser(username, password)
         if(!user){
             throw new UnauthorizedException()
+        }else if(!user.isEmailConfirmed){
+            throw new UnauthorizedException("Account Not Activated")
         }
+        
         return user
     }
 
