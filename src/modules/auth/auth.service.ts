@@ -8,6 +8,7 @@ import { Response, Request } from 'express';
 import { Types } from 'mongoose';
 import { ProfileService } from '../profile/profile.service';
 import { MailService } from '../mail/mail.service';
+import * as uiavatars from 'ui-avatars';
 
 
 @Injectable()
@@ -34,10 +35,21 @@ export class AuthService {
         if(checkUser){
             throw new ForbiddenException("User Already Exists")
         }
-        
+
+        const avatar = uiavatars.generateAvatar({
+            uppercase: true,
+            name: `${user.firstName}+${user.lastName}`,
+            //background: "990000",
+            //color: "000000",
+            fontsize: 0.5,
+            bold: true,
+            length: 2,
+            size: 512
+        })
+       
         user.password = await argon.hash(user.password)
         const newUser = await this.userService.create(user as any)
-        const newProfile = await this.profileService.create({_id: newUser._id, userID:newUser._id} as any)
+        const newProfile = await this.profileService.create({_id: newUser._id, userID:newUser._id, avatar} as any)
         await this.userService.update(newUser._id.toString(), {profileID:newProfile._id})
 
         const confirmation_token = await this.jwt.signAsync({email:user.email},{

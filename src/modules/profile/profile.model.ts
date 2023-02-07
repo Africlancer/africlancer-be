@@ -235,6 +235,10 @@ export class Profile{
 
     @AutoMap()
     @Field({ nullable: true })
+    banner?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
     hourlyRate?:number;
 
     @AutoMap()
@@ -284,6 +288,10 @@ export class CreateProfileInput{
 
     @AutoMap()
     @Field({ nullable: true })
+    banner?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
     hourlyRate?:number;
 
     @AutoMap()
@@ -316,6 +324,10 @@ export class CommonProfileInput{
     @AutoMap()
     @Field({ nullable: true })
     avatar?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    banner?:string;
 
     @AutoMap()
     @Field({ nullable: true })

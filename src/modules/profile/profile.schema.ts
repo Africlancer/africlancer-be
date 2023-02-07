@@ -19,6 +19,10 @@ export class Profile{
     avatar:string;
 
     @AutoMap()
+    @Prop()
+    banner:string;
+
+    @AutoMap()
     @Prop({required:true,default:0})
     hourlyRate:number;
 

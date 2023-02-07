@@ -69,6 +69,7 @@ type Profile {
   _id: String!
   userID: String!
   avatar: String
+  banner: String
   hourlyRate: Float
   professionalHeadline: String
   summary: String
@@ -146,6 +147,7 @@ input QueryProfileInput {
   _id: String
   userID: String
   avatar: String
+  banner: String
   hourlyRate: Float
   professionalHeadline: String
   summary: String
