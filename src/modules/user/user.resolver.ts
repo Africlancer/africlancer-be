@@ -29,9 +29,11 @@ export class UserResolver {
     return true;
   }
 
+  @UseGuards(GqlJwtGuard)
+  @Roles(Role.USER)
   @Query((returns) => User, { name: 'findOneUser' })
-  public async findOne(@Args('query') query: QueryUserInput): Promise<User> {
-    return await this.classMapper.mapAsync(await this.userSvc.findOne(query as unknown), UserSchema, User);
+  public async findOne(@GqlCurrentUser() user:any): Promise<User> {
+    return await this.classMapper.mapAsync(await this.userSvc.findOne({_id:user.sub} as unknown), UserSchema, User);
   }
 
   @Query((returns) => [User], { name: 'findUsers' })

@@ -13,7 +13,7 @@ import * as uiavatars from 'ui-avatars';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly userService:UserService, private readonly profileService:ProfileService, private jwt:JwtService, private mailService: MailService){}
+    constructor(private readonly userService:UserService, private readonly profileService:ProfileService, private jwt:JwtService, private readonly mailService: MailService){}
 
     async validateUser(username:string, password: string):Promise<UserSchema>{
         const checkUser = await this.userService.findOneAuth({username:username, email:username})
@@ -67,12 +67,12 @@ export class AuthService {
         const cookies = req.cookies
         const checkUser = await this.userService.findOneAuth({username:user.username, email:user.username})
 
-        const access_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
+        const access_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
             expiresIn: "15m",
             secret: process.env.ACCESS_TOKEN_SECRET
         })
 
-        const refresh_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
+        const refresh_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
             expiresIn: "7d",
             secret: process.env.REFRESH_TOKEN_SECRET
         })
@@ -189,11 +189,11 @@ export class AuthService {
 
         //everything checks out, send access and refresh token again
 
-        const access_token = await this.jwt.signAsync({user:user.username, sub:user._id, profile:user.profileID, roles:user.roles}, {
+        const access_token = await this.jwt.signAsync({user:user.username, sub:user._id, roles:user.roles}, {
             expiresIn: "15m",
             secret: process.env.ACCESS_TOKEN_SECRET
         })
-        const refresh_token = await this.jwt.signAsync({user:user.username, sub:user._id, profile:user.profileID, roles:user.roles}, {
+        const refresh_token = await this.jwt.signAsync({user:user.username, sub:user._id, roles:user.roles}, {
             expiresIn: "7d",
             secret: process.env.REFRESH_TOKEN_SECRET
         })
@@ -217,12 +217,12 @@ export class AuthService {
         if(checkUser){
 
             //issue new access and refresh token
-            const access_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
+            const access_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
                 expiresIn: "15m",
                 secret: process.env.ACCESS_TOKEN_SECRET
             })
     
-            const refresh_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, profile:checkUser.profileID, roles:checkUser.roles}, {
+            const refresh_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
                 expiresIn: "7d",
                 secret: process.env.REFRESH_TOKEN_SECRET
             })
@@ -269,12 +269,12 @@ export class AuthService {
         if(checkUser){
 
             //issue new access and refresh token
-            const access_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, profile:checkUser.profileID,roles:checkUser.roles}, {
+            const access_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
                 expiresIn: "15m",
                 secret: process.env.ACCESS_TOKEN_SECRET
             })
     
-            const refresh_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, profile:checkUser.profileID,roles:checkUser.roles}, {
+            const refresh_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
                 expiresIn: "7d",
                 secret: process.env.REFRESH_TOKEN_SECRET
             })

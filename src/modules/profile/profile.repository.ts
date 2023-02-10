@@ -14,8 +14,8 @@ export class ProfileRepository{
         return createProfile.save();
     }
 
-    async findOne(_id: string):Promise<Profile>{
-        return this.profileModel.findOne({_id:new Types.ObjectId(_id)})
+    async findOne(profile: Partial<Profile>):Promise<Profile>{
+        return this.profileModel.findOne(profile)
     }
 
     async find(userQuery: Partial<Profile>):Promise<Profile[]>{

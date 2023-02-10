@@ -15,6 +15,9 @@ export class UserMapper extends AutomapperProfile {
             createMap(mapper, UserSchema, UserModel, 
                 forMember((dest) => dest._id, 
                 mapFrom(src => src._id.toString())
+                ),
+                forMember((dest) => dest.profileID, 
+                mapFrom(src => src.profileID.toString())
                 )
             )
             createMap(mapper, QueryUserInput, UserSchema)

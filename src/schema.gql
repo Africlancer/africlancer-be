@@ -113,13 +113,13 @@ type Tokens {
 }
 
 type Query {
-  findOneUser(query: QueryUserInput!): User!
+  findOneUser: User!
   findUsers(query: QueryUserInput!): [User!]!
   findOneProject(query: QueryProjectInput!): Project!
   findProjects(query: QueryProjectInput!): [Project!]!
   deleteProject(_id: String!): Boolean!
-  findProfileByID(profileID: String!): Profile!
-  findProfileByQuery(query: QueryProfileInput!): [Profile!]!
+  findOneProfile: Profile!
+  findProfiles(query: QueryProfileInput!): [Profile!]!
   findOnePortfolio(query: QueryPortfolioInput!): Portfolio!
   findPortfolios(query: QueryPortfolioInput!): [Portfolio!]!
   deletePortfolio(_id: String!): Boolean!

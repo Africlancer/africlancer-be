@@ -1,5 +1,5 @@
 import { AutoMap } from '@automapper/classes';
-import { Field, InputType, ObjectType, PartialType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class User {

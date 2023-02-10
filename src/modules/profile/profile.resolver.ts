@@ -16,15 +16,15 @@ export class ProfileResolver{
     constructor(private profileService:ProfileService, @InjectMapper() private readonly classMapper: Mapper){}
 
 
-    @Query(returns => Profile, {name:"findProfileByID"})
-    async findProfileByID(@Args("profileID") profileID:string):Promise<Profile>{
-        return this.classMapper.mapAsync(await this.profileService.findOne(profileID as any), ProfileSchema, Profile);
-        // return (await this.profileService.findOne(profileID as any)) as any;
-        
+    @Query(returns => Profile, {name:"findOneProfile"})
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    async findOne(@GqlCurrentUser() profileID:any):Promise<Profile>{
+        return this.classMapper.mapAsync(await this.profileService.findOne({_id:profileID.sub} as unknown), ProfileSchema, Profile);
     }
 
-    @Query(returns => [Profile], {name:"findProfileByQuery"})
-    async findProfileByQuery(@Args("query") query:QueryProfileInput):Promise<Profile[]>{
+    @Query(returns => [Profile], {name:"findProfiles"})
+    async find(@Args("query") query:QueryProfileInput):Promise<Profile[]>{
         return this.classMapper.mapArrayAsync(await this.profileService.find(query as unknown), ProfileSchema, Profile);
     }
 
@@ -42,7 +42,7 @@ export class ProfileResolver{
         @Args("profile") profile:QueryProfileInput
     ){
         const queryMap = await this.classMapper.mapAsync(profile, QueryProfileInput, ProfileSchema)
-        await this.profileService.updateOne(profileID.profile, queryMap)
+        await this.profileService.updateOne(profileID.sub, queryMap)
         return true;
     }
 

@@ -19,8 +19,8 @@ export class ProfileService{
         return this.profileRepository.find(profile)
     }
 
-    public async findOne(user:string):Promise<Profile>{
-        return this.profileRepository.findOne(user)
+    public async findOne(profile:Partial<Profile>):Promise<Profile>{
+        return this.profileRepository.findOne(profile)
     }
 
     public async updateOne(_id:string, profile:Partial<Profile>):Promise<void>{
@@ -33,7 +33,7 @@ export class ProfileService{
     
     public async addOrUpdateEducation(model:Education){
 
-        const profile = await this.profileRepository.findOne(model.profileId);
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
         console.log(profile)
 
         if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
@@ -54,7 +54,7 @@ export class ProfileService{
     }
 
     public async deleteEducation(model:Education){
-        const profile = await this.profileRepository.findOne(model.profileId);
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
 
     
         if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
@@ -72,7 +72,7 @@ export class ProfileService{
 
     public async addOrUpdateExperience(model:Experience){
 
-        const profile = await this.profileRepository.findOne(model.profileId);
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
         console.log(profile)
 
         if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
@@ -93,7 +93,7 @@ export class ProfileService{
     }
 
     public async deleteExperience(model:Experience){
-        const profile = await this.profileRepository.findOne(model.profileId);
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
 
     
         if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
@@ -110,7 +110,7 @@ export class ProfileService{
 
     public async addOrUpdateQualification(model:Qualification){
 
-        const profile = await this.profileRepository.findOne(model.profileId);
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
         console.log(profile)
 
         if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
@@ -131,7 +131,7 @@ export class ProfileService{
     }
 
     public async deleteQualification(model:Qualification){
-        const profile = await this.profileRepository.findOne(model.profileId);
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
 
     
         if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
@@ -148,7 +148,7 @@ export class ProfileService{
 
     public async addOrUpdatePublications(model:Publications){
 
-        const profile = await this.profileRepository.findOne(model.profileId);
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
         console.log(profile)
 
         if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
@@ -169,7 +169,7 @@ export class ProfileService{
     }
 
     public async deletePublications(model:Publications){
-        const profile = await this.profileRepository.findOne(model.profileId);
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
 
     
         if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
