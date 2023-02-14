@@ -1,8 +1,18 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt/dist';
 import { User as UserSchema } from '../user/user.schema';
 import { UserService } from '../user/user.service';
-import { LoginResponse, Tokens, UserChangePassword, UserSignIn, UserSignUp } from './auth.model';
+import {
+  LoginResponse,
+  Tokens,
+  UserChangePassword,
+  UserSignIn,
+  UserSignUp,
+} from './auth.model';
 import * as argon from 'argon2';
 import { Response, Request } from 'express';
 import { Types } from 'mongoose';
@@ -10,363 +20,543 @@ import { ProfileService } from '../profile/profile.service';
 import { MailService } from '../mail/mail.service';
 import * as uiavatars from 'ui-avatars';
 
-
 @Injectable()
 export class AuthService {
-    constructor(private readonly userService:UserService, private readonly profileService:ProfileService, private jwt:JwtService, private readonly mailService: MailService){}
+  constructor(
+    private readonly userService: UserService,
+    private readonly profileService: ProfileService,
+    private jwt: JwtService,
+    private readonly mailService: MailService,
+  ) {}
 
-    async validateUser(username:string, password: string):Promise<UserSchema>{
-        const checkUser = await this.userService.findOneAuth({username:username, email:username})
-        if(!checkUser){
-            throw new ForbiddenException("Invalid Username Or Password")
-        }
-
-        if(await argon.verify(checkUser.password, password)){
-            delete checkUser.password
-            return checkUser
-        }else{
-            throw new ForbiddenException("Invalid Username Or Password")
-        }
-        
+  async validateUser(username: string, password: string): Promise<UserSchema> {
+    const checkUser = await this.userService.findOneAuth({
+      username: username,
+      email: username,
+    });
+    if (!checkUser) {
+      throw new ForbiddenException('Invalid Username Or Password');
     }
 
-    async signup(user:UserSignUp):Promise<UserSchema>{
-        const checkUser = await this.userService.findOneAuth({username:user.username, email:user.email})
-        if(checkUser){
-            throw new ForbiddenException("User Already Exists")
-        }
+    if (await argon.verify(checkUser.password, password)) {
+      delete checkUser.password;
+      return checkUser;
+    } else {
+      throw new ForbiddenException('Invalid Username Or Password');
+    }
+  }
 
-        const avatar = uiavatars.generateAvatar({
-            uppercase: true,
-            name: `${user.firstName}+${user.lastName}`,
-            //background: "990000",
-            //color: "000000",
-            fontsize: 0.5,
-            bold: true,
-            length: 2,
-            size: 512
-        })
-       
-        user.password = await argon.hash(user.password)
-        const newUser = await this.userService.create(user as any)
-        const newProfile = await this.profileService.create({_id: newUser._id, userID:newUser._id, avatar} as any)
-        await this.userService.update(newUser._id.toString(), {profileID:newProfile._id})
-
-        const confirmation_token = await this.jwt.signAsync({email:user.email},{
-        expiresIn:"15m",
-        secret:process.env.CONFIRM_EMAIL_SECRET
-        })
-
-        const url = `${process.env.BASE_URL}/auth/confirm-email/${confirmation_token}`
-
-        await this.mailService.sendConfirmEmail(url, user.email)
-        return newUser
+  async signup(user: UserSignUp): Promise<UserSchema> {
+    const checkUser = await this.userService.findOneAuth({
+      username: user.username,
+      email: user.email,
+    });
+    if (checkUser) {
+      throw new ForbiddenException('User Already Exists');
     }
 
-    async signin(user:UserSignIn, req:Request, res:Response):Promise<LoginResponse>{
-        const cookies = req.cookies
-        const checkUser = await this.userService.findOneAuth({username:user.username, email:user.username})
+    const avatar = uiavatars.generateAvatar({
+      uppercase: true,
+      name: `${user.firstName}+${user.lastName}`,
+      //background: "990000",
+      //color: "000000",
+      fontsize: 0.5,
+      bold: true,
+      length: 2,
+      size: 512,
+    });
 
-        const access_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
-            expiresIn: "15m",
-            secret: process.env.ACCESS_TOKEN_SECRET
-        })
+    user.password = await argon.hash(user.password);
+    const newUser = await this.userService.create(user as any);
+    const newProfile = await this.profileService.create({
+      _id: newUser._id,
+      userID: newUser._id,
+      avatar,
+    } as any);
+    await this.userService.update(newUser._id.toString(), {
+      profileID: newProfile._id,
+    });
 
-        const refresh_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
-            expiresIn: "7d",
-            secret: process.env.REFRESH_TOKEN_SECRET
-        })
+    const confirmation_token = await this.jwt.signAsync(
+      { email: user.email },
+      {
+        expiresIn: '15m',
+        secret: process.env.CONFIRM_EMAIL_SECRET,
+      },
+    );
 
-        if(cookies.refresh_token){
-            const oldRefreshToken = req.cookies.refresh_token
-            const newRefreshTokenArray = checkUser.refreshToken.filter(rt => rt !== oldRefreshToken)
-            await this.userService.update(checkUser._id.toString(), {refreshToken: [...newRefreshTokenArray, refresh_token]})
-        }else{
+    const url = `${process.env.BASE_URL}/auth/confirm-email/${confirmation_token}`;
 
-            await this.userService.update(checkUser._id.toString(), {refreshToken: [...checkUser.refreshToken, refresh_token]})
-        }
+    await this.mailService.sendConfirmEmail(url, user.email);
+    return newUser;
+  }
 
-        
-        res.cookie("refresh_token", refresh_token, {
-            httpOnly: true,
-            sameSite:"none",
-            secure: true,
-            maxAge: 60*60*24*7
-        })
+  async signin(
+    user: UserSignIn,
+    req: Request,
+    res: Response,
+  ): Promise<LoginResponse> {
+    const cookies = req.cookies;
+    const checkUser = await this.userService.findOneAuth({
+      username: user.username,
+      email: user.username,
+    });
 
-        return {access_token, refresh_token, details:user}
+    const token = await this.genJwtToken(checkUser);
+    // const access_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
+    //     expiresIn: "15m",
+    //     secret: process.env.ACCESS_TOKEN_SECRET
+    // })
+
+    // const refresh_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
+    //     expiresIn: "7d",
+    //     secret: process.env.REFRESH_TOKEN_SECRET
+    // })
+
+    if (cookies.refresh_token) {
+      const oldRefreshToken = req.cookies.refresh_token;
+      const newRefreshTokenArray = checkUser.refreshToken.filter(
+        (rt) => rt !== oldRefreshToken,
+      );
+      await this.userService.update(checkUser._id.toString(), {
+        refreshToken: [...newRefreshTokenArray, token.refresh_token],
+      });
+    } else {
+      await this.userService.update(checkUser._id.toString(), {
+        refreshToken: [...checkUser.refreshToken, token.refresh_token],
+      });
     }
 
-    async signout(req:Request, res:Response):Promise<void>{
-        //delete access token from client
+    res.cookie('refresh_token', token.refresh_token, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+      maxAge: 60 * 60 * 24 * 7,
+    });
 
-        //delete refresh token from db
-        const cookies = req.cookies
-        if(!cookies?.refresh_token){
-            throw new UnauthorizedException() 
-        }
-        const oldRefreshToken = req.cookies.refresh_token
+    return {
+      ...token,
+      details: {
+        _id: checkUser._id.toString(),
+        roles: checkUser.roles,
+        name: `${checkUser.firstName} ${checkUser.lastName}`,
+      },
+    };
+  }
 
-        const user = await this.userService.findOne({refreshToken:oldRefreshToken})
-        if(!user){
-            res.clearCookie("refresh_token", {httpOnly: true, sameSite:"none", secure: true})
-            throw new ForbiddenException() 
-        }
+  async signout(req: Request, res: Response): Promise<void> {
+    //delete access token from client
 
-        const newRefreshTokenArray = user.refreshToken.filter(rt => rt !== oldRefreshToken)
-        await this.userService.update(user._id.toString(), {refreshToken: [...newRefreshTokenArray]})
-        //clear cookie
-        res.clearCookie("refresh_token", {httpOnly: true, sameSite:"none", secure: true})
+    //delete refresh token from db
+    const cookies = req.cookies;
+    if (!cookies?.refresh_token) {
+      throw new UnauthorizedException();
+    }
+    const oldRefreshToken = req.cookies.refresh_token;
 
+    const user = await this.userService.findOne({
+      refreshToken: oldRefreshToken,
+    });
+    if (!user) {
+      res.clearCookie('refresh_token', {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+      });
+      throw new ForbiddenException();
     }
 
-    
-    async changePassword(id:string, resetData:UserChangePassword):Promise<void>{
-        const user = await this.userService.findOne({_id: new Types.ObjectId(id)})
+    const newRefreshTokenArray = user.refreshToken.filter(
+      (rt) => rt !== oldRefreshToken,
+    );
+    await this.userService.update(user._id.toString(), {
+      refreshToken: [...newRefreshTokenArray],
+    });
+    //clear cookie
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
+  }
 
-        if(!user){
-            throw new ForbiddenException("Invalid User")
-        }
+  async changePassword(
+    id: string,
+    resetData: UserChangePassword,
+  ): Promise<void> {
+    const user = await this.userService.findOne({
+      _id: new Types.ObjectId(id),
+    });
 
-        if(await argon.verify(user.password, resetData.oldPassword)){
-            const hashPassword = await argon.hash(resetData.newPassword)
-            return await this.userService.update(id, {password: hashPassword})
-        }else{
-            throw new ForbiddenException("Current Password is Invalid")
-        }
+    if (!user) {
+      throw new ForbiddenException('Invalid User');
     }
 
-    async deleteAccount(id:string):Promise<void>{
-        const user = await this.userService.findOne({_id: new Types.ObjectId(id)})
+    if (await argon.verify(user.password, resetData.oldPassword)) {
+      const hashPassword = await argon.hash(resetData.newPassword);
+      return await this.userService.update(id, { password: hashPassword });
+    } else {
+      throw new ForbiddenException('Current Password is Invalid');
+    }
+  }
 
-        if(!user){
-            throw new ForbiddenException("Invalid User")
-        }
+  async deleteAccount(id: string): Promise<void> {
+    const user = await this.userService.findOne({
+      _id: new Types.ObjectId(id),
+    });
 
-        await this.profileService.deleteOne(user.profileID.toString())
-
-        await this.userService.delete(id)
-
+    if (!user) {
+      throw new ForbiddenException('Invalid User');
     }
 
-    async refresh(req:Request, res:Response):Promise<Tokens>{
-        const cookies = req.cookies
-        if(!cookies.refresh_token){
-            throw new UnauthorizedException() 
-        }
-        const oldRefreshToken = req.cookies.refresh_token
-        res.clearCookie("refresh_token", {httpOnly: true, sameSite:"none", secure: true})
+    await this.profileService.deleteOne(user.profileID.toString());
 
-        const user = await this.userService.findOne({refreshToken:oldRefreshToken})
+    await this.userService.delete(id);
+  }
 
-        //reuse detection
-        if(!user){
-            const token = await this.jwt.verifyAsync(oldRefreshToken, {
-                secret: process.env.REFRESH_TOKEN_SECRET
-            }).catch(() => {throw new ForbiddenException()})
-            const invalidUser = await this.userService.findOneAuth({username:token.user, email:token.user})
+  async refresh(req: Request, res: Response): Promise<Tokens> {
+    const cookies = req.cookies;
+    if (!cookies.refresh_token) {
+      throw new UnauthorizedException();
+    }
+    const oldRefreshToken = req.cookies.refresh_token;
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
 
-            if(!invalidUser){
-                throw new ForbiddenException()
-            }
-            await this.userService.update(invalidUser._id.toString(), {refreshToken: []})
-            throw new ForbiddenException()
-        }
-        
+    const user = await this.userService.findOne({
+      refreshToken: oldRefreshToken,
+    });
 
-        const newRefreshTokenArray = user.refreshToken.filter(rt => rt !== oldRefreshToken)
-
-        //evaluate refresh token 
-        const decode = await this.jwt.verifyAsync(oldRefreshToken, {
-            secret: process.env.REFRESH_TOKEN_SECRET
-        }).catch(error =>{
-            if(error || user._id !== decode.sub){
-                this.userService.update(user._id.toString(), {refreshToken: [...newRefreshTokenArray]})
-                throw new UnauthorizedException()
-            }
+    //reuse detection
+    if (!user) {
+      const token = await this.jwt
+        .verifyAsync(oldRefreshToken, {
+          secret: process.env.REFRESH_TOKEN_SECRET,
         })
+        .catch(() => {
+          throw new ForbiddenException();
+        });
+      const invalidUser = await this.userService.findOneAuth({
+        username: token.user,
+        email: token.user,
+      });
 
-
-        //everything checks out, send access and refresh token again
-
-        const access_token = await this.jwt.signAsync({user:user.username, sub:user._id, roles:user.roles}, {
-            expiresIn: "15m",
-            secret: process.env.ACCESS_TOKEN_SECRET
-        })
-        const refresh_token = await this.jwt.signAsync({user:user.username, sub:user._id, roles:user.roles}, {
-            expiresIn: "7d",
-            secret: process.env.REFRESH_TOKEN_SECRET
-        })
-        await this.userService.update(user._id.toString(), {refreshToken: [...newRefreshTokenArray, refresh_token]})
-        res.cookie("refresh_token", refresh_token, {
-            httpOnly: true,
-            sameSite:"none",
-            secure: true,
-            maxAge: 60*60*24*7
-        })
-        return {access_token, refresh_token}
+      if (!invalidUser) {
+        throw new ForbiddenException();
+      }
+      await this.userService.update(invalidUser._id.toString(), {
+        refreshToken: [],
+      });
+      throw new ForbiddenException();
     }
 
-    async googleAuth(req, res):Promise<any>{
-        const cookies = req.cookies
-        if(!req.user){
-            throw new ForbiddenException("No User From Google")
+    const newRefreshTokenArray = user.refreshToken.filter(
+      (rt) => rt !== oldRefreshToken,
+    );
+
+    //evaluate refresh token
+    const decode = await this.jwt
+      .verifyAsync(oldRefreshToken, {
+        secret: process.env.REFRESH_TOKEN_SECRET,
+      })
+      .catch((error) => {
+        if (error || user._id !== decode.sub) {
+          this.userService.update(user._id.toString(), {
+            refreshToken: [...newRefreshTokenArray],
+          });
+          throw new UnauthorizedException();
         }
-        const {email, firstName, lastName, username, avatar} = req.user
-        const checkUser = await this.userService.findOne({email})
-        if(checkUser){
+      });
 
-            //issue new access and refresh token
-            const access_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
-                expiresIn: "15m",
-                secret: process.env.ACCESS_TOKEN_SECRET
-            })
-    
-            const refresh_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
-                expiresIn: "7d",
-                secret: process.env.REFRESH_TOKEN_SECRET
-            })
-    
-            if(cookies.refresh_token){
-                const oldRefreshToken = req.cookies.refresh_token
-                const newRefreshTokenArray = checkUser.refreshToken.filter(rt => rt !== oldRefreshToken)
-                await this.userService.update(checkUser._id.toString(), {refreshToken: [...newRefreshTokenArray, refresh_token]})
-            }else{
-    
-                await this.userService.update(checkUser._id.toString(), {refreshToken: [...checkUser.refreshToken, refresh_token]})
-            }
+    //everything checks out, send access and refresh token again
 
-            res.cookie("refresh_token", refresh_token, {
-                httpOnly: true,
-                sameSite:"none",
-                secure: true,
-                maxAge: 60*60*24*7
-            })
+    const access_token = await this.jwt.signAsync(
+      { user: user.username, sub: user._id, roles: user.roles },
+      {
+        expiresIn: '15m',
+        secret: process.env.ACCESS_TOKEN_SECRET,
+      },
+    );
+    const refresh_token = await this.jwt.signAsync(
+      { user: user.username, sub: user._id, roles: user.roles },
+      {
+        expiresIn: '7d',
+        secret: process.env.REFRESH_TOKEN_SECRET,
+      },
+    );
+    await this.userService.update(user._id.toString(), {
+      refreshToken: [...newRefreshTokenArray, refresh_token],
+    });
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    return { access_token, refresh_token };
+  }
 
-            return {access_token, refresh_token}
-        }
+  async googleAuth(req, res): Promise<any> {
+    const cookies = req.cookies;
+    if (!req.user) {
+      throw new ForbiddenException('No User From Google');
+    }
+    const { email, firstName, lastName, username, avatar } = req.user;
+    const checkUser = await this.userService.findOne({ email });
+    if (checkUser) {
+      //issue new access and refresh token
+      const access_token = await this.jwt.signAsync(
+        {
+          user: checkUser.username,
+          sub: checkUser._id,
+          roles: checkUser.roles,
+        },
+        {
+          expiresIn: '15m',
+          secret: process.env.ACCESS_TOKEN_SECRET,
+        },
+      );
 
-        //sign up user
-        const userData = {
-            email,
-            firstName,
-            lastName,
-            username
-        }
-        const newUser = await this.userService.create(userData as any)
-        const newProfile = await this.profileService.create({userID:newUser._id, avatar} as any)
-        await this.userService.update(newUser._id.toString(), {profileID:newProfile._id})
-        return newUser
+      const refresh_token = await this.jwt.signAsync(
+        {
+          user: checkUser.username,
+          sub: checkUser._id,
+          roles: checkUser.roles,
+        },
+        {
+          expiresIn: '7d',
+          secret: process.env.REFRESH_TOKEN_SECRET,
+        },
+      );
+
+      if (cookies.refresh_token) {
+        const oldRefreshToken = req.cookies.refresh_token;
+        const newRefreshTokenArray = checkUser.refreshToken.filter(
+          (rt) => rt !== oldRefreshToken,
+        );
+        await this.userService.update(checkUser._id.toString(), {
+          refreshToken: [...newRefreshTokenArray, refresh_token],
+        });
+      } else {
+        await this.userService.update(checkUser._id.toString(), {
+          refreshToken: [...checkUser.refreshToken, refresh_token],
+        });
+      }
+
+      res.cookie('refresh_token', refresh_token, {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+        maxAge: 60 * 60 * 24 * 7,
+      });
+
+      return { access_token, refresh_token };
     }
 
-    async facebookAuth(req, res):Promise<any>{
-        const cookies = req.cookies
-        if(!req.user){
-            throw new ForbiddenException("No User From Facebook")
-        }
-        const {email, firstName, lastName, username, avatar} = req.user
-        const checkUser = await this.userService.findOne({email})
-        if(checkUser){
+    //sign up user
+    const userData = {
+      email,
+      firstName,
+      lastName,
+      username,
+    };
+    const newUser = await this.userService.create(userData as any);
+    const newProfile = await this.profileService.create({
+      userID: newUser._id,
+      avatar,
+    } as any);
+    await this.userService.update(newUser._id.toString(), {
+      profileID: newProfile._id,
+    });
+    return newUser;
+  }
 
-            //issue new access and refresh token
-            const access_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
-                expiresIn: "15m",
-                secret: process.env.ACCESS_TOKEN_SECRET
-            })
-    
-            const refresh_token = await this.jwt.signAsync({user:checkUser.username, sub:checkUser._id, roles:checkUser.roles}, {
-                expiresIn: "7d",
-                secret: process.env.REFRESH_TOKEN_SECRET
-            })
-    
-            if(cookies.refresh_token){
-                const oldRefreshToken = req.cookies.refresh_token
-                const newRefreshTokenArray = checkUser.refreshToken.filter(rt => rt !== oldRefreshToken)
-                await this.userService.update(checkUser._id.toString(), {refreshToken: [...newRefreshTokenArray, refresh_token]})
-            }else{
-    
-                await this.userService.update(checkUser._id.toString(), {refreshToken: [...checkUser.refreshToken, refresh_token]})
-            }
+  async facebookAuth(req, res): Promise<any> {
+    const cookies = req.cookies;
+    if (!req.user) {
+      throw new ForbiddenException('No User From Facebook');
+    }
+    const { email, firstName, lastName, username, avatar } = req.user;
+    const checkUser = await this.userService.findOne({ email });
+    if (checkUser) {
+      //issue new access and refresh token
+      const access_token = await this.jwt.signAsync(
+        {
+          user: checkUser.username,
+          sub: checkUser._id,
+          roles: checkUser.roles,
+        },
+        {
+          expiresIn: '15m',
+          secret: process.env.ACCESS_TOKEN_SECRET,
+        },
+      );
 
-            res.cookie("refresh_token", refresh_token, {
-                httpOnly: true,
-                sameSite:"none",
-                secure: true,
-                maxAge: 60*60*24*7
-            })
+      const refresh_token = await this.jwt.signAsync(
+        {
+          user: checkUser.username,
+          sub: checkUser._id,
+          roles: checkUser.roles,
+        },
+        {
+          expiresIn: '7d',
+          secret: process.env.REFRESH_TOKEN_SECRET,
+        },
+      );
 
-            return {access_token, refresh_token}
-        }
+      if (cookies.refresh_token) {
+        const oldRefreshToken = req.cookies.refresh_token;
+        const newRefreshTokenArray = checkUser.refreshToken.filter(
+          (rt) => rt !== oldRefreshToken,
+        );
+        await this.userService.update(checkUser._id.toString(), {
+          refreshToken: [...newRefreshTokenArray, refresh_token],
+        });
+      } else {
+        await this.userService.update(checkUser._id.toString(), {
+          refreshToken: [...checkUser.refreshToken, refresh_token],
+        });
+      }
 
-        //sign up user
-        const userData = {
-            email,
-            firstName,
-            lastName,
-            username
-        }
-        const newUser = await this.userService.create(userData as any)
-        const newProfile = await this.profileService.create({userID:newUser._id, avatar} as any)
-        await this.userService.update(newUser._id.toString(), {profileID:newProfile._id})
-        return newUser
+      res.cookie('refresh_token', refresh_token, {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+        maxAge: 60 * 60 * 24 * 7,
+      });
+
+      return { access_token, refresh_token };
     }
 
-    async confirmEmail(token:string):Promise<any>{
-        const decode = await this.jwt.verifyAsync(token, {
-            secret: process.env.CONFIRM_EMAIL_SECRET
-        }).catch(() =>{throw new ForbiddenException("Invalid Token")})
+    //sign up user
+    const userData = {
+      email,
+      firstName,
+      lastName,
+      username,
+    };
+    const newUser = await this.userService.create(userData as any);
+    const newProfile = await this.profileService.create({
+      userID: newUser._id,
+      avatar,
+    } as any);
+    await this.userService.update(newUser._id.toString(), {
+      profileID: newProfile._id,
+    });
+    return newUser;
+  }
 
-        const user = await this.userService.findOne({email:decode.email})
+  async confirmEmail(token: string): Promise<any> {
+    const decode = await this.jwt
+      .verifyAsync(token, {
+        secret: process.env.CONFIRM_EMAIL_SECRET,
+      })
+      .catch(() => {
+        throw new ForbiddenException('Invalid Token');
+      });
 
-        if(!user){
-            throw new ForbiddenException("Invalid User")
-        }else if(user.isEmailConfirmed){
-            throw new ForbiddenException("Email Already Activated")
-        }
+    const user = await this.userService.findOne({ email: decode.email });
 
-        await this.userService.update(user._id.toString(), {isEmailConfirmed:true})
-        .then(()=>{
-            this.mailService.sendWelcomeEmail(user.firstName, user.email)
-            return user.isEmailConfirmed
-        })
-        .catch(()=>{
-            throw new ForbiddenException("Could not activate email")
-        })
+    if (!user) {
+      throw new ForbiddenException('Invalid User');
+    } else if (user.isEmailConfirmed) {
+      throw new ForbiddenException('Email Already Activated');
     }
 
-    async generateResetLink(email:string):Promise<any>{
-        const user = await this.userService.findOne({email})
+    await this.userService
+      .update(user._id.toString(), { isEmailConfirmed: true })
+      .then(() => {
+        this.mailService.sendWelcomeEmail(user.firstName, user.email);
+        return user.isEmailConfirmed;
+      })
+      .catch(() => {
+        throw new ForbiddenException('Could not activate email');
+      });
+  }
 
-        if(!user){
-            throw new ForbiddenException("Invalid User")
-        }
+  async generateResetLink(email: string): Promise<any> {
+    const user = await this.userService.findOne({ email });
 
-        const secret = process.env.RESET_PASSWORD_SECRET + user.password
-
-        const token = await this.jwt.signAsync({email:user.email, sub:user._id}, {
-            expiresIn:"15m",
-            secret
-        })
-
-        const url = `${process.env.BASE_URL}/auth/reset/${user._id}/${token}`
-
-        await this.mailService.sendResetPassword(url, user.firstName, user.email)
+    if (!user) {
+      throw new ForbiddenException('Invalid User');
     }
 
-    async resetPassword(id:string, token:string, newPassword:string):Promise<any>{
-        const user = await this.userService.findOne({_id:new Types.ObjectId(id)})
+    const secret = process.env.RESET_PASSWORD_SECRET + user.password;
 
-        if(!user){
-            throw new ForbiddenException("Invalid User")
-        }
+    const token = await this.jwt.signAsync(
+      { email: user.email, sub: user._id },
+      {
+        expiresIn: '15m',
+        secret,
+      },
+    );
 
-        this.jwt.verifyAsync(token, {
-            secret: process.env.RESET_PASSWORD_SECRET + user.password
-        }).catch(() =>{throw new ForbiddenException("Invalid Token")})
+    const url = `${process.env.BASE_URL}/auth/reset/${user._id}/${token}`;
 
-        const newHashPassword = await argon.hash(newPassword)
+    await this.mailService.sendResetPassword(url, user.firstName, user.email);
+  }
 
-        return this.userService.update(user._id.toString(), {password:newHashPassword})
+  async resetPassword(
+    id: string,
+    token: string,
+    newPassword: string,
+  ): Promise<any> {
+    const user = await this.userService.findOne({
+      _id: new Types.ObjectId(id),
+    });
 
+    if (!user) {
+      throw new ForbiddenException('Invalid User');
     }
+
+    this.jwt
+      .verifyAsync(token, {
+        secret: process.env.RESET_PASSWORD_SECRET + user.password,
+      })
+      .catch(() => {
+        throw new ForbiddenException('Invalid Token');
+      });
+
+    const newHashPassword = await argon.hash(newPassword);
+
+    return this.userService.update(user._id.toString(), {
+      password: newHashPassword,
+    });
+  }
+
+  async genJwtToken(
+    user: UserSchema,
+  ): Promise<{ access_token: string; refresh_token: string }> {
+    const access_token = await this.jwt.signAsync(
+      {
+        user: user.username,
+        sub: user._id,
+        roles: user.roles,
+      },
+      {
+        expiresIn: '15m',
+        secret: process.env.ACCESS_TOKEN_SECRET,
+      },
+    );
+
+    const refresh_token = await this.jwt.signAsync(
+      {
+        user: user.username,
+        sub: user._id,
+        roles: user.roles,
+      },
+      {
+        expiresIn: '7d',
+        secret: process.env.REFRESH_TOKEN_SECRET,
+      },
+    );
+
+    return {
+      access_token,
+      refresh_token,
+    };
+  }
 }

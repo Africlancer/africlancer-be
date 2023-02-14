@@ -99,6 +99,7 @@ type Details {
   username: String
   refreshToken: [String!]
   roles: [String!]
+  name: String!
 }
 
 type LoginResponse {

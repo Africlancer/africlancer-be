@@ -42,6 +42,7 @@ export class User {
 
   @Prop({required:true, default:false})
   isEmailConfirmed: boolean
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
