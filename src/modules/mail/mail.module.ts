@@ -5,23 +5,28 @@ import { MailService } from "./mail.service";
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { JwtModule } from "@nestjs/jwt";
 
+const host = process.env.SMTP_HOST
+const user = process.env.SMTP_USER
+const pass = process.env.SMTP_PASSWORD
+const from = process.env.SMTP_FROM
+
 @Global()
 @Module({
     imports:[
         JwtModule,
         MailerModule.forRoot({
             transport: {
-                host: 'smtp.gmail.com',
+                host,
                 secure: true,
                 port: 465,
                 auth: {
-                  user: 'devafriclancer2023@gmail.com',
-                  pass: 'eftjuwromidzdxmx',
+                  user,
+                  pass,
                 },
             },
             //preview:true,
             defaults: {
-                from: '"Africlancer" <devafriclancer2023@gmail.com>',
+                from,
             },
             template: {
                 dir: join(process.cwd(), 'src/modules', 'mail/templates'),
