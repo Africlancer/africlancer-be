@@ -1,13 +1,8 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
+  Controller, Get,
   HttpException,
   HttpStatus,
-  Param,
-  Post,
-  Put,
+  Param
 } from '@nestjs/common';
 import { User } from './user.schema';
 import { UserService } from './user.service';
@@ -29,8 +24,10 @@ export class UserController {
       _id: rs._id,
       email: rs.email,
       username: rs.username,
-      firstName: rs.firstName,
-      lastName: rs.lastName,
+      name: `${rs.firstName} ${rs.lastName}`,
+      refresh_token: rs?.refreshToken
+        ? rs?.refreshToken[rs.refreshToken?.length - 1]
+        : '',
       roles: rs.roles,
     } as User;
   }
