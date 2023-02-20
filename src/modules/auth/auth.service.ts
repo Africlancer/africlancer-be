@@ -530,6 +530,11 @@ export class AuthService {
   async genJwtToken(
     user: UserSchema,
   ): Promise<{ access_token: string; refresh_token: string }> {
+
+
+    console.log(process.env.ACCESS_TOKEN_SECRET,'process.env.ACCESS_TOKEN_SECRET,process.env.ACCESS_TOKEN_SECRET,')
+
+
     const access_token = await this.jwt.signAsync(
       {
         user: user.username,
