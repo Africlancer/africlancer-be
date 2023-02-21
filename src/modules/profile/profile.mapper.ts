@@ -30,8 +30,8 @@ export class ProfileMapper extends AutomapperProfile {
                 forMember((dest) => dest.qualification, 
                 mapFrom(src => src.qualification)
                 ),
-                forMember((dest) => dest.publications, 
-                mapFrom(src => src.publications)
+                forMember((dest) => dest.publication, 
+                mapFrom(src => src.publication)
                 )
             )
             createMap(mapper, QueryProfileInput, ProfileSchema)

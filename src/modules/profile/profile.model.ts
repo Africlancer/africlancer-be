@@ -29,6 +29,10 @@ export class Qualification{
 export class QualificationInput{
     @AutoMap()
     @Field({ nullable: true })
+    _id?:string;
+    
+    @AutoMap()
+    @Field({ nullable: true })
     title?:string;
 
     @AutoMap()
@@ -42,10 +46,6 @@ export class QualificationInput{
     @AutoMap()
     @Field({ nullable: true })
     startYear?:number;
-
-    @AutoMap()
-    @Field({ nullable: true })
-    profileId:string;
 }
 
 @ObjectType()
@@ -91,6 +91,10 @@ export class Experience{
 export class ExperienceInput{
     @AutoMap()
     @Field({ nullable: true })
+    _id?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
     title?:string;
 
     @AutoMap()
@@ -120,15 +124,11 @@ export class ExperienceInput{
     @AutoMap()
     @Field({ nullable: true })
     summary?:string;
-
-    @AutoMap()
-    @Field()
-    profileId:string;
 }
 
 
 @ObjectType()
-export class Publications{
+export class Publication{
     @AutoMap()
     @Field({ nullable: true })
     title?:string;
@@ -147,7 +147,11 @@ export class Publications{
 }
 
 @InputType()
-export class PublicationsInput{
+export class PublicationInput{
+    @AutoMap()
+    @Field({ nullable: true })
+    _id?:string;
+
     @AutoMap()
     @Field({ nullable: true })
     title?:string;
@@ -159,10 +163,6 @@ export class PublicationsInput{
     @AutoMap()
     @Field({ nullable: true })
     summary?:string;
-
-    @AutoMap()
-    @Field({ nullable: true })
-    profileId:string;
 }
 
 @ObjectType()
@@ -196,6 +196,10 @@ export class Education{
 export class EducationInput{
     @AutoMap()
     @Field({ nullable: true })
+    _id?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
     country?:string;
 
     @AutoMap()
@@ -213,10 +217,6 @@ export class EducationInput{
     @AutoMap()
     @Field({ nullable: true })
     endYear?:number;
-
-    @AutoMap()
-    @Field({ nullable: true })
-    profileId:string;
 }
 
 @ObjectType()
@@ -272,8 +272,8 @@ export class Profile{
     qualification?:Qualification[];
 
     @AutoMap()
-    @Field(type=>[Publications], { nullable: true })
-    publications?:Publications[];
+    @Field(type=>[Publication], { nullable: true })
+    publication?:Publication[];
 }
 
 @InputType()

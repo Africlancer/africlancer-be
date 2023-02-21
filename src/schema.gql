@@ -49,7 +49,7 @@ type Experience {
   profileId: String!
 }
 
-type Publications {
+type Publication {
   title: String
   publisher: String
   summary: String
@@ -79,7 +79,7 @@ type Profile {
   education: [Education!]
   experience: [Experience!]
   qualification: [Qualification!]
-  publications: [Publications!]
+  publication: [Publication!]
 }
 
 type Portfolio {
@@ -157,12 +157,12 @@ input QueryProfileInput {
 }
 
 input EducationInput {
+  _id: String
   country: String
   insitution: String
   degree: String
   startYear: Float
   endYear: Float
-  profileId: String
 }
 
 input QueryPortfolioInput {
@@ -178,9 +178,13 @@ type Mutation {
   updateProject(_id: String!, project: QueryProjectInput!): Boolean!
   updateProfile(profile: QueryProfileInput!): Boolean!
   addOrUpdateEducation(education: EducationInput!): Boolean!
+  deleteEducation(educationID: String!): Boolean!
   addOrUpdateExperience(experience: ExperienceInput!): Boolean!
+  deleteExperience(experienceID: String!): Boolean!
   addOrUpdateQualification(qualification: QualificationInput!): Boolean!
-  addOrUpdatePublications(publication: PublicationsInput!): Boolean!
+  deleteQualification(qualificationID: String!): Boolean!
+  addOrUpdatePublication(publication: PublicationInput!): Boolean!
+  deletePublication(publicationID: String!): Boolean!
   createPortfolio(portfolio: CreatePortfolioInput!): Portfolio!
   updatePortfolio(_id: String!, portfolio: QueryPortfolioInput!): Boolean!
   userSignUp(user: UserSignUp!): User!
@@ -201,6 +205,7 @@ input CreateProjectInput {
 }
 
 input ExperienceInput {
+  _id: String
   title: String
   company: String
   startMonth: String
@@ -209,22 +214,21 @@ input ExperienceInput {
   endYear: Float
   working: Boolean
   summary: String
-  profileId: String!
 }
 
 input QualificationInput {
+  _id: String
   title: String
   conferringOrganization: String
   summary: String
   startYear: Float
-  profileId: String
 }
 
-input PublicationsInput {
+input PublicationInput {
+  _id: String
   title: String
   publisher: String
   summary: String
-  profileId: String
 }
 
 input CreatePortfolioInput {

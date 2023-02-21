@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { HttpStatus } from "@nestjs/common/enums";
 import { Request, Response } from "express";
 import { LoginResponse, UserSignIn, UserSignUp } from "./auth.model";
 import { AuthService } from "./auth.service";
@@ -7,6 +8,7 @@ import { FacebookGuard } from "./guards/facebook.guard";
 import { GoogleGuard } from "./guards/google.guard";
 import { JwtGuard } from "./guards/jwt.guard";
 import { LocalGuard } from "./guards/local.guard";
+import { RolesGuard } from "./guards/roles.guard";
 import { Role } from "./roles.enum";
 
 
@@ -37,6 +39,7 @@ export class AuthController{
         return this.authService.facebookAuth(req, res)
     }
 
+    @HttpCode(HttpStatus.OK)
     @Get("/confirm-email/:token")
     async confirmEmail(@Param("token") getToken:any):Promise<any>{
         return this.authService.confirmEmail(getToken)
@@ -59,7 +62,7 @@ export class AuthController{
     }
 
     @Post("/signout")
-    @UseGuards(JwtGuard)
+    @UseGuards(JwtGuard, RolesGuard)
     @Roles(Role.USER)
     async signout(@Req() req:Request, @Res({passthrough:true}) res:Response):Promise<any>{
         await this.authService.signout(req, res)

@@ -1,7 +1,7 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
-import { CreateProfileInput, EducationInput, ExperienceInput, Profile, PublicationsInput, QualificationInput, QueryProfileInput } from "./profile.model";
+import { EducationInput, ExperienceInput, Profile, PublicationInput, QualificationInput, QueryProfileInput } from "./profile.model";
 import { ProfileService } from "./profile.service";
 import { Education as EducationSchema, Profile as ProfileSchema } from "./profile.schema";
 import { GqlCurrentUser } from "../auth/decorators/gql.user.decorator";
@@ -53,26 +53,66 @@ export class ProfileResolver{
     // }
 
     @Mutation(returns => Boolean, {name:"addOrUpdateEducation"})
-    async addOrUpdateEducation(@Args("education") education:EducationInput){
-        await this.profileService.addOrUpdateEducation(education as any)
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    async addOrUpdateEducation(@GqlCurrentUser() profileID:any, @Args("education") education:EducationInput){
+        await this.profileService.addOrUpdateEducation(education as any, profileID.sub)
+        return true;
+    }
+
+    @Mutation(returns => Boolean, {name:"deleteEducation"})
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    async deleteEducation(@GqlCurrentUser() profileID:any, @Args("educationID") educationID:string){
+        await this.profileService.deleteEducation(educationID , profileID.sub)
         return true;
     }
 
     @Mutation(returns => Boolean, {name:"addOrUpdateExperience"})
-    async addOrUpdateExperience(@Args("experience") experience:ExperienceInput){
-        await this.profileService.addOrUpdateExperience(experience as any)
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    async addOrUpdateExperience(@GqlCurrentUser() profileID:any, @Args("experience") experience:ExperienceInput){
+        await this.profileService.addOrUpdateExperience(experience as any, profileID.sub)
+        return true;
+    }
+
+    @Mutation(returns => Boolean, {name:"deleteExperience"})
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    async deleteExperience(@GqlCurrentUser() profileID:any, @Args("experienceID") experienceID:string){
+        await this.profileService.deleteExperience(experienceID , profileID.sub)
         return true;
     }
 
     @Mutation(returns => Boolean, {name:"addOrUpdateQualification"})
-    async addOrUpdateQualification(@Args("qualification") qualification:QualificationInput){
-        await this.profileService.addOrUpdateQualification(qualification as any)
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    async addOrUpdateQualification(@GqlCurrentUser() profileID:any, @Args("qualification") qualification:QualificationInput){
+        await this.profileService.addOrUpdateQualification(qualification as any, profileID.sub)
         return true;
     }
 
-    @Mutation(returns => Boolean, {name:"addOrUpdatePublications"})
-    async addOrUpdatePublications(@Args("publication") publication:PublicationsInput){
-        await this.profileService.addOrUpdatePublications(publication as any)
+    @Mutation(returns => Boolean, {name:"deleteQualification"})
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    async deleteQualification(@GqlCurrentUser() profileID:any, @Args("qualificationID") qualificationID:string){
+        await this.profileService.deleteQualification(qualificationID , profileID.sub)
+        return true;
+    }
+
+    @Mutation(returns => Boolean, {name:"addOrUpdatePublication"})
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    async addOrUpdatePublication(@GqlCurrentUser() profileID:any, @Args("publication") publication:PublicationInput){
+        await this.profileService.addOrUpdatePublication(publication as any, profileID.sub)
+        return true;
+    }
+
+    @Mutation(returns => Boolean, {name:"deletePublication"})
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    async deletePublication(@GqlCurrentUser() profileID:any, @Args("publicationID") publicationID:string){
+        await this.profileService.deletePublication(publicationID , profileID.sub)
         return true;
     }
 }

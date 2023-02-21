@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ProfileRepository } from "./profile.repository";
-import { Education, Experience, Publications, Qualification, Profile } from "./profile.schema";
+import { Education, Experience, Publication, Qualification, Profile } from "./profile.schema";
 import { Types } from "mongoose";
 
 
@@ -31,154 +31,149 @@ export class ProfileService{
         await this.profileRepository.deleteOne(_id)
     }
     
-    public async addOrUpdateEducation(model:Education){
+    public async addOrUpdateEducation(model:Education, profileID:string){
+        model.profileId = profileID;
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
 
-        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
-        console.log(profile)
-
-        if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
+        if(!profile) throw new HttpException('Profile not Found', HttpStatus.NOT_FOUND);
 
         const prof = (profile as any)._doc || profile;
-        //update education not working, there's no id in model/...
+
         if(model._id){
             const index  = prof.education.findIndex(e=>e._id.toString() === model._id.toString());
-
+            delete model._id;
             prof.education[index] = {...prof.education[index], ...model };
         }else{
             prof.education.push({...model,_id: new Types.ObjectId()})
         }
 
-        await this.updateOne(profile._id?.toString(),prof);
+        await this.updateOne(profileID, prof);
 
         return prof;
     }
 
-    public async deleteEducation(model:Education){
-        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
-
+    public async deleteEducation(educationID:string, profileID:string){
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
     
-        if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
+        if(!profile) throw new HttpException('Profile not Found', HttpStatus.NOT_FOUND);
 
         const prof = (profile as any)._doc || profile;
 
-        prof.educations = prof.educations.filter(e=>e._id.toString() === model._id.toString());
+        prof.education = prof.education.filter(e=>e._id.toString() !== educationID);
 
-        await this.updateOne(profile._id?.toString(),prof);
+        await this.updateOne(profileID, prof);
 
         return prof;
 
     }
 
 
-    public async addOrUpdateExperience(model:Experience){
+    public async addOrUpdateExperience(model:Experience, profileID:string){
+        model.profileId = profileID;
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
 
-        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
-        console.log(profile)
-
-        if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
+        if(!profile) throw new HttpException('Profile not Found', HttpStatus.NOT_FOUND);
 
         const prof = (profile as any)._doc || profile;
-        //update education not working, there's no id in model/...
+
         if(model._id){
             const index  = prof.experience.findIndex(e=>e._id.toString() === model._id.toString());
-
+            delete model._id;
             prof.experience[index] = {...prof.experience[index], ...model };
         }else{
             prof.experience.push({...model,_id: new Types.ObjectId()})
         }
 
-        await this.updateOne(profile._id?.toString(),prof);
+        await this.updateOne(profileID, prof);
 
         return prof;
     }
 
-    public async deleteExperience(model:Experience){
-        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
+    public async deleteExperience(experienceID:string, profileID:string){
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
 
     
-        if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
+        if(!profile) throw new HttpException('Profile not Found', HttpStatus.NOT_FOUND);
 
         const prof = (profile as any)._doc || profile;
 
-        prof.experience = prof.experience.filter(e=>e._id.toString() === model._id.toString());
+        prof.experience = prof.experience.filter(e=>e._id.toString() !== experienceID);
 
-        await this.updateOne(profile._id?.toString(),prof);
+        await this.updateOne(profileID, prof);
 
         return prof;
 
     }
 
-    public async addOrUpdateQualification(model:Qualification){
+    public async addOrUpdateQualification(model:Qualification, profileID:string){
+        model.profileId = profileID;
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
 
-        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
-        console.log(profile)
-
-        if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
+        if(!profile) throw new HttpException('Profile not Found', HttpStatus.NOT_FOUND);
 
         const prof = (profile as any)._doc || profile;
-        //update education not working, there's no id in model/...
+
         if(model._id){
             const index  = prof.qualification.findIndex(e=>e._id.toString() === model._id.toString());
-
+            delete model._id;
             prof.qualification[index] = {...prof.qualification[index], ...model };
         }else{
             prof.qualification.push({...model,_id: new Types.ObjectId()})
         }
 
-        await this.updateOne(profile._id?.toString(),prof);
+        await this.updateOne(profileID, prof);
 
         return prof;
     }
 
-    public async deleteQualification(model:Qualification){
-        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
+    public async deleteQualification(qualificationID:string, profileID:string){
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
 
     
-        if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
+        if(!profile) throw new HttpException('Profile not Found', HttpStatus.NOT_FOUND);
 
         const prof = (profile as any)._doc || profile;
 
-        prof.qualification = prof.qualification.filter(e=>e._id.toString() === model._id.toString());
+        prof.qualification = prof.qualification.filter(e=>e._id.toString() !== qualificationID);
 
-        await this.updateOne(profile._id?.toString(),prof);
+        await this.updateOne(profileID, prof);
 
         return prof;
 
     }
 
-    public async addOrUpdatePublications(model:Publications){
+    public async addOrUpdatePublication(model:Publication, profileID:string){
+        model.profileId = profileID;
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
 
-        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
-        console.log(profile)
-
-        if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
+        if(!profile) throw new HttpException('Profile not Found', HttpStatus.NOT_FOUND);
 
         const prof = (profile as any)._doc || profile;
-        //update education not working, there's no id in model/...
-        if(model._id){
-            const index  = prof.publications.findIndex(e=>e._id.toString() === model._id.toString());
 
-            prof.publications[index] = {...prof.publications[index], ...model };
+        if(model._id){
+            const index  = prof.publication.findIndex(e=>e._id.toString() === model._id.toString());
+            delete model._id;
+            prof.publication[index] = {...prof.publication[index], ...model };
         }else{
-            prof.publications.push({...model,_id: new Types.ObjectId()})
+            prof.publication.push({...model,_id: new Types.ObjectId()})
         }
 
-        await this.updateOne(profile._id?.toString(),prof);
+        await this.updateOne(profileID, prof);
 
         return prof;
     }
 
-    public async deletePublications(model:Publications){
-        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(model.profileId)});
+    public async deletePublication(publicationID:string, profileID:string){
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
 
     
-        if(!profile) throw new HttpException('pROFILE NOT FOUND', HttpStatus.NOT_FOUND);
+        if(!profile) throw new HttpException('Profile not Found', HttpStatus.NOT_FOUND);
 
         const prof = (profile as any)._doc || profile;
 
-        prof.publications = prof.publications.filter(e=>e._id.toString() === model._id.toString());
+        prof.publication = prof.publication.filter(e=>e._id.toString() !== publicationID);
 
-        await this.updateOne(profile._id?.toString(),prof);
+        await this.updateOne(profileID, prof);
 
         return prof;
 

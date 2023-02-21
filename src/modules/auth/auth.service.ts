@@ -76,6 +76,7 @@ export class AuthService {
     await this.userService.update(newUser._id.toString(), {
       profileID: newProfile._id,
     });
+    newUser.profileID = newProfile._id;
 
     const confirmation_token = await this.jwt.signAsync(
       { email: user.email },
@@ -96,7 +97,7 @@ export class AuthService {
     req: Request,
     res: Response,
   ): Promise<LoginResponse> {
-    const cookies = req.cookies;
+    const headers = req.headers;
     const checkUser = await this.userService.findOneAuth({
       username: user.username,
       email: user.username,
@@ -113,8 +114,8 @@ export class AuthService {
     //     secret: process.env.REFRESH_TOKEN_SECRET
     // })
 
-    if (cookies.refresh_token) {
-      const oldRefreshToken = req.cookies.refresh_token;
+    if (headers.refresh_token) {
+      const oldRefreshToken = req.headers.refresh_token;
       const newRefreshTokenArray = checkUser.refreshToken.filter(
         (rt) => rt !== oldRefreshToken,
       );
@@ -127,12 +128,12 @@ export class AuthService {
       });
     }
 
-    res.cookie('refresh_token', token.refresh_token, {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-      maxAge: 60 * 60 * 24 * 7,
-    });
+    // res.cookie('refresh_token', token.refresh_token, {
+    //   httpOnly: true,
+    //   sameSite: 'none',
+    //   secure: true,
+    //   maxAge: 60 * 60 * 24 * 7,
+    // });
 
     return {
       ...token,
@@ -145,24 +146,24 @@ export class AuthService {
   }
 
   async signout(req: Request, res: Response): Promise<void> {
-    //delete access token from client
+    //delete access token and refresh token from client
 
     //delete refresh token from db
-    const cookies = req.cookies;
-    if (!cookies?.refresh_token) {
+    const headers = req.headers;
+    if (!headers?.refresh_token) {
       throw new UnauthorizedException();
     }
-    const oldRefreshToken = req.cookies.refresh_token;
+    const oldRefreshToken = req.headers.refresh_token;
 
     const user = await this.userService.findOne({
-      refreshToken: oldRefreshToken,
+      refreshToken: oldRefreshToken as any,
     });
     if (!user) {
-      res.clearCookie('refresh_token', {
-        httpOnly: true,
-        sameSite: 'none',
-        secure: true,
-      });
+      // res.clearCookie('refresh_token', {
+      //   httpOnly: true,
+      //   sameSite: 'none',
+      //   secure: true,
+      // });
       throw new ForbiddenException();
     }
 
@@ -173,11 +174,11 @@ export class AuthService {
       refreshToken: [...newRefreshTokenArray],
     });
     //clear cookie
-    res.clearCookie('refresh_token', {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-    });
+    // res.clearCookie('refresh_token', {
+    //   httpOnly: true,
+    //   sameSite: 'none',
+    //   secure: true,
+    // });
   }
 
   async changePassword(
@@ -215,25 +216,25 @@ export class AuthService {
   }
 
   async refresh(req: Request, res: Response): Promise<Tokens> {
-    const cookies = req.cookies;
-    if (!cookies.refresh_token) {
+    const headers = req.headers;
+    if (!headers.refresh_token) {
       throw new UnauthorizedException();
     }
-    const oldRefreshToken = req.cookies.refresh_token;
-    res.clearCookie('refresh_token', {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-    });
+    const oldRefreshToken = req.headers.refresh_token;
+    // res.clearCookie('refresh_token', {
+    //   httpOnly: true,
+    //   sameSite: 'none',
+    //   secure: true,
+    // });
 
     const user = await this.userService.findOne({
-      refreshToken: oldRefreshToken,
+      refreshToken: oldRefreshToken as any,
     });
 
     //reuse detection
     if (!user) {
       const token = await this.jwt
-        .verifyAsync(oldRefreshToken, {
+        .verifyAsync(oldRefreshToken as any, {
           secret: process.env.REFRESH_TOKEN_SECRET,
         })
         .catch(() => {
@@ -259,7 +260,7 @@ export class AuthService {
 
     //evaluate refresh token
     const decode = await this.jwt
-      .verifyAsync(oldRefreshToken, {
+      .verifyAsync(oldRefreshToken as any, {
         secret: process.env.REFRESH_TOKEN_SECRET,
       })
       .catch((error) => {
@@ -290,17 +291,17 @@ export class AuthService {
     await this.userService.update(user._id.toString(), {
       refreshToken: [...newRefreshTokenArray, refresh_token],
     });
-    res.cookie('refresh_token', refresh_token, {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-      maxAge: 60 * 60 * 24 * 7,
-    });
+    // res.cookie('refresh_token', refresh_token, {
+    //   httpOnly: true,
+    //   sameSite: 'none',
+    //   secure: true,
+    //   maxAge: 60 * 60 * 24 * 7,
+    // });
     return { access_token, refresh_token };
   }
 
   async googleAuth(req, res): Promise<any> {
-    const cookies = req.cookies;
+    const headers = req.headers;
     if (!req.user) {
       throw new ForbiddenException('No User From Google');
     }
@@ -332,8 +333,8 @@ export class AuthService {
         },
       );
 
-      if (cookies.refresh_token) {
-        const oldRefreshToken = req.cookies.refresh_token;
+      if (headers.refresh_token) {
+        const oldRefreshToken = req.headers.refresh_token;
         const newRefreshTokenArray = checkUser.refreshToken.filter(
           (rt) => rt !== oldRefreshToken,
         );
@@ -346,12 +347,12 @@ export class AuthService {
         });
       }
 
-      res.cookie('refresh_token', refresh_token, {
-        httpOnly: true,
-        sameSite: 'none',
-        secure: true,
-        maxAge: 60 * 60 * 24 * 7,
-      });
+      // res.cookie('refresh_token', refresh_token, {
+      //   httpOnly: true,
+      //   sameSite: 'none',
+      //   secure: true,
+      //   maxAge: 60 * 60 * 24 * 7,
+      // });
 
       return { access_token, refresh_token };
     }
@@ -371,11 +372,12 @@ export class AuthService {
     await this.userService.update(newUser._id.toString(), {
       profileID: newProfile._id,
     });
+    newUser.profileID = newProfile._id;
     return newUser;
   }
 
   async facebookAuth(req, res): Promise<any> {
-    const cookies = req.cookies;
+    const headers = req.headers;
     if (!req.user) {
       throw new ForbiddenException('No User From Facebook');
     }
@@ -407,8 +409,8 @@ export class AuthService {
         },
       );
 
-      if (cookies.refresh_token) {
-        const oldRefreshToken = req.cookies.refresh_token;
+      if (headers.refresh_token) {
+        const oldRefreshToken = req.headers.refresh_token;
         const newRefreshTokenArray = checkUser.refreshToken.filter(
           (rt) => rt !== oldRefreshToken,
         );
@@ -421,12 +423,12 @@ export class AuthService {
         });
       }
 
-      res.cookie('refresh_token', refresh_token, {
-        httpOnly: true,
-        sameSite: 'none',
-        secure: true,
-        maxAge: 60 * 60 * 24 * 7,
-      });
+      // res.cookie('refresh_token', refresh_token, {
+      //   httpOnly: true,
+      //   sameSite: 'none',
+      //   secure: true,
+      //   maxAge: 60 * 60 * 24 * 7,
+      // });
 
       return { access_token, refresh_token };
     }
@@ -446,6 +448,7 @@ export class AuthService {
     await this.userService.update(newUser._id.toString(), {
       profileID: newProfile._id,
     });
+    newUser.profileID = newProfile._id;
     return newUser;
   }
 
@@ -530,10 +533,6 @@ export class AuthService {
   async genJwtToken(
     user: UserSchema,
   ): Promise<{ access_token: string; refresh_token: string }> {
-
-
-    console.log(process.env.ACCESS_TOKEN_SECRET,'process.env.ACCESS_TOKEN_SECRET,process.env.ACCESS_TOKEN_SECRET,')
-
 
     const access_token = await this.jwt.signAsync(
       {

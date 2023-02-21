@@ -4,37 +4,37 @@ import { join } from "path";
 import { MailService } from "./mail.service";
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { JwtModule } from "@nestjs/jwt";
-
-const host = process.env.SMTP_HOST
-const user = process.env.SMTP_USER
-const pass = process.env.SMTP_PASSWORD
-const from = process.env.SMTP_FROM
+import { ConfigModule, ConfigService } from "@nestjs/config";
 
 @Global()
 @Module({
     imports:[
         JwtModule,
-        MailerModule.forRoot({
-            transport: {
-                host,
-                secure: true,
-                port: 465,
-                auth: {
-                  user,
-                  pass,
+        MailerModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: async (config: ConfigService) => ({
+                transport: {
+                    host: config.get('MAIL_HOST'),
+                    secure: true,
+                    port: 465,
+                    auth: {
+                      user: config.get('MAIL_USER'),
+                      pass: config.get('MAIL_PASSWORD'),
+                    },
                 },
-            },
-            //preview:true,
-            defaults: {
-                from,
-            },
-            template: {
-                dir: join(process.cwd(), 'src/modules', 'mail/templates'),
-                adapter: new EjsAdapter({inlineCssEnabled: true }),
-                options: {
-                strict: false,
+                //preview:true,
+                defaults: {
+                    from: config.get('MAIL_FROM'),
                 },
-            },
+                template: {
+                    dir: join(process.cwd(), 'src/modules', 'mail/templates'),
+                    adapter: new EjsAdapter({inlineCssEnabled: true }),
+                    options: {
+                    strict: false,
+                    },
+                },
+            }),
+            inject: [ConfigService],
         }),
     ],
     providers:[MailService],

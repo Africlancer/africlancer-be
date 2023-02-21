@@ -1,7 +1,7 @@
 import { AutoMap } from "@automapper/classes";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, now, Types } from "mongoose";
-
+import defaultValue from "./defaults"
 
 export type ProfileDocument = HydratedDocument<Profile>
 
@@ -19,19 +19,19 @@ export class Profile{
     avatar:string;
 
     @AutoMap()
-    @Prop()
+    @Prop({default:defaultValue().banner})
     banner:string;
 
     @AutoMap()
-    @Prop({required:true,default:0})
+    @Prop({required:true,default:defaultValue().hourlyRate})
     hourlyRate:number;
 
     @AutoMap()
-    @Prop({required:true, default:"I'm a freelancer"})
+    @Prop({required:true, default:defaultValue().professionalHeadline})
     professionalHeadline:string;
 
     @AutoMap()
-    @Prop({required:true, default:"About my services"})
+    @Prop({required:true, default:defaultValue().summary})
     summary:string;
 
     @AutoMap()
@@ -43,14 +43,14 @@ export class Profile{
     updatedAt:Date;
 
     @AutoMap()
-    @Prop({required:true, default:0})
+    @Prop({required:true, default:defaultValue().recommendations})
     recommendations:number;
 
     @Prop()
     education: Array<Education>
 
     @Prop()
-    publications: Array<Publications>
+    publication: Array<Publication>
 
     @Prop()
     experience: Array<Experience>
@@ -156,7 +156,7 @@ export class Qualification{
     profileId:string;
 }
 
-export class Publications{
+export class Publication{
     @AutoMap()
     _id: Types.ObjectId;
 
