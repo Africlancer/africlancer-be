@@ -5,6 +5,10 @@ import { AutoMap } from "@automapper/classes";
 @ObjectType()
 export class Qualification{
     @AutoMap()
+    @Field()
+    _id:string;
+    
+    @AutoMap()
     @Field({ nullable: true })
     title?:string;
 
@@ -50,6 +54,10 @@ export class QualificationInput{
 
 @ObjectType()
 export class Experience{
+    @AutoMap()
+    @Field()
+    _id:string;
+
     @AutoMap()
     @Field({ nullable: true })
     title?:string;
@@ -130,6 +138,10 @@ export class ExperienceInput{
 @ObjectType()
 export class Publication{
     @AutoMap()
+    @Field()
+    _id:string;
+
+    @AutoMap()
     @Field({ nullable: true })
     title?:string;
 
@@ -167,6 +179,10 @@ export class PublicationInput{
 
 @ObjectType()
 export class Education{
+    @AutoMap()
+    @Field()
+    _id:string;
+
     @AutoMap()
     @Field({ nullable: true })
     country?:string;
@@ -239,6 +255,10 @@ export class Profile{
 
     @AutoMap()
     @Field({ nullable: true })
+    location?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
     hourlyRate?:number;
 
     @AutoMap()
@@ -292,6 +312,10 @@ export class CreateProfileInput{
 
     @AutoMap()
     @Field({ nullable: true })
+    location?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
     hourlyRate?:number;
 
     @AutoMap()
@@ -328,6 +352,10 @@ export class CommonProfileInput{
     @AutoMap()
     @Field({ nullable: true })
     banner?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    location?:string;
 
     @AutoMap()
     @Field({ nullable: true })

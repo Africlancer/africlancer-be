@@ -21,16 +21,16 @@ export class ProfileMapper extends AutomapperProfile {
                 forMember((dest) => dest.userID, 
                 mapFrom(src => src.userID.toString())
                 ),
-                forMember((dest) => dest.education, 
+                forMember((dest) => dest.education as any, 
                 mapFrom(src => src.education)
                 ),
-                forMember((dest) => dest.experience, 
+                forMember((dest) => dest.experience as any, 
                 mapFrom(src => src.experience)
                 ),
-                forMember((dest) => dest.qualification, 
+                forMember((dest) => dest.qualification as any, 
                 mapFrom(src => src.qualification)
                 ),
-                forMember((dest) => dest.publication, 
+                forMember((dest) => dest.publication as any, 
                 mapFrom(src => src.publication)
                 )
             )

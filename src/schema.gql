@@ -30,6 +30,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type Qualification {
+  _id: String!
   title: String
   conferringOrganization: String
   summary: String
@@ -38,6 +39,7 @@ type Qualification {
 }
 
 type Experience {
+  _id: String!
   title: String
   company: String
   startMonth: String
@@ -50,6 +52,7 @@ type Experience {
 }
 
 type Publication {
+  _id: String!
   title: String
   publisher: String
   summary: String
@@ -57,6 +60,7 @@ type Publication {
 }
 
 type Education {
+  _id: String!
   country: String
   insitution: String
   degree: String
@@ -70,6 +74,7 @@ type Profile {
   userID: String!
   avatar: String
   banner: String
+  location: String
   hourlyRate: Float
   professionalHeadline: String
   summary: String
@@ -149,6 +154,7 @@ input QueryProfileInput {
   userID: String
   avatar: String
   banner: String
+  location: String
   hourlyRate: Float
   professionalHeadline: String
   summary: String

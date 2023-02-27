@@ -23,6 +23,10 @@ export class Profile{
     banner:string;
 
     @AutoMap()
+    @Prop({required:true,default:defaultValue().location})
+    location:string;
+
+    @AutoMap()
     @Prop({required:true,default:defaultValue().hourlyRate})
     hourlyRate:number;
 
