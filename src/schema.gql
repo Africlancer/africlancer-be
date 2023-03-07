@@ -15,19 +15,34 @@ type User {
 
 type Project {
   _id: String!
+  userId: String
   title: String!
-  budget: Float!
+  minBudget: Float!
+  maxBudget: Float!
   summary: String!
   details: String!
   startDate: DateTime!
   endDate: DateTime!
   projectId: String
+  status: ProjectStatus
+  type: ProjectType!
 }
 
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+enum ProjectStatus {
+  BIDDING_OPEN
+  BIDDING_CLOSE
+  COMPLETED
+}
+
+enum ProjectType {
+  FIXED_PRICE
+  HOURLY_RATE
+}
 
 type Qualification {
   _id: String!
@@ -118,18 +133,31 @@ type Tokens {
   refresh_token: String!
 }
 
+type Bid {
+  _id: String!
+  userID: String!
+  projectID: String!
+  proposal: String!
+  isAwarded: Boolean
+  budget: Float
+  hourlyRate: Float
+  deliveredIn: Float!
+}
+
 type Query {
   findOneUser: User!
   findUsers(query: QueryUserInput!): [User!]!
   findOneProject(query: QueryProjectInput!): Project!
   findProjects(query: QueryProjectInput!): [Project!]!
-  deleteProject(_id: String!): Boolean!
+  deleteProject: Boolean!
   findOneProfile: Profile!
   findProfiles(query: QueryProfileInput!): [Profile!]!
   findOnePortfolio(query: QueryPortfolioInput!): Portfolio!
   findPortfolios(query: QueryPortfolioInput!): [Portfolio!]!
   deletePortfolio(_id: String!): Boolean!
   deleteUser: Boolean!
+  findBids(query: QueryBidInput!): [Bid!]!
+  findOneBid(query: QueryBidInput!): Bid!
 }
 
 input QueryUserInput {
@@ -142,11 +170,13 @@ input QueryUserInput {
 
 input QueryProjectInput {
   title: String
-  budget: Float
+  minBudget: Float
+  maxBudget: Float
   summary: String
   details: String
   startDate: DateTime
   endDate: DateTime
+  type: ProjectType
 }
 
 input QueryProfileInput {
@@ -178,10 +208,19 @@ input QueryPortfolioInput {
   stack: String
 }
 
+input QueryBidInput {
+  projectID: String
+  proposal: String
+  budget: Float
+  hourlyRate: Float
+  deliveredIn: Float
+  isAwarded: Boolean
+}
+
 type Mutation {
   updateUser(user: QueryUserInput!): Boolean!
   createProject(project: CreateProjectInput!): Project!
-  updateProject(_id: String!, project: QueryProjectInput!): Boolean!
+  updateProject(project: QueryProjectInput!): Boolean!
   updateProfile(profile: QueryProfileInput!): Boolean!
   addOrUpdateEducation(education: EducationInput!): Boolean!
   deleteEducation(educationID: String!): Boolean!
@@ -199,15 +238,23 @@ type Mutation {
   userChangePassword(resetData: UserChangePassword!): Boolean!
   getNewTokens: Tokens!
   userResetPassword(email: String!): Boolean!
+  createBid(bid: CreateBidInput!): Bid!
+  updateBid(bid: QueryBidInput!): Boolean!
+  deleteBid: Boolean!
+  awardBid(projectId: String!, bidId: String!): Boolean!
+  unawardBid(projectId: String!, bidId: String!): Boolean!
 }
 
 input CreateProjectInput {
+  userId: String
   title: String!
-  budget: Float!
+  minBudget: Float!
+  maxBudget: Float!
   summary: String!
   details: String!
   startDate: DateTime!
   endDate: DateTime!
+  type: ProjectType!
 }
 
 input ExperienceInput {
@@ -261,4 +308,13 @@ input UserSignIn {
 input UserChangePassword {
   oldPassword: String!
   newPassword: String!
+}
+
+input CreateBidInput {
+  userID: String
+  projectID: String!
+  proposal: String!
+  budget: Float
+  hourlyRate: Float
+  deliveredIn: Float!
 }

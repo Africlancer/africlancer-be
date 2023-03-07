@@ -1,6 +1,7 @@
 import { AutoMap } from '@automapper/classes';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { ProjectStatus, ProjectType } from './project.enum';
 
 export type ProjectDocument = HydratedDocument<Project>;
 
@@ -11,11 +12,19 @@ export class Project {
 
   @AutoMap()
   @Prop({ required: true })
+  userId: Types.ObjectId;
+
+  @AutoMap()
+  @Prop({ required: true })
   title: string;
 
   @AutoMap()
   @Prop({ required: true })
-  budget: number;
+  minBudget: number;
+
+  @AutoMap()
+  @Prop({ required: true })
+  maxBudget: number;
 
   @AutoMap()
   @Prop({ required: true })
@@ -33,8 +42,17 @@ export class Project {
   @Prop({ required: true })
   endDate: Date;
 
+  @AutoMap()
   @Prop({})
   projectId: number;
+
+  @AutoMap()
+  @Prop({type:String, enum:ProjectStatus, required: true, default: ProjectStatus.BIDDING_OPEN})
+  status: ProjectStatus;
+
+  @AutoMap()
+  @Prop({type:String, enum:ProjectType, required: true})
+  type:ProjectType;
 }
 
 
@@ -47,5 +65,3 @@ export const ProjectSchema = SchemaFactory.createForClass(Project);
 // startDate: string;
 // @Prop({ type:'date' })
 // endDate: string;
-
-//Damilola: made some type changes and added support for mapping 

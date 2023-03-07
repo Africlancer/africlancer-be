@@ -13,5 +13,6 @@ import { ProjectMapper } from './project.mapper';
   ],
   controllers: [ProjectController],
   providers: [ProjectResolver, ProjectService, ProjectRepository, ProjectMapper],
+  exports:[ProjectService, ProjectRepository]
 })
 export class ProjectModule {}

@@ -28,12 +28,6 @@ export class ProfileResolver{
         return this.classMapper.mapArrayAsync(await this.profileService.find(query as unknown), ProfileSchema, Profile);
     }
 
-    // @Mutation(returns => Profile, {name:"createProfile"})
-    // async createProfile(@Args("profile") profile:CreateProfileInput):Promise<Profile>{
-    //     const queryMap = await this.classMapper.mapAsync(profile, CreateProfileInput, ProfileSchema)
-    //     return await this.classMapper.mapAsync(await this.profileService.create(queryMap), ProfileSchema, Profile);
-    // }
-
     @Mutation(returns => Boolean, {name:"updateProfile"})
     @UseGuards(GqlJwtGuard)
     @Roles(Role.USER)
@@ -45,12 +39,6 @@ export class ProfileResolver{
         await this.profileService.updateOne(profileID.sub, queryMap)
         return true;
     }
-
-    // @Query(returns => Boolean, {name: "deleteProfile"})
-    // async deleteProfile(@Args("id") id:string):Promise<Boolean>{
-    //     await this.profileService.deleteOne(id)
-    //     return true;
-    // }
 
     @Mutation(returns => Boolean, {name:"addOrUpdateEducation"})
     @UseGuards(GqlJwtGuard)

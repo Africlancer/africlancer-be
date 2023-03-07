@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import { ProjectStatus } from './project.enum';
 import { Project, ProjectDocument } from './project.schema';
 
 @Injectable()
@@ -8,8 +9,8 @@ export class ProjectRepository {
   constructor(@InjectModel(Project.name) private projectModel: Model<ProjectDocument>) {}
 
   public create(project: Project): Promise<Project> {
-    const createProject = new this.projectModel(project);
-    return createProject.save();
+    project.userId = new Types.ObjectId(project.userId)
+    return this.projectModel.create(project);
   }
 
   public async updateOne(_id: string, project: Partial<Project>): Promise<void> {
@@ -23,8 +24,7 @@ export class ProjectRepository {
   }
 
   public async find(project: Partial<Project>): Promise<Project[]> {
-
-    return await this.projectModel.find(project);
+    return await this.projectModel.find({"$and":[project, {status:ProjectStatus.BIDDING_OPEN}]});
   }
 
   public async delete(_id: string): Promise<void> {

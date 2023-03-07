@@ -1,7 +1,14 @@
 import { AutoMap } from '@automapper/classes';
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { ProjectStatus, ProjectType } from './project.enum';
 
-//Damilola: made some type changes and added support for mapping 
+registerEnumType(ProjectStatus, {
+  name:"ProjectStatus"
+})
+
+registerEnumType(ProjectType, {
+  name:"ProjectType"
+})
 
 @ObjectType()
 export class Project {
@@ -10,12 +17,20 @@ export class Project {
   _id: string;
 
   @AutoMap()
+  @Field({ nullable: true })
+  userId?: string;
+
+  @AutoMap()
   @Field()
   title: string;
 
   @AutoMap()
   @Field()
-  budget: number;
+  minBudget: number;
+
+  @AutoMap()
+  @Field()
+  maxBudget: number;
 
   @AutoMap()
   @Field()
@@ -33,8 +48,17 @@ export class Project {
   @Field()
   endDate: Date;
 
+  @AutoMap()
   @Field({ nullable: true })
   projectId: string;
+
+  @AutoMap()
+  @Field(type => ProjectStatus, { nullable: true })
+  status: ProjectStatus;
+
+  @AutoMap()
+  @Field(type => ProjectType)
+  type: ProjectType;
 }
 
 @InputType()
@@ -45,7 +69,11 @@ export class CommonProjectInput {
 
   @AutoMap()
   @Field({ nullable: true })
-  budget?: number;
+  minBudget?: number;
+
+  @AutoMap()
+  @Field({ nullable: true })
+  maxBudget?: number;
 
   @AutoMap()
   @Field({ nullable: true })
@@ -62,10 +90,18 @@ export class CommonProjectInput {
   @AutoMap()
   @Field({ nullable: true })
   endDate?: Date;
+
+  @AutoMap()
+  @Field(type => ProjectType, { nullable: true })
+  type?: ProjectType;
 }
 
 @InputType()
 export class CreateProjectInput {
+  
+  @AutoMap()
+  @Field({ nullable: true })
+  userId?: string;
 
   @AutoMap()
   @Field()
@@ -73,7 +109,11 @@ export class CreateProjectInput {
 
   @AutoMap()
   @Field()
-  budget: number;
+  minBudget: number;
+
+  @AutoMap()
+  @Field()
+  maxBudget: number;
 
   @AutoMap()
   @Field()
@@ -90,13 +130,11 @@ export class CreateProjectInput {
   @AutoMap()
   @Field()
   endDate: Date;
+
+  @AutoMap()
+  @Field(type => ProjectType)
+  type: ProjectType;
 }
-
-@InputType()
-export class UpdateProjectInput extends CommonProjectInput {}
-
-@InputType()
-export class ProjectQueryInput extends CommonProjectInput {}
 
 @InputType()
 export class QueryProjectInput extends CommonProjectInput {}

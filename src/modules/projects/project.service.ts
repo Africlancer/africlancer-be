@@ -27,8 +27,6 @@ export class ProjectService {
   public async delete(_id: string): Promise<void> {
     await this.ProjectRepo.delete(_id);
   }
-}
-function useParams<T>(): { digits: any; } {
-  throw new Error('Function not implemented.');
+    
 }
 

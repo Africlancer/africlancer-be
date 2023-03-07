@@ -16,6 +16,9 @@ export class ProjectMapper extends AutomapperProfile {
             createMap(mapper, ProjectSchema, ProjectModel, 
                 forMember((dest) => dest._id, 
                 mapFrom(src => src._id.toString())
+                ),
+                forMember((dest) => dest.userId, 
+                mapFrom(src => src.userId.toString())
                 )
             )
             createMap(mapper, QueryProjectInput, ProjectSchema)
