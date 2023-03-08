@@ -65,6 +65,10 @@ export class Project {
 export class CommonProjectInput {
   @AutoMap()
   @Field({ nullable: true })
+  userId?: string;
+
+  @AutoMap()
+  @Field({ nullable: true })
   title?: string;
 
   @AutoMap()
