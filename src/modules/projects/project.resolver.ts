@@ -47,7 +47,7 @@ export class ProjectResolver {
 
   @Query((returns) => [Project], { name: 'findProjects' })
   public async find(@Args('query') query: QueryProjectInput): Promise<Project[]> {
-    return this.classMapper.mapArrayAsync(await this.projectService.find(query), ProjectSchema, Project);
+    return this.classMapper.mapArrayAsync(await this.projectService.find(query as unknown), ProjectSchema, Project);
   }
 
   @Query((returns) => Boolean, { name: 'deleteProject' })

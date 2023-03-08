@@ -169,6 +169,7 @@ input QueryUserInput {
 }
 
 input QueryProjectInput {
+  userId: String
   title: String
   minBudget: Float
   maxBudget: Float

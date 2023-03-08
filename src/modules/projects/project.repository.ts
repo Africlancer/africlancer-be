@@ -24,6 +24,7 @@ export class ProjectRepository {
   }
 
   public async find(project: Partial<Project>): Promise<Project[]> {
+    if(project.userId) project.userId = new Types.ObjectId(project.userId);
     return await this.projectModel.find({"$and":[project, {status:ProjectStatus.BIDDING_OPEN}]});
   }
 
