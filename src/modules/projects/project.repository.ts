@@ -23,9 +23,14 @@ export class ProjectRepository {
     return await this.projectModel.findOne(project);
   }
 
-  public async find(project: Partial<Project>): Promise<Project[]> {
+  public async findFilter(project: Partial<Project>): Promise<Project[]> {
     if(project.userId) project.userId = new Types.ObjectId(project.userId);
     return await this.projectModel.find({"$and":[project, {status:ProjectStatus.BIDDING_OPEN}]});
+  }
+
+  public async find(project: Partial<Project>): Promise<Project[]> {
+    if(project.userId) project.userId = new Types.ObjectId(project.userId);
+    return await this.projectModel.find(project);
   }
 
   public async delete(_id: string): Promise<void> {

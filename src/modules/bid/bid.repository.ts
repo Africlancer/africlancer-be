@@ -8,12 +8,12 @@ export class BidRepository{
     constructor(@InjectModel(Bid.name) private bidModel:Model<BidDocument>){}
 
     async findOne( bid:Partial<Bid>):Promise<Bid>{
-        if(bid._id) bid._id = new Types.ObjectId(bid._id) as any;
+        if(bid._id) bid._id = new Types.ObjectId(bid._id);
         return this.bidModel.findOne(bid);
     }
 
     async find(bid:Partial<Bid>):Promise<Bid[]>{
-        if(bid.projectID) bid.projectID = new Types.ObjectId(bid.projectID) as any;
+        if(bid.projectID) bid.projectID = new Types.ObjectId(bid.projectID);
         return this.bidModel.find(bid);
     }
 

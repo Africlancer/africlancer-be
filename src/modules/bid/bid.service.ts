@@ -72,6 +72,19 @@ export class BidService {
         })
     }
 
+    async totalBids(projectId:string):Promise<Number>{
+        return (await this.bidRepo.find({projectID: new Types.ObjectId(projectId)})).length;
+    }
+
+    async averageBids(projectId:string):Promise<Number>{
+        let totalBudget = 0;
+        const bids = await this.bidRepo.find({projectID: new Types.ObjectId(projectId)});
+        for(let bid in bids){
+            totalBudget += bids[bid].budget
+        }
+        return totalBudget / bids.length;
+    }
+
     //TODO: Team project bidding(more than 1 accepted bidder)
     //TODO: set project status to completed => payment occurs
     

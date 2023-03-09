@@ -148,6 +148,7 @@ type Query {
   findOneUser: User!
   findUsers(query: QueryUserInput!): [User!]!
   findOneProject(query: QueryProjectInput!): Project!
+  findProjectsFilter(query: QueryProjectInput!): [Project!]!
   findProjects(query: QueryProjectInput!): [Project!]!
   deleteProject: Boolean!
   findOneProfile: Profile!
@@ -158,6 +159,8 @@ type Query {
   deleteUser: Boolean!
   findBids(query: QueryBidInput!): [Bid!]!
   findOneBid(query: QueryBidInput!): Bid!
+  totalBids(projectId: String!): Float!
+  averageBids(projectId: String!): Float!
 }
 
 input QueryUserInput {

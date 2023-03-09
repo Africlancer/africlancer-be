@@ -45,8 +45,16 @@ export class ProjectResolver {
     return this.classMapper.mapAsync(await this.projectService.findOne(query as unknown), ProjectSchema, Project);
   }
 
+  @Query((returns) => [Project], { name: 'findProjectsFilter' })
+  public async findFilter(@Args('query') query: QueryProjectInput): Promise<Project[]> {
+    return this.classMapper.mapArrayAsync(await this.projectService.findFilter(query as unknown), ProjectSchema, Project);
+  }
+
   @Query((returns) => [Project], { name: 'findProjects' })
-  public async find(@Args('query') query: QueryProjectInput): Promise<Project[]> {
+  @UseGuards(GqlJwtGuard)
+  @Roles(Role.USER)
+  public async find(@GqlCurrentUser() user:any, @Args('query') query: QueryProjectInput): Promise<Project[]> {
+    query.userId = user.sub
     return this.classMapper.mapArrayAsync(await this.projectService.find(query as unknown), ProjectSchema, Project);
   }
 

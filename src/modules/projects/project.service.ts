@@ -20,6 +20,10 @@ export class ProjectService {
     return this.ProjectRepo.findOne(project);
   }
 
+  public async findFilter(project: Partial<Project>): Promise<Project[]> {
+    return this.ProjectRepo.findFilter(project);
+  }
+
   public async find(project: Partial<Project>): Promise<Project[]> {
     return this.ProjectRepo.find(project);
   }

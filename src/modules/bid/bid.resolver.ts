@@ -60,5 +60,17 @@ export class BidResolver {
         return true;
     }
 
+    @Query(returns => Number, {name:"totalBids"})
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    async totalBids(@Args("projectId") projectId:string):Promise<Number>{
+        return this.bidSvc.totalBids(projectId);
+    }
 
+    @Query(returns => Number, {name:"averageBids"})
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    async averageBids(@Args("projectId") projectId:string):Promise<Number>{
+        return this.bidSvc.averageBids(projectId);
+    }
 }
