@@ -51,6 +51,9 @@ export class CreateBidInput{
 @InputType()
 export class CommonBidInput{
     @Field({nullable:true})
+    userID?: string;
+    
+    @Field({nullable:true})
     projectID?: string;
 
     @Field({nullable:true})

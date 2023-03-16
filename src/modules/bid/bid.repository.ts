@@ -9,6 +9,8 @@ export class BidRepository{
 
     async findOne( bid:Partial<Bid>):Promise<Bid>{
         if(bid._id) bid._id = new Types.ObjectId(bid._id);
+        if(bid.userID) bid.userID = new Types.ObjectId(bid.userID);
+        if(bid.projectID) bid.projectID = new Types.ObjectId(bid.projectID);
         return this.bidModel.findOne(bid);
     }
 

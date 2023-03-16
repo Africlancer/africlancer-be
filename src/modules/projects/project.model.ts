@@ -141,4 +141,8 @@ export class CreateProjectInput {
 }
 
 @InputType()
-export class QueryProjectInput extends CommonProjectInput {}
+export class QueryProjectInput extends CommonProjectInput {
+  @AutoMap()
+  @Field({nullable:true})
+  _id?: string;
+}

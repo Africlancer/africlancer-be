@@ -181,6 +181,7 @@ input QueryProjectInput {
   startDate: DateTime
   endDate: DateTime
   type: ProjectType
+  _id: String
 }
 
 input QueryProfileInput {
@@ -213,6 +214,7 @@ input QueryPortfolioInput {
 }
 
 input QueryBidInput {
+  userID: String
   projectID: String
   proposal: String
   budget: Float
