@@ -32,8 +32,8 @@ export class BidResolver {
     @Mutation(returns => Boolean, {name:"updateBid"})
     @UseGuards(GqlJwtGuard)
     @Roles(Role.USER)
-    async update(@GqlCurrentUser() user:any,@Args("bid") bid:QueryBidInput):Promise<Boolean>{
-        return this.bidSvc.update(user.sub, bid as any) as any;
+    async update(@Args("id") id:string, @Args("bid") bid:QueryBidInput):Promise<Boolean>{
+        return this.bidSvc.update(id, bid as any) as any;
     }
 
     @Mutation(returns => Boolean, {name:"deleteBid"})
