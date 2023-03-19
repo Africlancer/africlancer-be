@@ -59,6 +59,18 @@ export class Project {
   @AutoMap()
   @Field(type => ProjectType)
   type: ProjectType;
+
+  @AutoMap()
+  @Field({ nullable: true })
+  totalBids: number;
+
+  @AutoMap()
+  @Field({ nullable: true })
+  averageBid: number;
+
+  @AutoMap()
+  @Field(type => [String])
+  skills: String[];
 }
 
 @InputType()
@@ -98,6 +110,18 @@ export class CommonProjectInput {
   @AutoMap()
   @Field(type => ProjectType, { nullable: true })
   type?: ProjectType;
+
+  @AutoMap()
+  @Field({ nullable: true })
+  totalBids?: number;
+
+  @AutoMap()
+  @Field({ nullable: true })
+  averageBid?: number;
+
+  @AutoMap()
+  @Field(type => [String], { nullable: true })
+  skills?: String[];
 }
 
 @InputType()
@@ -138,6 +162,10 @@ export class CreateProjectInput {
   @AutoMap()
   @Field(type => ProjectType)
   type: ProjectType;
+
+  @AutoMap()
+  @Field(type => [String])
+  skills: String[];
 }
 
 @InputType()

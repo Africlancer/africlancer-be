@@ -26,6 +26,9 @@ type Project {
   projectId: String
   status: ProjectStatus
   type: ProjectType!
+  totalBids: Float
+  averageBid: Float
+  skills: [String!]!
 }
 
 """
@@ -148,7 +151,7 @@ type Query {
   findOneUser: User!
   findUsers(query: QueryUserInput!): [User!]!
   findOneProject(query: QueryProjectInput!): Project!
-  findProjectsFilter(query: QueryProjectInput!): [Project!]!
+  findProjectsFilter(query: QueryProjectInput!, fullSearch: Boolean!): [Project!]!
   findProjects(query: QueryProjectInput!): [Project!]!
   deleteProject: Boolean!
   findOneProfile: Profile!
@@ -181,6 +184,9 @@ input QueryProjectInput {
   startDate: DateTime
   endDate: DateTime
   type: ProjectType
+  totalBids: Float
+  averageBid: Float
+  skills: [String!]
   _id: String
 }
 
@@ -261,6 +267,7 @@ input CreateProjectInput {
   startDate: DateTime!
   endDate: DateTime!
   type: ProjectType!
+  skills: [String!]!
 }
 
 input ExperienceInput {

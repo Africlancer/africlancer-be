@@ -46,8 +46,8 @@ export class ProjectResolver {
   }
 
   @Query((returns) => [Project], { name: 'findProjectsFilter' })
-  public async findFilter(@Args('query') query: QueryProjectInput): Promise<Project[]> {
-    return this.classMapper.mapArrayAsync(await this.projectService.findFilter(query as unknown), ProjectSchema, Project);
+  public async findFilter(@Args('query') query: QueryProjectInput, @Args('fullSearch') fullSearch: Boolean ): Promise<Project[]> {
+    return this.classMapper.mapArrayAsync(await this.projectService.findFilter(query as unknown, fullSearch), ProjectSchema, Project);
   }
 
   @Query((returns) => [Project], { name: 'findProjects' })

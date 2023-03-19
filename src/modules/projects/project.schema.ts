@@ -53,6 +53,18 @@ export class Project {
   @AutoMap()
   @Prop({type:String, enum:ProjectType, required: true})
   type:ProjectType;
+
+  @AutoMap()
+  @Prop({})
+  totalBids: number;
+
+  @AutoMap()
+  @Prop({})
+  averageBid: number;
+
+  @AutoMap()
+  @Prop()
+  skills: Array<String>;
 }
 
 

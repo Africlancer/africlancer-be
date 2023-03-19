@@ -23,8 +23,18 @@ export class ProjectRepository {
     return await this.projectModel.findOne(project);
   }
 
-  public async findFilter(project: Partial<Project>): Promise<Project[]> {
+  public async findFilter(project: Partial<Project>, fullSearch:Boolean): Promise<Project[]> {
     if(project.userId) project.userId = new Types.ObjectId(project.userId);
+    if(project.title && !fullSearch){
+      const title = project.title.split(" ");
+      delete project.title;
+      for (let i in title){
+        const query = await this.projectModel.find({"$and":[project, {status:ProjectStatus.BIDDING_OPEN}, {title: {"$regex":title[i], "$options":"i"}}]});
+        if(query){
+          return query;
+        }
+      }
+    }
     return await this.projectModel.find({"$and":[project, {status:ProjectStatus.BIDDING_OPEN}]});
   }
 

@@ -1,14 +1,14 @@
 import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ForbiddenError } from 'apollo-server-express';
 import { Types } from 'mongoose';
 import { ProjectStatus } from '../projects/project.enum';
 import { ProjectRepository } from '../projects/project.repository';
+import { ProjectService } from '../projects/project.service';
 import { BidRepository } from './bid.repository';
 import { Bid } from './bid.schema';
 
 @Injectable()
 export class BidService {
-    constructor(private readonly bidRepo:BidRepository, private readonly projectRepo:ProjectRepository){}
+    constructor(private readonly bidRepo:BidRepository, private readonly projectService:ProjectService){}
 
     async find(bid:Partial<Bid>):Promise<Bid[]>{
         return this.bidRepo.find(bid);
@@ -19,7 +19,7 @@ export class BidService {
     }
 
     async create(userId:string, bid:Bid):Promise<Bid>{
-        const project = await this.projectRepo.findOne({_id: bid.projectID})
+        const project = await this.projectService.findOne({_id: bid.projectID})
         if(!project){
             throw new HttpException("Project does not exist", HttpStatus.NOT_FOUND)
         }else if(project.status != ProjectStatus.BIDDING_OPEN){
@@ -27,6 +27,12 @@ export class BidService {
         }else if(await this.bidRepo.findOne({userID:new Types.ObjectId(userId), projectID:new Types.ObjectId(bid.projectID)})){
             throw new ForbiddenException("Already bidded for this project")
         }
+
+        const totalBids = await this.totalBids(project._id.toString());
+        const averageBid = await this.averageBids(project._id.toString());
+
+        await this.projectService.updateOne(project._id.toString(), {totalBids, averageBid});
+        
         return this.bidRepo.create(bid); 
     }
 
@@ -42,9 +48,9 @@ export class BidService {
         const bid_id = new Types.ObjectId(bidId);
         const project_id = new Types.ObjectId(projectId);
         
-        const project = await this.projectRepo.findOne({userId: new Types.ObjectId(userId), _id: project_id});
+        const project = await this.projectService.findOne({userId: new Types.ObjectId(userId), _id: project_id});
         if(!project){
-            throw new ForbiddenError("Invalid user, can't award this project");
+            throw new ForbiddenException("Invalid user, can't award this project");
         }
         const bid = await this.bidRepo.findOne({_id: bid_id, projectID:project._id});
         if(!bid){
@@ -52,31 +58,31 @@ export class BidService {
         }
 
         await this.bidRepo.update(bidId, {isAwarded:true}).then(()=>{
-            this.projectRepo.updateOne(project._id.toString(), {status: ProjectStatus.BIDDING_CLOSE})
+            this.projectService.updateOne(project._id.toString(), {status: ProjectStatus.BIDDING_CLOSE})
         })
     }
 
     async unaward(userId:string, projectId:string, bidId:string):Promise<void>{
         const bid_id = new Types.ObjectId(bidId);
         const project_id = new Types.ObjectId(projectId);
-        const project = await this.projectRepo.findOne({userId: new Types.ObjectId(userId), _id: project_id});
+        const project = await this.projectService.findOne({userId: new Types.ObjectId(userId), _id: project_id});
         if(!project){
-            throw new ForbiddenError("Invalid user, can't unaward this project");
+            throw new ForbiddenException("Invalid user, can't unaward this project");
         }
         const bid = await this.bidRepo.findOne({_id: bid_id, projectID:project._id});
         if(!bid){
             throw new HttpException("Cannot find bid", HttpStatus.NOT_FOUND);
         }
         await this.bidRepo.update(bidId, {isAwarded:false}).then(()=>{
-            this.projectRepo.updateOne(project._id.toString(), {status: ProjectStatus.BIDDING_OPEN})
+            this.projectService.updateOne(project._id.toString(), {status: ProjectStatus.BIDDING_OPEN})
         })
     }
 
-    async totalBids(projectId:string):Promise<Number>{
+    async totalBids(projectId:string):Promise<number>{
         return (await this.bidRepo.find({projectID: new Types.ObjectId(projectId)})).length;
     }
 
-    async averageBids(projectId:string):Promise<Number>{
+    async averageBids(projectId:string):Promise<number>{
         let totalBudget = 0;
         const bids = await this.bidRepo.find({projectID: new Types.ObjectId(projectId)});
         for(let bid in bids){
