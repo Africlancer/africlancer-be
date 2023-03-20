@@ -251,7 +251,7 @@ type Mutation {
   getNewTokens: Tokens!
   userResetPassword(email: String!): Boolean!
   createBid(bid: CreateBidInput!): Bid!
-  updateBid(bid: QueryBidInput!): Boolean!
+  updateBid(id: String!, bid: QueryBidInput!): Boolean!
   deleteBid: Boolean!
   awardBid(projectId: String!, bidId: String!): Boolean!
   unawardBid(projectId: String!, bidId: String!): Boolean!

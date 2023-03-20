@@ -27,7 +27,8 @@ export class UserRepository {
   }
 
   public async find(user: Partial<User>): Promise<User[]> {
-
+    if (user._id) user._id = new Types.ObjectId(user._id);
+    if (user.profileID) user.profileID = new Types.ObjectId(user.profileID);
     return await this.userModel.find(user);
   }
 
