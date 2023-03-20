@@ -252,7 +252,7 @@ type Mutation {
   userResetPassword(email: String!): Boolean!
   createBid(bid: CreateBidInput!): Bid!
   updateBid(id: String!, bid: QueryBidInput!): Boolean!
-  deleteBid: Boolean!
+  deleteBid(id: String!): Boolean!
   awardBid(projectId: String!, bidId: String!): Boolean!
   unawardBid(projectId: String!, bidId: String!): Boolean!
 }
