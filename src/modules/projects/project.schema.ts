@@ -55,11 +55,11 @@ export class Project {
   type:ProjectType;
 
   @AutoMap()
-  @Prop({})
+  @Prop({default:0})
   totalBids: number;
 
   @AutoMap()
-  @Prop({})
+  @Prop({default:0})
   averageBid: number;
 
   @AutoMap()
