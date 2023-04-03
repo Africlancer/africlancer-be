@@ -1,5 +1,5 @@
 import { AutoMap } from '@automapper/classes';
-import { Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, InputType, Mutation, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { ProjectStatus, ProjectType } from './project.enum';
 
 registerEnumType(ProjectStatus, {
@@ -173,4 +173,11 @@ export class QueryProjectInput extends CommonProjectInput {
   @AutoMap()
   @Field({nullable:true})
   _id?: string;
+}
+
+@ObjectType()
+export class Subscription{
+  @AutoMap()
+  @Field(type => [String])
+  newProject: Project[];
 }
