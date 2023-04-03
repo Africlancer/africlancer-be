@@ -1,3 +1,6 @@
+import { PersonModule } from './person/person.module';
+import { PubsubModule } from './modules/pubsub/pubsub.module';
+import { NotificationModule } from './modules/notification/notification.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -20,30 +23,40 @@ import { BidModule } from './modules/bid/bid.module';
 
 @Module({
   imports: [
+    PersonModule,
+    PubsubModule,
+    NotificationModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       debug: false,
       playground: {
         settings: {
-        "request.credentials": "include",
-        }
+          'request.credentials': 'include',
+        },
       },
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       cors: { origin: true, credentials: true },
-      context: ({ req, res }) => ({ req, res })
+      context: ({ req, res }) => ({ req, res }),
+      //subcription
+      subscriptions: {
+        'graphql-ws': true,
+      },
     }),
     MongooseModule.forRoot(`mongodb://localhost/${process.env.DB_NAME}`),
-    AutomapperModule.forRoot({strategyInitializer:classes()}),
+    AutomapperModule.forRoot({ strategyInitializer: classes() }),
     UserModule,
     ProjectModule,
     ProfileModule,
     PortfolioModule,
     AuthModule,
     MailModule,
-    BidModule
+    BidModule,
+    NotificationModule,
+    PubsubModule,
+    PersonModule,
   ],
   controllers: [AppController],
-  providers: [AppService, {provide: APP_GUARD, useClass: GqlRolesGuard}],
+  providers: [AppService, { provide: APP_GUARD, useClass: GqlRolesGuard }],
 })
 export class AppModule {}
