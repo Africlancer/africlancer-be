@@ -4,10 +4,12 @@ import { ProjectStatus } from '../projects/project.enum';
 import { ProjectService } from '../projects/project.service';
 import { BidRepository } from './bid.repository';
 import { Bid } from './bid.schema';
+import { User } from '../user/user.schema';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class BidService {
-    constructor(private readonly bidRepo:BidRepository, private readonly projectService:ProjectService){}
+    constructor(private readonly bidRepo:BidRepository, private readonly projectService:ProjectService, private readonly userService:UserService){}
 
     async find(bid:Partial<Bid>):Promise<Bid[]>{
         return this.bidRepo.find(bid);
@@ -91,6 +93,10 @@ export class BidService {
             totalBudget += bids[bid].budget
         }
         return totalBudget / bids.length;
+    }
+
+    async finduser(userId:string):Promise<User>{
+        return this.userService.findOne({_id: new Types.ObjectId(userId)});
     }
 
     //TODO: Team project bidding(more than 1 accepted bidder)

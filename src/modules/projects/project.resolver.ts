@@ -33,10 +33,11 @@ export class ProjectResolver {
   @Roles(Role.USER)
   public async update(
     @GqlCurrentUser() user:any,
+    @Args('id') id:string,
     @Args('project') project: QueryProjectInput,
   ): Promise<boolean> {
     const queryMap = await this.classMapper.mapAsync(project, QueryProjectInput, ProjectSchema)
-    await this.projectService.updateOne(user.sub, queryMap);
+    await this.projectService.updateOne(id, queryMap);
     return true;
   }
 

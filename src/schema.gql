@@ -145,6 +145,7 @@ type Bid {
   budget: Float
   hourlyRate: Float
   deliveredIn: Float!
+  user: User!
 }
 
 type Query {
@@ -232,7 +233,7 @@ input QueryBidInput {
 type Mutation {
   updateUser(user: QueryUserInput!): Boolean!
   createProject(project: CreateProjectInput!): Project!
-  updateProject(project: QueryProjectInput!): Boolean!
+  updateProject(id: String!, project: QueryProjectInput!): Boolean!
   updateProfile(profile: QueryProfileInput!): Boolean!
   addOrUpdateEducation(education: EducationInput!): Boolean!
   deleteEducation(educationID: String!): Boolean!
