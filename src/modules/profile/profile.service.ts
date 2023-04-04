@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ProfileRepository } from "./profile.repository";
 import { Education, Experience, Publication, Qualification, Profile } from "./profile.schema";
 import { Types } from "mongoose";
+import { UserService } from "../user/user.service";
+import { User } from "../user/user.schema";
 
 
 @Injectable()
@@ -9,7 +11,7 @@ export class ProfileService{
     findOneBy(arg0: { id: number; }): any {
         throw new Error("Method not implemented.");
     }
-    constructor(private readonly profileRepository:ProfileRepository){}
+    constructor(private readonly profileRepository:ProfileRepository, private readonly userService:UserService){}
 
     public create(profile:Profile):Promise<Profile>{
         return this.profileRepository.create(profile)
@@ -177,5 +179,13 @@ export class ProfileService{
 
         return prof;
 
+    }
+
+    async finduser(userId:string):Promise<User>{
+        return this.userService.findOne({_id: new Types.ObjectId(userId)});
+    }
+
+    public async findFilter(profile: Partial<Profile>, fullSearch:Boolean): Promise<Profile[]> {
+        return this.profileRepository.findFilter(profile, fullSearch);
     }
 }

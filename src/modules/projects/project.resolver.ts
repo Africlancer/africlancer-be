@@ -1,7 +1,7 @@
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
 import { Param, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Parent, Query, Resolver, ResolveField } from '@nestjs/graphql';
 import { GqlCurrentUser } from '../auth/decorators/gql.user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { GqlJwtGuard } from '../auth/guards/gql.jwt.guard';
@@ -14,6 +14,7 @@ import {
 import { Project as ProjectSchema } from './project.schema';
 
 import { ProjectService } from './project.service';
+import { User } from '../user/user.model';
 
 @Resolver((of) => Project)
 export class ProjectResolver {
@@ -65,5 +66,10 @@ export class ProjectResolver {
   public async delete(@GqlCurrentUser() user:any): Promise<true> {
     await this.projectService.delete(user.sub);
     return true;
+  }
+
+  @ResolveField(returns => User)
+  async user(@Parent() project:Project):Promise<any>{
+      return this.projectService.finduser(project.userId);
   }
 }

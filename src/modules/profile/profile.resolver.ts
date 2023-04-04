@@ -1,4 +1,4 @@
-import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { Args, Mutation, Parent, Query, Resolver, ResolveField } from "@nestjs/graphql";
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
 import { EducationInput, ExperienceInput, Profile, PublicationInput, QualificationInput, QueryProfileInput } from "./profile.model";
@@ -9,6 +9,7 @@ import { GqlJwtGuard } from "../auth/guards/gql.jwt.guard";
 import { UseGuards } from "@nestjs/common";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { Role } from "../auth/roles.enum";
+import { User } from "../user/user.model";
 
 
 @Resolver(of => Profile)
@@ -102,5 +103,15 @@ export class ProfileResolver{
     async deletePublication(@GqlCurrentUser() profileID:any, @Args("publicationID") publicationID:string){
         await this.profileService.deletePublication(publicationID , profileID.sub)
         return true;
+    }
+
+    @ResolveField(returns => User)
+    async user(@Parent() profile:Profile):Promise<any>{
+        return this.profileService.finduser(profile.userID);
+    }
+
+    @Query((returns) => [Profile], { name: 'findProfilesFilter' })
+    public async findFilter(@Args('query') query: QueryProfileInput, @Args('fullSearch') fullSearch: Boolean ): Promise<Profile[]> {
+      return this.classMapper.mapArrayAsync(await this.profileService.findFilter(query as unknown, fullSearch), ProfileSchema, Profile);
     }
 }

@@ -29,6 +29,7 @@ type Project {
   totalBids: Float
   averageBid: Float
   skills: [String!]!
+  user: User!
 }
 
 """
@@ -103,6 +104,9 @@ type Profile {
   experience: [Experience!]
   qualification: [Qualification!]
   publication: [Publication!]
+  skills: [String!]
+  fullName: String
+  user: User!
 }
 
 type Portfolio {
@@ -157,6 +161,7 @@ type Query {
   deleteProject: Boolean!
   findOneProfile: Profile!
   findProfiles(query: QueryProfileInput!): [Profile!]!
+  findProfilesFilter(query: QueryProfileInput!, fullSearch: Boolean!): [Profile!]!
   findOnePortfolio(query: QueryPortfolioInput!): Portfolio!
   findPortfolios(query: QueryPortfolioInput!): [Portfolio!]!
   deletePortfolio(_id: String!): Boolean!
@@ -201,16 +206,8 @@ input QueryProfileInput {
   professionalHeadline: String
   summary: String
   recommendations: Float
-  education: [EducationInput!]
-}
-
-input EducationInput {
-  _id: String
-  country: String
-  insitution: String
-  degree: String
-  startYear: Float
-  endYear: Float
+  skills: [String!]
+  fullName: String
 }
 
 input QueryPortfolioInput {
@@ -269,6 +266,15 @@ input CreateProjectInput {
   endDate: DateTime!
   type: ProjectType!
   skills: [String!]!
+}
+
+input EducationInput {
+  _id: String
+  country: String
+  insitution: String
+  degree: String
+  startYear: Float
+  endYear: Float
 }
 
 input ExperienceInput {

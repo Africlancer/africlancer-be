@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ProjectRepository } from './project.repository';
 import { Project } from './project.schema';
+import { UserService } from '../user/user.service';
+import { User } from '../user/user.schema';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class ProjectService {
-  constructor(private readonly ProjectRepo: ProjectRepository) {}
+  constructor(private readonly ProjectRepo: ProjectRepository, private readonly userService:UserService) {}
 
   public create(project: Project): Promise<Project> {
     var digits = Math.floor(Math.random() * 9000000000) + 1;
@@ -31,6 +34,10 @@ export class ProjectService {
   public async delete(_id: string): Promise<void> {
     await this.ProjectRepo.delete(_id);
   }
+
+  async finduser(userId:string):Promise<User>{
+    return this.userService.findOne({_id: new Types.ObjectId(userId)});
+}
     
 }
 
