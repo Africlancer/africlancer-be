@@ -21,8 +21,8 @@ type Project {
   maxBudget: Float!
   summary: String!
   details: String!
-  startDate: DateTime!
-  endDate: DateTime!
+  startDate: DateTime
+  endDate: DateTime
   projectId: String
   status: ProjectStatus
   type: ProjectType!
@@ -264,8 +264,8 @@ input CreateProjectInput {
   maxBudget: Float!
   summary: String!
   details: String!
-  startDate: DateTime!
-  endDate: DateTime!
+  startDate: DateTime
+  endDate: DateTime
   type: ProjectType!
   skills: [String!]!
 }
@@ -330,4 +330,8 @@ input CreateBidInput {
   budget: Float
   hourlyRate: Float
   deliveredIn: Float!
+}
+
+type Subscription {
+  newProject: Project!
 }

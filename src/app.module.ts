@@ -1,4 +1,4 @@
-import { PersonModule } from './person/person.module';
+// import { PersonModule } from './person/person.module';
 import { PubsubModule } from './modules/pubsub/pubsub.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { Module } from '@nestjs/common';
@@ -20,10 +20,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { GqlRolesGuard } from './modules/auth/guards/gql.roles.guard';
 import { MailModule } from './modules/mail/mail.module';
 import { BidModule } from './modules/bid/bid.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
-    PersonModule,
     PubsubModule,
     NotificationModule,
     ConfigModule.forRoot(),
@@ -54,7 +54,7 @@ import { BidModule } from './modules/bid/bid.module';
     BidModule,
     NotificationModule,
     PubsubModule,
-    PersonModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: GqlRolesGuard }],

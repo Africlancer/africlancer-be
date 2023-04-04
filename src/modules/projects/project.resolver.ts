@@ -37,7 +37,7 @@ export class ProjectResolver {
   //     return project
   // }
 
-  @Subscription()
+  @Subscription(returns => Project)
   newProject(){
     return this.pubSub.asyncIterator(SUBSCRIPTION_EVENTS.newProject)
   }
