@@ -8,6 +8,7 @@ import { GqlJwtGuard } from '../auth/guards/gql.jwt.guard';
 import { Role } from '../auth/roles.enum';
 import { PUB_SUB } from '../pubsub/pubsub.module';
 import { RedisPubSub } from 'graphql-redis-subscriptions';
+
 import {
   CommonProjectInput,
   CreateProjectInput,
@@ -21,16 +22,21 @@ import { ProjectService } from './project.service';
 enum SUBSCRIPTION_EVENTS{
   newProject = 'newProject',
 }
-
+// }export class MyClass {
+//   allSubscribers: Subscription;
+// }
 @Resolver((of) => Project)
 export class ProjectResolver {
   constructor(@Inject(PUB_SUB) private readonly pubSub: RedisPubSub, private readonly projectService: ProjectService, @InjectMapper() private readonly classMapper: Mapper) {}
+
+
 
   // @Resolver()
   // export class ProjectResolver {
     allSubscribers: Project[] = []
     // constructor (@inject(PUB_SUB) private readonly pubSub: RedisPubSub){}
   // @Mutation()
+  
   //   CreateProjectInput(@Args("project") project: Project){
 
       
@@ -44,12 +50,12 @@ export class ProjectResolver {
 
 
   @Mutation((returns) => Project, { name: 'createProject' })
-  @UseGuards(GqlJwtGuard)
-  @Roles(Role.USER)
+  // @UseGuards(GqlJwtGuard)
+  // @Roles(Role.USER)
   public async create(@GqlCurrentUser() user:any, @Args('project') project: CreateProjectInput): Promise<Project> {
-    project.userId = user.sub;
+    // project.userId = user.sub;
     const queryMap = await this.classMapper.mapAsync(project, CreateProjectInput, ProjectSchema);
-    // edit next line to any if it doesnt run - azeezSaid
+    // // edit next line to any if it doesnt run - azeezSaid
     this.allSubscribers.push(new Project)
     this.pubSub.publish(SUBSCRIPTION_EVENTS.newProject, {newProject: project})
     return this.classMapper.mapAsync(await this.projectService.create(queryMap), ProjectSchema, Project);
