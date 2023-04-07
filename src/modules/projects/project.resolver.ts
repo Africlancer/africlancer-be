@@ -16,6 +16,8 @@ import { Project as ProjectSchema } from './project.schema';
 
 import { ProjectService } from './project.service';
 import { User } from '../user/user.model';
+import { RedisPubSub } from 'graphql-redis-subscriptions';
+import { PUB_SUB } from '../pubsub/pubsub.module';
 
 enum SUBSCRIPTION_EVENTS{
   newProject = 'newProject',
@@ -27,16 +29,7 @@ enum SUBSCRIPTION_EVENTS{
 export class ProjectResolver {
   constructor(@Inject(PUB_SUB) private readonly pubSub: RedisPubSub, private readonly projectService: ProjectService, @InjectMapper() private readonly classMapper: Mapper) {}
 
-  // @Resolver()
-  // export class ProjectResolver {
-    allSubscribers: Project[] = []
-    // constructor (@inject(PUB_SUB) private readonly pubSub: RedisPubSub){}
-  // @Mutation()
-  //   CreateProjectInput(@Args("project") project: Project){
-
-      
-  //     return project
-  // }
+  allSubscribers: Project[] = []
 
   @Subscription()
   newProject(){
@@ -54,7 +47,7 @@ export class ProjectResolver {
     this.allSubscribers.push(new Project)
     this.pubSub.publish(SUBSCRIPTION_EVENTS.newProject, {newProject: project})
     return this.classMapper.mapAsync(await this.projectService.create(queryMap), ProjectSchema, Project);
-    }
+  }
     
 
   @Mutation((returns) => Boolean, { name: 'updateProject' })
