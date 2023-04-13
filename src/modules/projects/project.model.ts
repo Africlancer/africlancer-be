@@ -41,11 +41,11 @@ export class Project {
   details: string;
 
   @AutoMap()
-  @Field()
+  @Field({ nullable: true })
   startDate: Date;
 
   @AutoMap()
-  @Field()
+  @Field({ nullable: true })
   endDate: Date;
 
   @AutoMap()
@@ -152,11 +152,11 @@ export class CreateProjectInput {
   details: string;
 
   @AutoMap()
-  @Field()
+  @Field({ nullable:true })
   startDate: Date;
 
   @AutoMap()
-  @Field()
+  @Field({ nullable:true })
   endDate: Date;
 
   @AutoMap()

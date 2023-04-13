@@ -10,12 +10,17 @@ services:
     restart: 'no'
     volumes:
       - db-data:/data/db:delegated
+<<<<<<< HEAD
   depends_on:
     - redis
   env_file:
     .env
   redis:
     image: 'redis:alphine'
+=======
+  redis:
+    image: 'redis'
+>>>>>>> bf975328910ba9c8071cbb270c0d1857723b0e2e
     ports:
       - 6379:${REDIS_PORT}
 volumes:
