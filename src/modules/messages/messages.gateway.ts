@@ -1,6 +1,6 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer, ConnectedSocket } from '@nestjs/websockets';
 import { MessagesService } from './messages.service';
-import { CreateMessageInput } from './message.model';
+import { CreateMessageInput } from './messages.model';
 import {Server, Socket} from 'socket.io';
 
 @WebSocketGateway({

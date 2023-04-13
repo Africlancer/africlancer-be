@@ -3,27 +3,31 @@ import { AutoMap } from '@automapper/classes';
 
 
 @ObjectType()
-export class Message {
+export class Messages {
     @AutoMap()
     @Field()
-    message:strin
+    _id:string;
+
+    @AutoMap()
+    @Field()
+    messages:string;
 }
 
 @InputType()
-export class CreateMessageInput {
+export class CreateMessagesInput {
     @AutoMap()
     @Field({nullable:false})
-    message: string;
+    messages: string;
     
 }
 
 @InputType()
-class MessageInput{
+class MessagesInput{
     @AutoMap()
     @Field({nullable:false})
-    message:string;
+    messages:string;
 
 }
 
 @InputType()
-export class QueryMessageInput extends MessageInput {}
+export class QueryMessagesInput extends MessagesInput {}
