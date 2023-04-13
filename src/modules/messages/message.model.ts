@@ -1,10 +1,29 @@
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { AutoMap } from '@automapper/classes';
+
+
+@ObjectType()
 export class Message {
-    name: string;
-    text: string;
+    @AutoMap()
+    @Field()
+    message:string
 }
 
-
+@InputType()
 export class CreateMessageInput {
-    name: string;
-    text: string;
+    @AutoMap()
+    @Field({nullable:false})
+    message: string;
+    
 }
+
+@InputType()
+class MessageInput{
+    @AutoMap()
+    @Field({nullable:false})
+    message:string;
+
+}
+
+@InputType()
+export class QueryMessageInput extends MessageInput {}
