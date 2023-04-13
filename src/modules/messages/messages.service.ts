@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMessageInput, Message } from './message.model';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { Messages, MessagesDocument } from './messages.schema';
 
 @Injectable()
 export class MessagesService {
-  messages: Message[] = [{name:"Mark", text:"Hello"}]
+  constructor(@InjectModel(Messages.name) private messagesModel: Model<MessagesDocument>) {}
+
   clientToUser = {}
 
   identify(name:string, clientid:string){
@@ -15,16 +18,13 @@ export class MessagesService {
     return this.clientToUser[clientid];
   }
 
-  create(createMessage: CreateMessageInput, clientid: string) {
-    const message:Message = {
-      name: this.clientToUser[clientid],
-      text: createMessage.text
-    }
-    this.messages.push(message);
-    return message;
+  public create(createMessage: Messages, clientid: string) {
+    const message =  new this.messagesModel(createMessage);
+
+    return message.save();
   }
 
   findAll() {
-    return this.messages;
+    return this.messagesModel;
   }
 }
