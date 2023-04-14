@@ -1,3 +1,4 @@
+import { BookmarkModule } from './modules/bookmark/bookmark.module';
 import { PubsubModule } from './modules/pubsub/pubsub.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -22,6 +23,7 @@ import { MessagesModule } from './modules/messages/messages.module';
 
 @Module({
   imports: [
+        BookmarkModule, 
     PubsubModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
