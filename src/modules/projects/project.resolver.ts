@@ -8,10 +8,6 @@ import { GqlJwtGuard } from '../auth/guards/gql.jwt.guard';
 import { Role } from '../auth/roles.enum';
 import { PUB_SUB } from '../pubsub/pubsub.module';
 import { RedisPubSub } from 'graphql-redis-subscriptions';
-<<<<<<< HEAD
-=======
-
->>>>>>> bf975328910ba9c8071cbb270c0d1857723b0e2e
 import {
   CommonProjectInput,
   CreateProjectInput,
@@ -25,42 +21,28 @@ import { ProjectService } from './project.service';
 enum SUBSCRIPTION_EVENTS{
   newProject = 'newProject',
 }
-<<<<<<< HEAD
-
-=======
 // }export class MyClass {
 //   allSubscribers: Subscription;
 // }
->>>>>>> bf975328910ba9c8071cbb270c0d1857723b0e2e
 @Resolver((of) => Project)
 export class ProjectResolver {
   constructor(@Inject(PUB_SUB) private readonly pubSub: RedisPubSub, private readonly projectService: ProjectService, @InjectMapper() private readonly classMapper: Mapper) {}
 
-<<<<<<< HEAD
-=======
 
 
->>>>>>> bf975328910ba9c8071cbb270c0d1857723b0e2e
   // @Resolver()
   // export class ProjectResolver {
     allSubscribers: Project[] = []
     // constructor (@inject(PUB_SUB) private readonly pubSub: RedisPubSub){}
   // @Mutation()
-<<<<<<< HEAD
-=======
   
->>>>>>> bf975328910ba9c8071cbb270c0d1857723b0e2e
   //   CreateProjectInput(@Args("project") project: Project){
 
       
   //     return project
   // }
 
-<<<<<<< HEAD
-  @Subscription()
-=======
   @Subscription(returns => Project)
->>>>>>> bf975328910ba9c8071cbb270c0d1857723b0e2e
   newProject(){
     return this.pubSub.asyncIterator(SUBSCRIPTION_EVENTS.newProject)
   }
@@ -72,11 +54,7 @@ export class ProjectResolver {
   public async create(@GqlCurrentUser() user:any, @Args('project') project: CreateProjectInput): Promise<Project> {
     // project.userId = user.sub;
     const queryMap = await this.classMapper.mapAsync(project, CreateProjectInput, ProjectSchema);
-<<<<<<< HEAD
-    // edit next line to any if it doesnt run - azeezSaid
-=======
     // // edit next line to any if it doesnt run - azeezSaid
->>>>>>> bf975328910ba9c8071cbb270c0d1857723b0e2e
     this.allSubscribers.push(new Project)
     this.pubSub.publish(SUBSCRIPTION_EVENTS.newProject, {newProject: project})
     return this.classMapper.mapAsync(await this.projectService.create(queryMap), ProjectSchema, Project);

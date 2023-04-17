@@ -49,20 +49,14 @@
     "ejs": "^3.1.8",
     "express-session": "^1.17.3",
     "graphql": "^16.6.0",
-<<<<<<< HEAD
-=======
     "graphql-playground-middleware-express": "^1.7.23",
->>>>>>> bf975328910ba9c8071cbb270c0d1857723b0e2e
     "graphql-redis-subscriptions": "^2.6.0",
     "graphql-subscriptions": "^2.0.0",
     "mongoose": "^6.8.3",
     "nestjs-onesignal": "^2.0.0",
     "nodemailer": "^6.9.1",
     "onesignal-api-client-nest": "^1.0.10",
-<<<<<<< HEAD
-=======
     "onesignal-node": "^3.4.0",
->>>>>>> bf975328910ba9c8071cbb270c0d1857723b0e2e
     "passport": "^0.6.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
