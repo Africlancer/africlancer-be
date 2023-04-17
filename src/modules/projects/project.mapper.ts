@@ -19,11 +19,18 @@ export class ProjectMapper extends AutomapperProfile {
                 ),
                 forMember((dest) => dest.userId, 
                 mapFrom(src => src.userId.toString())
-                )
+                ),
+                forMember((dest) => dest.skills, 
+                mapFrom(src => src.skills)
+                ),
             )
             createMap(mapper, QueryProjectInput, ProjectSchema)
             createMap(mapper, QueryProjectInput, ProjectModel)
-            createMap(mapper, CreateProjectInput, ProjectSchema)
+            createMap(mapper, CreateProjectInput, ProjectSchema,
+                forMember((dest) => dest.skills, 
+                mapFrom(src => src.skills)
+                ),
+            )
         };
     }
 }

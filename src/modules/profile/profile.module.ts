@@ -5,9 +5,10 @@ import { ProfileRepository } from "./profile.repository";
 import { ProfileResolver } from "./profile.resolver";
 import { Profile, ProfileSchema } from "./profile.schema";
 import { ProfileService } from "./profile.service";
+import { UserModule } from "../user/user.module";
 
 @Module({
-    imports:[MongooseModule.forFeature([{name:Profile.name, schema:ProfileSchema}])],
+    imports:[MongooseModule.forFeature([{name:Profile.name, schema:ProfileSchema}]), UserModule],
     providers:[ProfileService,ProfileResolver,ProfileRepository, ProfileMapper],
     exports:[ProfileService, ProfileRepository]
 })

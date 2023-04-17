@@ -18,6 +18,7 @@ import {
 import { Project as ProjectSchema } from './project.schema';
 
 import { ProjectService } from './project.service';
+import { User } from '../user/user.model';
 
 enum SUBSCRIPTION_EVENTS{
   newProject = 'newProject',
@@ -67,10 +68,11 @@ export class ProjectResolver {
   @Roles(Role.USER)
   public async update(
     @GqlCurrentUser() user:any,
+    @Args('id') id:string,
     @Args('project') project: QueryProjectInput,
   ): Promise<boolean> {
     const queryMap = await this.classMapper.mapAsync(project, QueryProjectInput, ProjectSchema)
-    await this.projectService.updateOne(user.sub, queryMap);
+    await this.projectService.updateOne(id, queryMap);
     return true;
   }
 
@@ -98,5 +100,10 @@ export class ProjectResolver {
   public async delete(@GqlCurrentUser() user:any): Promise<true> {
     await this.projectService.delete(user.sub);
     return true;
+  }
+
+  @ResolveField(returns => User)
+  async user(@Parent() project:Project):Promise<any>{
+      return this.projectService.finduser(project.userId);
   }
 }

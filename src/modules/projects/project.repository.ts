@@ -29,10 +29,26 @@ export class ProjectRepository {
       const title = project.title.split(" ");
       delete project.title;
       for (let i in title){
-        const query = await this.projectModel.find({"$and":[project, {status:ProjectStatus.BIDDING_OPEN}, {title: {"$regex":title[i], "$options":"i"}}]});
+        let query:Project[]; 
+        if(project.skills){
+          const skills:String[] = project.skills;
+          delete project.skills;
+          query = await this.projectModel.find({"$and":[project, {status:ProjectStatus.BIDDING_OPEN}, {title: {"$regex":title[i], "$options":"i"}}, {skills: { $in: skills }}]});
+        }else{
+          query = await this.projectModel.find({"$and":[project, {status:ProjectStatus.BIDDING_OPEN}, {title: {"$regex":title[i], "$options":"i"}}]});
+        }
         if(query){
           return query;
         }
+      }
+    }
+    if(project.skills){
+      let query:Project[]; 
+      const skills = project.skills.map(skill => new RegExp(skill as any, 'i'));
+      delete project.skills;
+      query = await this.projectModel.find({"$and":[project, {status:ProjectStatus.BIDDING_OPEN}, {skills: { $in: skills }}]});
+      if(query){
+        return query;
       }
     }
     return await this.projectModel.find({"$and":[project, {status:ProjectStatus.BIDDING_OPEN}]});

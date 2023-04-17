@@ -1,14 +1,15 @@
 import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { ProjectStatus } from '../projects/project.enum';
-import { ProjectRepository } from '../projects/project.repository';
 import { ProjectService } from '../projects/project.service';
 import { BidRepository } from './bid.repository';
 import { Bid } from './bid.schema';
+import { User } from '../user/user.schema';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class BidService {
-    constructor(private readonly bidRepo:BidRepository, private readonly projectService:ProjectService){}
+    constructor(private readonly bidRepo:BidRepository, private readonly projectService:ProjectService, private readonly userService:UserService){}
 
     async find(bid:Partial<Bid>):Promise<Bid[]>{
         return this.bidRepo.find(bid);
@@ -28,12 +29,12 @@ export class BidService {
             throw new ForbiddenException("Already bidded for this project")
         }
 
+        const newBid = await this.bidRepo.create(bid); 
         const totalBids = await this.totalBids(project._id.toString());
         const averageBid = await this.averageBids(project._id.toString());
-
         await this.projectService.updateOne(project._id.toString(), {totalBids, averageBid});
         
-        return this.bidRepo.create(bid); 
+        return newBid; 
     }
 
     async update(id:string, bid:Partial<Bid>):Promise<void>{
@@ -85,10 +86,17 @@ export class BidService {
     async averageBids(projectId:string):Promise<number>{
         let totalBudget = 0;
         const bids = await this.bidRepo.find({projectID: new Types.ObjectId(projectId)});
+        if(bids.length == 0){
+            return 0;
+        }
         for(let bid in bids){
             totalBudget += bids[bid].budget
         }
         return totalBudget / bids.length;
+    }
+
+    async finduser(userId:string):Promise<User>{
+        return this.userService.findOne({_id: new Types.ObjectId(userId)});
     }
 
     //TODO: Team project bidding(more than 1 accepted bidder)
