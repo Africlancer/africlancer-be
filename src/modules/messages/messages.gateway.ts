@@ -1,6 +1,6 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer, ConnectedSocket } from '@nestjs/websockets';
 import { MessagesService } from './messages.service';
-import { CreateMessagesInput } from './messages.model';
+import { Messages } from './messages.schema';
 import {Server, Socket} from 'socket.io';
 
 @WebSocketGateway({
@@ -14,8 +14,8 @@ export class MessagesGateway {
   constructor(private readonly messagesService: MessagesService) {}
 
   @SubscribeMessage('createMessage')
-  async create(@MessageBody() createMessage: CreateMessagesInput, @ConnectedSocket() client:Socket) {
-    const message = await this.messagesService.create(createMessage, client.id);
+  async create(@MessageBody() createMessages: Messages, @ConnectedSocket() client:Socket) {
+    const message = await this.messagesService.create(createMessages, client.id);
     this.server.emit('message', message);
     return message;
   }
