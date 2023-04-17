@@ -10,14 +10,14 @@ export class Messages {
 
     @AutoMap()
     @Field()
-    message:string;
+    messages:string;
 }
 
 @InputType()
 export class CreateMessagesInput {
     @AutoMap()
     @Field({nullable:false})
-    message: string;
+    messages: string;
     
 }
 
@@ -25,7 +25,7 @@ export class CreateMessagesInput {
 class MessagesInput{
     @AutoMap()
     @Field({nullable:false})
-    message:string;
+    messages:string;
 
 }
 

@@ -12,7 +12,7 @@ export class Messages{
     _id: Types.ObjectId;
 
     @AutoMap()
-    message: string;
+    messages: string;
 }
 
 export const MessagesSchema = SchemaFactory.createForClass(Messages);
