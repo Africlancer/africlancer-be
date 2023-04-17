@@ -1,3 +1,6 @@
+// import { PersonModule } from './person/person.module';
+import { PubsubModule } from './modules/pubsub/pubsub.module';
+import { NotificationModule } from './modules/notification/notification.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -17,33 +20,50 @@ import { APP_GUARD } from '@nestjs/core';
 import { GqlRolesGuard } from './modules/auth/guards/gql.roles.guard';
 import { MailModule } from './modules/mail/mail.module';
 import { BidModule } from './modules/bid/bid.module';
+// import { MessagesModule } from './modules/messages/messages.module';
 
 @Module({
   imports: [
+    PubsubModule,
+    NotificationModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       debug: false,
       playground: {
         settings: {
-        "request.credentials": "include",
-        }
+          'request.credentials': 'include',
+        },
       },
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       cors: { origin: true, credentials: true },
-      context: ({ req, res }) => ({ req, res })
+      context: ({ req, res }) => ({ req, res }),
+      //subcription
+      installSubscriptionHandlers: true,
+      subscriptions: {
+        'graphql-ws': true,
+        'subscriptions-transport-ws': true,
+        // path: '/subscriptions',
+        // transport: 'websocket',
+        // wsOptions: {
+        //   maxPayload: 100 * 1024 * 1024, // 100MB
+        //   perMessageDeflate: true,
+        // },
+      },
     }),
     MongooseModule.forRoot(`mongodb://localhost/${process.env.DB_NAME}`),
-    AutomapperModule.forRoot({strategyInitializer:classes()}),
+    AutomapperModule.forRoot({ strategyInitializer: classes() }),
     UserModule,
     ProjectModule,
     ProfileModule,
     PortfolioModule,
     AuthModule,
     MailModule,
-    BidModule
+    BidModule,
+    NotificationModule,
+    PubsubModule,
   ],
   controllers: [AppController],
-  providers: [AppService, {provide: APP_GUARD, useClass: GqlRolesGuard}],
+  providers: [AppService, { provide: APP_GUARD, useClass: GqlRolesGuard }],
 })
 export class AppModule {}

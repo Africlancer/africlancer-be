@@ -12,6 +12,9 @@ export class ProjectService {
   public create(project: Project): Promise<Project> {
     var digits = Math.floor(Math.random() * 9000000000) + 1;
     project.projectId = digits
+
+//Notification
+
     return this.ProjectRepo.create(project);
   }
 

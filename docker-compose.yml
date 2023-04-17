@@ -7,9 +7,12 @@ services:
       - 27017:27017
     environment:
       - MONGO_INITDB_DATABASE=${DB_NAME}
-    restart: always
+    restart: 'no'
     volumes:
       - db-data:/data/db:delegated
-
+  redis:
+    image: 'redis'
+    ports:
+      - 6379:${REDIS_PORT}
 volumes:
   db-data:

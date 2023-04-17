@@ -35,11 +35,11 @@ export class Project {
   details: string;
 
   @AutoMap()
-  @Prop({ required: true })
+  @Prop({ required: false })
   startDate: Date;
 
   @AutoMap()
-  @Prop({ required: true })
+  @Prop({ required: false })
   endDate: Date;
 
   @AutoMap()
