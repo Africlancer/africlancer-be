@@ -2,6 +2,7 @@ import { AutoMap } from "@automapper/classes";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, now, Types } from "mongoose";
 import defaultValue from "./defaults"
+import { ReviewType } from "./profile.enum";
 
 export type ProfileDocument = HydratedDocument<Profile>
 
@@ -63,7 +64,19 @@ export class Profile{
     qualification: Array<Qualification>
 
     @Prop()
+    review: Array<Review>
+
+    @Prop()
     skills: Array<String>;
+
+    @Prop({required:true, default:defaultValue().rating})
+    clientRating: number;
+
+    @Prop({required:true, default:defaultValue().rating})
+    freelancerRating: number;
+    
+    @Prop()
+    flagURL: string;
 
     @Prop()
     fullName: string;
@@ -184,6 +197,27 @@ export class Publication{
     
     @AutoMap()
     @Prop({})
+    profileId:string;
+}
+
+export class Review{
+    @AutoMap()
+    _id: Types.ObjectId;
+
+    @AutoMap()
+    @Prop({type: ReviewType, required: true})
+    type:ReviewType;
+
+    @AutoMap()
+    @Prop({required: true})
+    rating:number;
+
+    @AutoMap()
+    @Prop({required: true})
+    summary:string;
+    
+    @AutoMap()
+    @Prop({required: true})
     profileId:string;
 }
 

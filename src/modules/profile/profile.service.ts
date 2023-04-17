@@ -1,9 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ProfileRepository } from "./profile.repository";
-import { Education, Experience, Publication, Qualification, Profile } from "./profile.schema";
+import { Education, Experience, Publication, Qualification, Profile, Review } from "./profile.schema";
 import { Types } from "mongoose";
 import { UserService } from "../user/user.service";
 import { User } from "../user/user.schema";
+import { ReviewType } from "./profile.enum";
 
 
 @Injectable()
@@ -187,5 +188,61 @@ export class ProfileService{
 
     public async findFilter(profile: Partial<Profile>, fullSearch:Boolean): Promise<Profile[]> {
         return this.profileRepository.findFilter(profile, fullSearch);
+    }
+
+    public async addRating(model:Review, profileID:string){
+        model.profileId = profileID;
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
+
+        if(!profile) throw new HttpException('Profile not Found', HttpStatus.NOT_FOUND);
+
+        const prof = (profile as any)._doc || profile;
+
+        // if(model._id){
+        //     const index  = prof.review.findIndex(e=>e._id.toString() === model._id.toString());
+        //     delete model._id;
+        //     prof.review[index] = {...prof.review[index], ...model };
+        // }else{
+        //     prof.review.push({...model,_id: new Types.ObjectId()})
+        // }
+
+        prof.review.push({...model,_id: new Types.ObjectId()})
+
+        await this.updateOne(profileID, prof);
+
+        return prof;
+    }
+
+    public async averageRateClient(profileID:string, rating:number){
+        let averageRating:number;
+        let averageFreelancer:number = 0;
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
+        const prof = (profile as any)._doc || profile;
+
+        for(const i in prof.review){
+            const index  = prof.review.findIndex(e=>e.type ===  ReviewType.CLIENT);
+            averageRating = averageRating+ prof.review[index].rating;
+            averageFreelancer + 1;
+        }
+        averageRating + rating
+
+        return averageRating/averageFreelancer;
+
+    }
+
+    public async averageRateFreelancer(profileID:string, rating:number){
+        let averageRating:number;
+        let averageClient:number = 0;
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
+        const prof = (profile as any)._doc || profile;
+
+        for(const i in prof.review){
+            const index  = prof.review.findIndex(e=>e.type ===  ReviewType.FREELANCER);
+            averageRating = averageRating+ prof.review[index].rating;
+            averageClient + 1;
+        }
+        averageRating + rating
+
+        return averageRating/averageClient;
     }
 }

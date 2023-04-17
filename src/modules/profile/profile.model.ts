@@ -300,6 +300,18 @@ export class Profile{
     skills?: String[];
 
     @AutoMap()
+    @Field({})
+    clientRating: number;
+
+    @AutoMap()
+    @Field({})
+    freelancerRating: number;
+    
+    @AutoMap()
+    @Field({})
+    flagURL: string;
+
+    @AutoMap()
     @Field({ nullable: true })
     fullName?: string;
 }
@@ -337,6 +349,10 @@ export class CreateProfileInput{
     @AutoMap()
     @Field({ nullable: true })
     recommendations?:number;
+
+    @AutoMap()
+    @Field({nullable: true})
+    flagURL?: string;
 
 
     // @AutoMap()
@@ -393,6 +409,18 @@ export class CommonProfileInput{
     @AutoMap()
     @Field({ nullable: true })
     fullName?: string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    clientRating: number;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    freelancerRating: number;
+    
+    @AutoMap()
+    @Field({ nullable: true })
+    flagURL: string;
 }
 
 @InputType()
