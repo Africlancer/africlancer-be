@@ -1,13 +1,11 @@
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
 import { Param, UseGuards, Inject } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver, Subscription, Parent, ResolveField  } from '@nestjs/graphql';
 import { GqlCurrentUser } from '../auth/decorators/gql.user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { GqlJwtGuard } from '../auth/guards/gql.jwt.guard';
 import { Role } from '../auth/roles.enum';
-import { PUB_SUB } from '../pubsub/pubsub.module';
-import { RedisPubSub } from 'graphql-redis-subscriptions';
 import {
   CommonProjectInput,
   CreateProjectInput,
@@ -17,6 +15,9 @@ import {
 import { Project as ProjectSchema } from './project.schema';
 
 import { ProjectService } from './project.service';
+import { User } from '../user/user.model';
+import { RedisPubSub } from 'graphql-redis-subscriptions';
+import { PUB_SUB } from '../pubsub/pubsub.module';
 
 enum SUBSCRIPTION_EVENTS{
   newProject = 'newProject',
@@ -28,19 +29,7 @@ enum SUBSCRIPTION_EVENTS{
 export class ProjectResolver {
   constructor(@Inject(PUB_SUB) private readonly pubSub: RedisPubSub, private readonly projectService: ProjectService, @InjectMapper() private readonly classMapper: Mapper) {}
 
-
-
-  // @Resolver()
-  // export class ProjectResolver {
-    allSubscribers: Project[] = []
-    // constructor (@inject(PUB_SUB) private readonly pubSub: RedisPubSub){}
-  // @Mutation()
-  
-  //   CreateProjectInput(@Args("project") project: Project){
-
-      
-  //     return project
-  // }
+  allSubscribers: Project[] = []
 
   @Subscription(returns => Project)
   newProject(){
@@ -58,7 +47,7 @@ export class ProjectResolver {
     this.allSubscribers.push(new Project)
     this.pubSub.publish(SUBSCRIPTION_EVENTS.newProject, {newProject: project})
     return this.classMapper.mapAsync(await this.projectService.create(queryMap), ProjectSchema, Project);
-    }
+  }
     
 
   @Mutation((returns) => Boolean, { name: 'updateProject' })
@@ -66,10 +55,11 @@ export class ProjectResolver {
   @Roles(Role.USER)
   public async update(
     @GqlCurrentUser() user:any,
+    @Args('id') id:string,
     @Args('project') project: QueryProjectInput,
   ): Promise<boolean> {
     const queryMap = await this.classMapper.mapAsync(project, QueryProjectInput, ProjectSchema)
-    await this.projectService.updateOne(user.sub, queryMap);
+    await this.projectService.updateOne(id, queryMap);
     return true;
   }
 
@@ -97,5 +87,10 @@ export class ProjectResolver {
   public async delete(@GqlCurrentUser() user:any): Promise<true> {
     await this.projectService.delete(user.sub);
     return true;
+  }
+
+  @ResolveField(returns => User)
+  async user(@Parent() project:Project):Promise<any>{
+      return this.projectService.finduser(project.userId);
   }
 }

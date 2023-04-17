@@ -62,6 +62,12 @@ export class Profile{
     @Prop()
     qualification: Array<Qualification>
 
+    @Prop()
+    skills: Array<String>;
+
+    @Prop()
+    fullName: string;
+
 }
 
 

@@ -71,6 +71,7 @@ export class AuthService {
     const newProfile = await this.profileService.create({
       _id: newUser._id,
       userID: newUser._id,
+      fullName: `${newUser.firstName} ${newUser.lastName}`,
       avatar,
     } as any);
     await this.userService.update(newUser._id.toString(), {

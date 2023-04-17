@@ -1,11 +1,12 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { GqlCurrentUser } from '../auth/decorators/gql.user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { GqlJwtGuard } from '../auth/guards/gql.jwt.guard';
 import { Role } from '../auth/roles.enum';
 import { Bid, CreateBidInput, QueryBidInput } from './bid.model';
 import { BidService } from './bid.service';
+import { User } from '../user/user.model';
 
 @Resolver(of=>Bid)
 export class BidResolver {
@@ -73,5 +74,10 @@ export class BidResolver {
     @Roles(Role.USER)
     async averageBids(@Args("projectId") projectId:string):Promise<Number>{
         return this.bidSvc.averageBids(projectId);
+    }
+
+    @ResolveField(returns => User)
+    async user(@Parent() bid:Bid):Promise<any>{
+        return this.bidSvc.finduser(bid.userID);
     }
 }

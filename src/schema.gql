@@ -29,6 +29,7 @@ type Project {
   totalBids: Float
   averageBid: Float
   skills: [String!]!
+  user: User!
 }
 
 """
@@ -103,6 +104,9 @@ type Profile {
   experience: [Experience!]
   qualification: [Qualification!]
   publication: [Publication!]
+  skills: [String!]
+  fullName: String
+  user: User!
 }
 
 type Portfolio {
@@ -145,6 +149,7 @@ type Bid {
   budget: Float
   hourlyRate: Float
   deliveredIn: Float!
+  user: User!
 }
 
 type Query {
@@ -156,6 +161,7 @@ type Query {
   deleteProject: Boolean!
   findOneProfile: Profile!
   findProfiles(query: QueryProfileInput!): [Profile!]!
+  findProfilesFilter(query: QueryProfileInput!, fullSearch: Boolean!): [Profile!]!
   findOnePortfolio(query: QueryPortfolioInput!): Portfolio!
   findPortfolios(query: QueryPortfolioInput!): [Portfolio!]!
   deletePortfolio(_id: String!): Boolean!
@@ -200,16 +206,8 @@ input QueryProfileInput {
   professionalHeadline: String
   summary: String
   recommendations: Float
-  education: [EducationInput!]
-}
-
-input EducationInput {
-  _id: String
-  country: String
-  insitution: String
-  degree: String
-  startYear: Float
-  endYear: Float
+  skills: [String!]
+  fullName: String
 }
 
 input QueryPortfolioInput {
@@ -232,7 +230,7 @@ input QueryBidInput {
 type Mutation {
   updateUser(user: QueryUserInput!): Boolean!
   createProject(project: CreateProjectInput!): Project!
-  updateProject(project: QueryProjectInput!): Boolean!
+  updateProject(id: String!, project: QueryProjectInput!): Boolean!
   updateProfile(profile: QueryProfileInput!): Boolean!
   addOrUpdateEducation(education: EducationInput!): Boolean!
   deleteEducation(educationID: String!): Boolean!
@@ -268,6 +266,15 @@ input CreateProjectInput {
   endDate: DateTime
   type: ProjectType!
   skills: [String!]!
+}
+
+input EducationInput {
+  _id: String
+  country: String
+  insitution: String
+  degree: String
+  startYear: Float
+  endYear: Float
 }
 
 input ExperienceInput {

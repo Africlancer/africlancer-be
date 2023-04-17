@@ -294,6 +294,14 @@ export class Profile{
     @AutoMap()
     @Field(type=>[Publication], { nullable: true })
     publication?:Publication[];
+
+    @AutoMap()
+    @Field(type => [String], { nullable: true })
+    skills?: String[];
+
+    @AutoMap()
+    @Field({ nullable: true })
+    fullName?: string;
 }
 
 @InputType()
@@ -330,9 +338,14 @@ export class CreateProfileInput{
     @Field({ nullable: true })
     recommendations?:number;
 
-    @AutoMap()
-    @Field(type=>[EducationInput], { nullable: true })
-    education?:Education[];
+
+    // @AutoMap()
+    // @Field({ nullable: true })
+    // fullName?: string;
+
+    // @AutoMap()
+    // @Field(type => [String], { nullable: true })
+    // skills?: String[];
 }
 
 @InputType()
@@ -374,8 +387,12 @@ export class CommonProfileInput{
     recommendations?:number;
 
     @AutoMap()
-    @Field(type=>[EducationInput], { nullable: true })
-    education?:EducationInput[];
+    @Field(type => [String], { nullable: true })
+    skills?: String[];
+
+    @AutoMap()
+    @Field({ nullable: true })
+    fullName?: string;
 }
 
 @InputType()

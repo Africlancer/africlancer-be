@@ -32,4 +32,35 @@ export class ProfileRepository{
     async deleteOne(_id:string):Promise<void>{
         await this.profileModel.deleteOne({_id:new Types.ObjectId(_id)});
     }
+
+    public async findFilter(profile: Partial<Profile>, fullSearch:Boolean): Promise<Profile[]> {
+        if(profile.userID) profile.userID = new Types.ObjectId(profile.userID);
+        if(profile.fullName && !fullSearch){
+          const name = profile.fullName.split(" ");
+          delete profile.fullName;
+          for (let i in name){
+            let query:Profile[]; 
+            if(profile.skills){
+              const skills:String[] = profile.skills;
+              delete profile.skills;
+              query = await this.profileModel.find({"$and":[profile, {fullName: {"$regex":name[i], "$options":"i"}}, {skills: { $in: skills }}]});
+            }else{
+              query = await this.profileModel.find({"$and":[profile, {fullName: {"$regex":name[i], "$options":"i"}}]});
+            }
+            if(query){
+              return query;
+            }
+          }
+        }
+        if(profile.skills){
+          let query:Profile[]; 
+          const skills = profile.skills.map(skill => new RegExp(skill as any, 'i'));
+          delete profile.skills;
+          query = await this.profileModel.find({"$and":[profile, {skills: { $in: skills }}]});
+          if(query){
+            return query;
+          }
+        }
+        return await this.profileModel.find({"$and":[profile]});
+      }
 }
