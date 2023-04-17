@@ -22,6 +22,9 @@ import { User } from '../user/user.model';
 enum SUBSCRIPTION_EVENTS{
   newProject = 'newProject',
 }
+// }export class MyClass {
+//   allSubscribers: Subscription;
+// }
 @Resolver((of) => Project)
 export class ProjectResolver {
   constructor(@Inject(PUB_SUB) private readonly pubSub: RedisPubSub, private readonly projectService: ProjectService, @InjectMapper() private readonly classMapper: Mapper) {}
