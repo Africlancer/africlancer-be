@@ -1,3 +1,4 @@
+import { BookmarkModule } from './modules/bookmark/bookmark.module';
 import { PubsubModule } from './modules/pubsub/pubsub.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -22,6 +23,7 @@ import { MessagesModule } from './modules/messages/messages.module';
 
 @Module({
   imports: [
+        BookmarkModule, 
     PubsubModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -36,8 +38,16 @@ import { MessagesModule } from './modules/messages/messages.module';
       cors: { origin: true, credentials: true },
       context: ({ req, res }) => ({ req, res }),
       //subcription
+      installSubscriptionHandlers: true,
       subscriptions: {
         'graphql-ws': true,
+        'subscriptions-transport-ws': true,
+        // path: '/subscriptions',
+        // transport: 'websocket',
+        // wsOptions: {
+        //   maxPayload: 100 * 1024 * 1024, // 100MB
+        //   perMessageDeflate: true,
+        // },
       },
     }),
     MongooseModule.forRoot(`mongodb://localhost/${process.env.DB_NAME}`),

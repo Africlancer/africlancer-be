@@ -31,19 +31,19 @@ export class ProjectResolver {
 
   allSubscribers: Project[] = []
 
-  @Subscription()
+  @Subscription(returns => Project)
   newProject(){
     return this.pubSub.asyncIterator(SUBSCRIPTION_EVENTS.newProject)
   }
 
 
   @Mutation((returns) => Project, { name: 'createProject' })
-  @UseGuards(GqlJwtGuard)
-  @Roles(Role.USER)
+  // @UseGuards(GqlJwtGuard)
+  // @Roles(Role.USER)
   public async create(@GqlCurrentUser() user:any, @Args('project') project: CreateProjectInput): Promise<Project> {
-    project.userId = user.sub;
+    // project.userId = user.sub;
     const queryMap = await this.classMapper.mapAsync(project, CreateProjectInput, ProjectSchema);
-    // edit next line to any if it doesnt run - azeezSaid
+    // // edit next line to any if it doesnt run - azeezSaid
     this.allSubscribers.push(new Project)
     this.pubSub.publish(SUBSCRIPTION_EVENTS.newProject, {newProject: project})
     return this.classMapper.mapAsync(await this.projectService.create(queryMap), ProjectSchema, Project);
