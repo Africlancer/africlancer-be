@@ -33,6 +33,9 @@ export class ProfileMapper extends AutomapperProfile {
                 forMember((dest) => dest.publication as any, 
                 mapFrom(src => src.publication)
                 ),
+                forMember((dest) => dest.review as any, 
+                mapFrom(src => src.review)
+                ),
                 forMember((dest) => dest.skills, 
                 mapFrom(src => src.skills)
                 ),

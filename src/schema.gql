@@ -2,6 +2,12 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Bookmark {
+  _id: String!
+  userID: String!
+  projectID: String!
+}
+
 type User {
   _id: String!
   profileID: String
@@ -88,6 +94,21 @@ type Education {
   profileId: String!
 }
 
+type Review {
+  _id: String!
+  type: ReviewType!
+  rating: Float!
+  summary: String!
+  profileId: String!
+  reviewerId: String!
+  projectId: String!
+}
+
+enum ReviewType {
+  CLIENT
+  FREELANCER
+}
+
 type Profile {
   _id: String!
   userID: String!
@@ -104,7 +125,11 @@ type Profile {
   experience: [Experience!]
   qualification: [Qualification!]
   publication: [Publication!]
+  review: [Review!]
   skills: [String!]
+  clientRating: Float!
+  freelancerRating: Float!
+  flagURL: String!
   fullName: String
   user: User!
 }
@@ -153,6 +178,8 @@ type Bid {
 }
 
 type Query {
+  findBookmark(query: QueryBookMarkInput!): [Bookmark!]!
+  deleteBookmark(_id: String!): Boolean!
   findOneUser: User!
   findUsers(query: QueryUserInput!): [User!]!
   findOneProject(query: QueryProjectInput!): Project!
@@ -170,6 +197,11 @@ type Query {
   findOneBid(query: QueryBidInput!): Bid!
   totalBids(projectId: String!): Float!
   averageBids(projectId: String!): Float!
+}
+
+input QueryBookMarkInput {
+  userID: String
+  projectID: String!
 }
 
 input QueryUserInput {
@@ -208,6 +240,9 @@ input QueryProfileInput {
   recommendations: Float
   skills: [String!]
   fullName: String
+  clientRating: Float
+  freelancerRating: Float
+  flagURL: String
 }
 
 input QueryPortfolioInput {
@@ -228,6 +263,8 @@ input QueryBidInput {
 }
 
 type Mutation {
+  createBookmark(portfolio: CreateBookmarkInput!): Bookmark!
+  updateBookmark(_id: String!, Bookmark: UpdateBookmarkInput!): Boolean!
   updateUser(user: QueryUserInput!): Boolean!
   createProject(project: CreateProjectInput!): Project!
   updateProject(id: String!, project: QueryProjectInput!): Boolean!
@@ -240,6 +277,8 @@ type Mutation {
   deleteQualification(qualificationID: String!): Boolean!
   addOrUpdatePublication(publication: PublicationInput!): Boolean!
   deletePublication(publicationID: String!): Boolean!
+  deleteReview(reviewID: String!, revieweeID: String!): Boolean!
+  reviewProfile(revieweeID: String!, projectID: String!, review: ReviewInput!): Boolean!
   createPortfolio(portfolio: CreatePortfolioInput!): Portfolio!
   updatePortfolio(_id: String!, portfolio: QueryPortfolioInput!): Boolean!
   userSignUp(user: UserSignUp!): User!
@@ -253,6 +292,16 @@ type Mutation {
   deleteBid(id: String!): Boolean!
   awardBid(projectId: String!, bidId: String!): Boolean!
   unawardBid(projectId: String!, bidId: String!): Boolean!
+}
+
+input CreateBookmarkInput {
+  userID: String
+  projectID: String!
+}
+
+input UpdateBookmarkInput {
+  userID: String
+  projectID: String!
 }
 
 input CreateProjectInput {
@@ -302,6 +351,16 @@ input PublicationInput {
   title: String
   publisher: String
   summary: String
+}
+
+input ReviewInput {
+  _id: String
+  type: ReviewType
+  rating: Float
+  summary: String
+  profileId: String
+  reviewerId: String
+  projectId: String
 }
 
 input CreatePortfolioInput {

@@ -23,8 +23,9 @@ import { MessagesModule } from './modules/messages/messages.module';
 
 @Module({
   imports: [
-        BookmarkModule, 
+    BookmarkModule, 
     PubsubModule,
+    //MessagesModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -59,8 +60,6 @@ import { MessagesModule } from './modules/messages/messages.module';
     AuthModule,
     MailModule,
     BidModule,
-    PubsubModule,
-    MessagesModule
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: GqlRolesGuard }],

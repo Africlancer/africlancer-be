@@ -1,5 +1,5 @@
 import { AutoMap } from "@automapper/classes";
-import { Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Types } from "mongoose";
 
 
@@ -12,6 +12,7 @@ export class Messages{
     _id: Types.ObjectId;
 
     @AutoMap()
+    @Prop({required: true})
     messages: string;
 }
 

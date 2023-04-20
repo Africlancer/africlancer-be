@@ -20,6 +20,8 @@ export class CreateBookmarkInput{
     @Field()
     projectID: string;
 }
+
+@InputType()
 export class UpdateBookmarkInput{
     @Field({nullable:true})
     userID?: string;
@@ -27,6 +29,8 @@ export class UpdateBookmarkInput{
     @Field()
     projectID: string;
 }
+
+@InputType()
 export class  BookmarkQueryInput{
     @Field({nullable:true})
     userID?: string;
@@ -34,6 +38,8 @@ export class  BookmarkQueryInput{
     @Field()
     projectID: string;
 }
+
+@InputType()
 export class QueryBookMarkInput{
     @Field({nullable:true})
     userID?: string;

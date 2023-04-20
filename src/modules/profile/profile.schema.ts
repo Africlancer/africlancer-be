@@ -219,6 +219,14 @@ export class Review{
     @AutoMap()
     @Prop({required: true})
     profileId:string;
+
+    @AutoMap()
+    @Prop({required: true})
+    reviewerId:string;
+
+    @AutoMap()
+    @Prop({required: true})
+    projectId:string;
 }
 
 export const ProfileSchema = SchemaFactory.createForClass(Profile)

@@ -1,6 +1,10 @@
-import { Field, InputType, ObjectType } from "@nestjs/graphql";
+import { Field, InputType, ObjectType, registerEnumType } from "@nestjs/graphql";
 import { AutoMap } from "@automapper/classes";
+import { ReviewType } from "./profile.enum";
 
+registerEnumType(ReviewType, {
+    name:"ReviewType"
+})
 
 @ObjectType()
 export class Qualification{
@@ -236,6 +240,68 @@ export class EducationInput{
 }
 
 @ObjectType()
+export class Review{
+    @AutoMap()
+    @Field()
+    _id: string;
+
+    @AutoMap()
+    @Field(type => ReviewType)
+    type:ReviewType;
+
+    @AutoMap()
+    @Field()
+    rating:number;
+
+    @AutoMap()
+    @Field()
+    summary:string;
+    
+    @AutoMap()
+    @Field()
+    profileId:string;
+
+    @AutoMap()
+    @Field()
+    reviewerId:string;
+
+    @AutoMap()
+    @Field()
+    projectId:string;
+}
+
+@InputType()
+export class ReviewInput{
+    @AutoMap()
+    @Field({ nullable: true })
+    _id?: string;
+
+    @AutoMap()
+    @Field(type => ReviewType, {nullable: true })
+    type?:ReviewType;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    rating?:number;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    summary?:string;
+    
+    @AutoMap()
+    @Field({ nullable: true })
+    profileId?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    reviewerId?:string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    projectId?:string;
+}
+
+@ObjectType()
 export class Profile{
     @AutoMap()
     @Field()
@@ -294,6 +360,10 @@ export class Profile{
     @AutoMap()
     @Field(type=>[Publication], { nullable: true })
     publication?:Publication[];
+
+    @AutoMap()
+    @Field(type=>[Review], { nullable: true })
+    review?:Review[];
 
     @AutoMap()
     @Field(type => [String], { nullable: true })

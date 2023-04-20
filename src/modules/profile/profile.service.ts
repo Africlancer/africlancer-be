@@ -1,10 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { ForbiddenException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ProfileRepository } from "./profile.repository";
 import { Education, Experience, Publication, Qualification, Profile, Review } from "./profile.schema";
 import { Types } from "mongoose";
 import { UserService } from "../user/user.service";
 import { User } from "../user/user.schema";
 import { ReviewType } from "./profile.enum";
+import { ProjectService } from "../projects/project.service";
+import { ProjectStatus } from "../projects/project.enum";
 
 
 @Injectable()
@@ -12,7 +14,7 @@ export class ProfileService{
     findOneBy(arg0: { id: number; }): any {
         throw new Error("Method not implemented.");
     }
-    constructor(private readonly profileRepository:ProfileRepository, private readonly userService:UserService){}
+    constructor(private readonly profileRepository:ProfileRepository, private readonly userService:UserService, private readonly projectService:ProjectService){}
 
     public create(profile:Profile):Promise<Profile>{
         return this.profileRepository.create(profile)
@@ -190,58 +192,110 @@ export class ProfileService{
         return this.profileRepository.findFilter(profile, fullSearch);
     }
 
-    public async addRating(model:Review, profileID:string){
-        model.profileId = profileID;
+    public async reviewProfile(model:Review, profileID:string, projectID:string, reviewerID:string){
         const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
+
+        if(!profile) throw new HttpException('Profile not Found', HttpStatus.NOT_FOUND);
+
+        const project = await this.projectService.findOne({_id:new Types.ObjectId(projectID)})
+
+        if(!project) throw new HttpException('Project not Found', HttpStatus.NOT_FOUND);
+
+        if(project.status !== ProjectStatus.COMPLETED){
+            throw new ForbiddenException("Cannot review user, If project is incomplete");
+        }
+
+        const prof = (profile as any)._doc || profile;
+
+        for(const i in prof.review){
+           if(prof.review[i].reviewerId.toString() === reviewerID){
+                throw new ForbiddenException("You have reviewed this user on this project already");
+           }
+        }
+
+        prof.review.push({...model, _id: new Types.ObjectId(), projectId: new Types.ObjectId(projectID), reviewerId: new Types.ObjectId(reviewerID), profileId: new Types.ObjectId(profileID)});
+
+        await this.updateOne(profileID, prof);
+
+        if(model.type === ReviewType.CLIENT){
+            const clientRating = await this.averageRateClient(profileID, model.rating);
+            this.profileRepository.updateOne(profileID, {clientRating});
+        }else{
+            const freelancerRating = await this.averageRateFreelancer(profileID, model.rating);
+            this.profileRepository.updateOne(profileID, {freelancerRating});
+        }
+
+        return prof;
+    }
+
+    public async deleteReview(reviewID:string, revieweeID:string){
+        const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(revieweeID)});
 
         if(!profile) throw new HttpException('Profile not Found', HttpStatus.NOT_FOUND);
 
         const prof = (profile as any)._doc || profile;
 
-        // if(model._id){
-        //     const index  = prof.review.findIndex(e=>e._id.toString() === model._id.toString());
-        //     delete model._id;
-        //     prof.review[index] = {...prof.review[index], ...model };
-        // }else{
-        //     prof.review.push({...model,_id: new Types.ObjectId()})
-        // }
+        const index  = prof.review.findIndex(e=>e._id.toString() === reviewID);
 
-        prof.review.push({...model,_id: new Types.ObjectId()})
+        const reviewType = prof.review[index].type;
 
-        await this.updateOne(profileID, prof);
+        prof.review = prof.review.filter(e=>e._id.toString() !== reviewID);
+
+        await this.updateOne(revieweeID, prof);
+
+        if(reviewType === ReviewType.CLIENT){
+            const clientRating = await this.averageRateClient(revieweeID, 0);
+            this.profileRepository.updateOne(revieweeID, {clientRating});
+        }else{
+            const freelancerRating = await this.averageRateFreelancer(revieweeID, 0);
+            this.profileRepository.updateOne(revieweeID, {freelancerRating});
+        }
 
         return prof;
+
     }
 
     public async averageRateClient(profileID:string, rating:number){
-        let averageRating:number;
+        let averageRating:number = 0;
         let averageFreelancer:number = 0;
         const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
         const prof = (profile as any)._doc || profile;
 
-        for(const i in prof.review){
-            const index  = prof.review.findIndex(e=>e.type ===  ReviewType.CLIENT);
-            averageRating = averageRating+ prof.review[index].rating;
-            averageFreelancer + 1;
+        if(prof.review.length === 0){
+            return 0;
         }
-        averageRating + rating
+
+        for(const i in prof.review){
+            if(prof.review[i].type === ReviewType.CLIENT){
+                averageRating = averageRating + prof.review[i].rating;
+                averageFreelancer = averageFreelancer + 1;
+            }
+        }
+        averageRating = averageRating + rating;
+        averageFreelancer = averageFreelancer + 1;
 
         return averageRating/averageFreelancer;
 
     }
 
     public async averageRateFreelancer(profileID:string, rating:number){
-        let averageRating:number;
+        let averageRating:number = 0;
         let averageClient:number = 0;
         const profile = await this.profileRepository.findOne({_id:new Types.ObjectId(profileID)});
         const prof = (profile as any)._doc || profile;
 
-        for(const i in prof.review){
-            const index  = prof.review.findIndex(e=>e.type ===  ReviewType.FREELANCER);
-            averageRating = averageRating+ prof.review[index].rating;
-            averageClient + 1;
+        if(prof.review.length === 0){
+            return 0;
         }
-        averageRating + rating
+
+        for(const i in prof.review){
+            if(prof.review[i].type === ReviewType.FREELANCER){
+                averageRating = averageRating + prof.review[i].rating;
+                averageClient = averageClient + 1;
+            }
+        }
+        averageRating = averageRating + rating;
+        averageClient = averageClient + 1;
 
         return averageRating/averageClient;
     }

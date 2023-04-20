@@ -1,7 +1,7 @@
 import { Args, Mutation, Parent, Query, Resolver, ResolveField } from "@nestjs/graphql";
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
-import { EducationInput, ExperienceInput, Profile, PublicationInput, QualificationInput, QueryProfileInput } from "./profile.model";
+import { EducationInput, ExperienceInput, Profile, PublicationInput, QualificationInput, QueryProfileInput, Review, ReviewInput } from "./profile.model";
 import { ProfileService } from "./profile.service";
 import { Education as EducationSchema, Profile as ProfileSchema } from "./profile.schema";
 import { GqlCurrentUser } from "../auth/decorators/gql.user.decorator";
@@ -113,5 +113,21 @@ export class ProfileResolver{
     @Query((returns) => [Profile], { name: 'findProfilesFilter' })
     public async findFilter(@Args('query') query: QueryProfileInput, @Args('fullSearch') fullSearch: Boolean ): Promise<Profile[]> {
       return this.classMapper.mapArrayAsync(await this.profileService.findFilter(query as unknown, fullSearch), ProfileSchema, Profile);
+    }
+
+    @Mutation(returns => Boolean, {name:"reviewProfile"})
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    async reviewProfile(@GqlCurrentUser() user:any, @Args("revieweeID") revieweeID:string, @Args("projectID") projectID:string, @Args("review") review:ReviewInput){
+        await this.profileService.reviewProfile(review as any, revieweeID, projectID, user.sub);
+        return true;
+    }
+
+    @Mutation(returns => Boolean, {name:"deleteReview"})
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    async deleteReview(@Args("reviewID") reviewID:string, @Args("revieweeID") revieweeID:string){
+        await this.profileService.deleteReview(reviewID , revieweeID);
+        return true;
     }
 }
