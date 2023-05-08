@@ -384,6 +384,15 @@ export class Profile{
     @AutoMap()
     @Field({ nullable: true })
     fullName?: string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    minRate: number;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    maxRate: number;
+
 }
 
 @InputType()
@@ -491,6 +500,16 @@ export class CommonProfileInput{
     @AutoMap()
     @Field({ nullable: true })
     flagURL: string;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    minRate: number;
+
+    @AutoMap()
+    @Field({ nullable: true })
+    maxRate: number;
+
+
 }
 
 @InputType()

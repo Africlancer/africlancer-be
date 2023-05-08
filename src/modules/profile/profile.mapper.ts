@@ -46,7 +46,7 @@ export class ProfileMapper extends AutomapperProfile {
             createMap(mapper, QueryProfileInput, ProfileSchema,
                 forMember((dest) => dest.skills, 
                 mapFrom(src => src.skills)
-                )
+                ),
             )
             createMap(mapper, CreateProfileInput, ProfileSchema)
         };

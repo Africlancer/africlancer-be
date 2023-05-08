@@ -41,11 +41,30 @@ export class ProfileRepository{
           for (let i in name){
             let query:Profile[]; 
             if(profile.skills){
-              const skills:String[] = profile.skills;
+              const skills = profile.skills.map(skill => new RegExp(skill as any, 'i'));
               delete profile.skills;
-              query = await this.profileModel.find({"$and":[profile, {fullName: {"$regex":name[i], "$options":"i"}}, {skills: { $in: skills }}]});
+              if(profile.minRate || profile.maxRate){
+                const maxRate = profile.maxRate;
+                const minRate = profile.minRate;
+                delete profile.hourlyRate;
+                delete profile.minRate;
+                delete profile.maxRate;
+                query = await this.profileModel.find({"$and":[profile, {fullName: {"$regex":name[i], "$options":"i"}}, {skills: { $in: skills }}, {hourlyRate: { "$lte": maxRate, "$gte": minRate }}]});
+              }else{
+                query = await this.profileModel.find({"$and":[profile, {fullName: {"$regex":name[i], "$options":"i"}}, {skills: { $in: skills }}]});
+              }
             }else{
-              query = await this.profileModel.find({"$and":[profile, {fullName: {"$regex":name[i], "$options":"i"}}]});
+              if(profile.minRate || profile.maxRate){
+                const maxRate = profile.maxRate;
+                const minRate = profile.minRate;
+                delete profile.hourlyRate;
+                delete profile.minRate;
+                delete profile.maxRate;
+                query = await this.profileModel.find({"$and":[profile, {fullName: {"$regex":name[i], "$options":"i"}}, {hourlyRate: { "$lte": maxRate, "$gte": minRate }}]});
+              }else{
+                query = await this.profileModel.find({"$and":[profile, {fullName: {"$regex":name[i], "$options":"i"}}]});
+              }
+              //query = await this.profileModel.find({"$and":[profile, {fullName: {"$regex":name[i], "$options":"i"}}]});
             }
             if(query){
               return query;
@@ -56,11 +75,36 @@ export class ProfileRepository{
           let query:Profile[]; 
           const skills = profile.skills.map(skill => new RegExp(skill as any, 'i'));
           delete profile.skills;
-          query = await this.profileModel.find({"$and":[profile, {skills: { $in: skills }}]});
+          if(profile.minRate || profile.maxRate){
+            const maxRate = profile.maxRate;
+            const minRate = profile.minRate;
+            delete profile.hourlyRate;
+            delete profile.minRate;
+            delete profile.maxRate;
+            query = await this.profileModel.find({"$and":[profile, {skills: { "$in": skills }}, {hourlyRate: { "$lte": maxRate, "$gte": minRate }}]});
+          }else{
+            query = await this.profileModel.find({"$and":[profile, {skills: { "$in": skills }}]});
+          }
+          //query = await this.profileModel.find({"$and":[profile, {skills: { $in: skills }}]});
           if(query){
             return query;
           }
         }
+
+        if(profile.minRate || profile.maxRate){
+          let query:Profile[]; 
+          const maxRate = profile.maxRate;
+          const minRate = profile.minRate;
+          delete profile.hourlyRate;
+          delete profile.minRate;
+          delete profile.maxRate;
+          query = await this.profileModel.find({"$and":[profile, {hourlyRate: { "$gte": minRate, "$lte": maxRate }}]});
+
+          if(query){
+            return query;
+          }
+        }
+        console.log(profile)
         return await this.profileModel.find({"$and":[profile]});
       }
 }

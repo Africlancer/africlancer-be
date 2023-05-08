@@ -36,8 +36,9 @@ export class ProfileResolver{
         @GqlCurrentUser() profileID:any,
         @Args("profile") profile:QueryProfileInput
     ){
-        const queryMap = await this.classMapper.mapAsync(profile, QueryProfileInput, ProfileSchema)
-        await this.profileService.updateOne(profileID.sub, queryMap)
+        //const queryMap = await this.classMapper.mapAsync(profile, QueryProfileInput, ProfileSchema);
+        //console.log(queryMap);
+        await this.profileService.updateOne(profileID.sub, profile as unknown as ProfileSchema);
         return true;
     }
 

@@ -81,6 +81,11 @@ export class Profile{
     @Prop()
     fullName: string;
 
+    @Prop()
+    minRate:number;
+
+    @Prop()
+    maxRate:number;
 }
 
 

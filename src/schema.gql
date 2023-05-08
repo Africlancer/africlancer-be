@@ -131,6 +131,8 @@ type Profile {
   freelancerRating: Float!
   flagURL: String!
   fullName: String
+  minRate: Float
+  maxRate: Float
   user: User!
 }
 
@@ -243,6 +245,8 @@ input QueryProfileInput {
   clientRating: Float
   freelancerRating: Float
   flagURL: String
+  minRate: Float
+  maxRate: Float
 }
 
 input QueryPortfolioInput {
@@ -277,8 +281,8 @@ type Mutation {
   deleteQualification(qualificationID: String!): Boolean!
   addOrUpdatePublication(publication: PublicationInput!): Boolean!
   deletePublication(publicationID: String!): Boolean!
-  deleteReview(reviewID: String!, revieweeID: String!): Boolean!
   reviewProfile(revieweeID: String!, projectID: String!, review: ReviewInput!): Boolean!
+  deleteReview(reviewID: String!, revieweeID: String!): Boolean!
   createPortfolio(portfolio: CreatePortfolioInput!): Portfolio!
   updatePortfolio(_id: String!, portfolio: QueryPortfolioInput!): Boolean!
   userSignUp(user: UserSignUp!): User!
