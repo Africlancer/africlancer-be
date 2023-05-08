@@ -180,7 +180,7 @@ type Bid {
 }
 
 type Query {
-  findBookmark(query: QueryBookMarkInput!): [Bookmark!]!
+  findBookmark(bookmark: QueryBookMarkInput!): [Bookmark!]!
   deleteBookmark(_id: String!): Boolean!
   findOneUser: User!
   findUsers(query: QueryUserInput!): [User!]!
@@ -203,7 +203,7 @@ type Query {
 
 input QueryBookMarkInput {
   userID: String
-  projectID: String!
+  projectID: String
 }
 
 input QueryUserInput {
@@ -267,8 +267,8 @@ input QueryBidInput {
 }
 
 type Mutation {
-  createBookmark(portfolio: CreateBookmarkInput!): Bookmark!
-  updateBookmark(_id: String!, Bookmark: UpdateBookmarkInput!): Boolean!
+  createBookmark(bookmark: CreateBookmarkInput!): Bookmark!
+  updateBookmark(_id: String!, bookmark: QueryBookMarkInput!): Boolean!
   updateUser(user: QueryUserInput!): Boolean!
   createProject(project: CreateProjectInput!): Project!
   updateProject(id: String!, project: QueryProjectInput!): Boolean!
@@ -299,12 +299,7 @@ type Mutation {
 }
 
 input CreateBookmarkInput {
-  userID: String
-  projectID: String!
-}
-
-input UpdateBookmarkInput {
-  userID: String
+  userID: String!
   projectID: String!
 }
 
