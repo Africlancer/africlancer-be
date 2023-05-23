@@ -17,8 +17,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { GqlRolesGuard } from './modules/auth/guards/gql.roles.guard';
 import { MailModule } from './modules/mail/mail.module';
 import { BidModule } from './modules/bid/bid.module';
-import { ChatModule } from './chat/chat.module';
-import { RoomsModule } from './rooms/rooms.module';
+import { ChatModule } from './modules/chat/chat.module';
+import { RoomsModule } from './modules/rooms/rooms.module';
 
 
 @Module({
