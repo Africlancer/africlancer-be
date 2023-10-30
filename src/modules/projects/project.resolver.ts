@@ -27,13 +27,14 @@ enum SUBSCRIPTION_EVENTS{
 // }
 @Resolver((of) => Project)
 export class ProjectResolver {
-  constructor(@Inject(PUB_SUB) private readonly pubSub: RedisPubSub, private readonly projectService: ProjectService, @InjectMapper() private readonly classMapper: Mapper) {}
+  // @Inject(PUB_SUB) private readonly pubSub: RedisPubSub, 
+  constructor(private readonly projectService: ProjectService, @InjectMapper() private readonly classMapper: Mapper) {}
 
   allSubscribers: Project[] = []
 
   @Subscription(returns => Project)
   newProject(){
-    return this.pubSub.asyncIterator(SUBSCRIPTION_EVENTS.newProject)
+    // return this.pubSub.asyncIterator(SUBSCRIPTION_EVENTS.newProject)
   }
 
 
@@ -45,7 +46,7 @@ export class ProjectResolver {
     const queryMap = await this.classMapper.mapAsync(project, CreateProjectInput, ProjectSchema);
     // // edit next line to any if it doesnt run - azeezSaid
     this.allSubscribers.push(new Project)
-    this.pubSub.publish(SUBSCRIPTION_EVENTS.newProject, {newProject: project})
+    // this.pubSub.publish(SUBSCRIPTION_EVENTS.newProject, {newProject: project})
     return this.classMapper.mapAsync(await this.projectService.create(queryMap), ProjectSchema, Project);
   }
     
