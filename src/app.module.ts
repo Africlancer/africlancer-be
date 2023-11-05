@@ -17,6 +17,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { GqlRolesGuard } from './modules/auth/guards/gql.roles.guard';
 import { MailModule } from './modules/mail/mail.module';
 import { BidModule } from './modules/bid/bid.module';
+import { AlertModule } from './modules/alert/alert.module';
 
 @Module({
   imports: [
@@ -41,7 +42,8 @@ import { BidModule } from './modules/bid/bid.module';
     PortfolioModule,
     AuthModule,
     MailModule,
-    BidModule
+    BidModule,
+    AlertModule
   ],
   controllers: [AppController],
   providers: [AppService, {provide: APP_GUARD, useClass: GqlRolesGuard}],

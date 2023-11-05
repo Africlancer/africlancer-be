@@ -152,6 +152,23 @@ type Bid {
   user: User!
 }
 
+type Alert {
+  _id: String!
+  userId: String
+  refId: String
+  createdAt: String!
+  updatedAt: Float
+}
+
+type AlertPageResult {
+  totalRecords: Float!
+  data: [Alert!]!
+}
+
+type AlertSummary {
+  totalCount: Float!
+}
+
 type Query {
   findOneUser: User!
   findUsers(query: QueryUserInput!): [User!]!
@@ -170,6 +187,8 @@ type Query {
   findOneBid(query: QueryBidInput!): Bid!
   totalBids(projectId: String!): Float!
   averageBids(projectId: String!): Float!
+  AlertSummary(query: AlertQueryInput!): AlertSummary!
+  AlertPage(page: AlertPageInput!): AlertPageResult!
 }
 
 input QueryUserInput {
@@ -227,6 +246,17 @@ input QueryBidInput {
   isAwarded: Boolean
 }
 
+input AlertQueryInput {
+  userId: String
+  refId: String
+}
+
+input AlertPageInput {
+  skip: Float!
+  take: Float!
+  userId: String
+}
+
 type Mutation {
   updateUser(user: QueryUserInput!): Boolean!
   createProject(project: CreateProjectInput!): Project!
@@ -253,6 +283,8 @@ type Mutation {
   deleteBid(id: String!): Boolean!
   awardBid(projectId: String!, bidId: String!): Boolean!
   unawardBid(projectId: String!, bidId: String!): Boolean!
+  createAlert(alert: CreateAlertInput!): Alert!
+  updateAlertStatus(alertId: String!, status: String!): Boolean!
 }
 
 input CreateProjectInput {
@@ -337,4 +369,9 @@ input CreateBidInput {
   budget: Float
   hourlyRate: Float
   deliveredIn: Float!
+}
+
+input CreateAlertInput {
+  userId: String!
+  refId: String!
 }
