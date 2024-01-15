@@ -27,7 +27,7 @@ import { PUB_SUB } from '../pubsub/pubsub.module';
 // }
 @Resolver((of) => Project)
 export class ProjectResolver {
-  //constructor(@Inject(PUB_SUB) private readonly pubSub: RedisPubSub, private readonly projectService: ProjectService, @InjectMapper() private readonly classMapper: Mapper) {}
+  // @Inject(PUB_SUB) private readonly pubSub: RedisPubSub, 
   constructor(private readonly projectService: ProjectService, @InjectMapper() private readonly classMapper: Mapper) {}
 
   // allSubscribers: Project[] = []
