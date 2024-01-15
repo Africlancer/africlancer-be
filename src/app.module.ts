@@ -24,7 +24,7 @@ import { MessagesModule } from './modules/messages/messages.module';
 @Module({
   imports: [
     BookmarkModule, 
-    PubsubModule,
+    //PubsubModule,
     //MessagesModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -51,7 +51,7 @@ import { MessagesModule } from './modules/messages/messages.module';
         // },
       },
     }),
-    MongooseModule.forRoot(`mongodb://localhost/${process.env.DB_NAME}`),
+    MongooseModule.forRoot(`mongodb://127.0.0.1:27017/${process.env.DB_NAME}`),
     AutomapperModule.forRoot({ strategyInitializer: classes() }),
     UserModule,
     ProjectModule,

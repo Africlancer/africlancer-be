@@ -396,7 +396,3 @@ input CreateBidInput {
   hourlyRate: Float
   deliveredIn: Float!
 }
-
-type Subscription {
-  newProject: Project!
-}
