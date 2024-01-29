@@ -1,5 +1,5 @@
 import { BookmarkModule } from './modules/bookmark/bookmark.module';
-import { PubsubModule } from './modules/pubsub/pubsub.module';
+import { PubSubModule } from './modules/pubsub/pubsub.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -20,11 +20,12 @@ import { GqlRolesGuard } from './modules/auth/guards/gql.roles.guard';
 import { MailModule } from './modules/mail/mail.module';
 import { BidModule } from './modules/bid/bid.module';
 import { MessagesModule } from './modules/messages/messages.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
     BookmarkModule, 
-    // PubsubModule,
+    PubSubModule,
     //MessagesModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -38,17 +39,8 @@ import { MessagesModule } from './modules/messages/messages.module';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       cors: { origin: true, credentials: true },
       context: ({ req, res }) => ({ req, res }),
-      //subcription
-      installSubscriptionHandlers: true,
       subscriptions: {
         'graphql-ws': true,
-        'subscriptions-transport-ws': true,
-        // path: '/subscriptions',
-        // transport: 'websocket',
-        // wsOptions: {
-        //   maxPayload: 100 * 1024 * 1024, // 100MB
-        //   perMessageDeflate: true,
-        // },
       },
     }),
     MongooseModule.forRoot(`mongodb://127.0.0.1:27017/${process.env.DB_NAME}`),
@@ -60,6 +52,7 @@ import { MessagesModule } from './modules/messages/messages.module';
     AuthModule,
     MailModule,
     BidModule,
+    NotificationModule
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: GqlRolesGuard }],

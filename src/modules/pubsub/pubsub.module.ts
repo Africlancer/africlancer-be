@@ -1,30 +1,18 @@
-/*
-https://docs.nestjs.com/modules
-*/
-
 import { Global, Module } from '@nestjs/common';
-import { RedisPubSub } from 'graphql-redis-subscriptions';
-import { ConfigService, ConfigModule } from '@nestjs/config';
+import { PubSub } from 'graphql-subscriptions';
 
 export const PUB_SUB = 'PUB_SUB';
 
 @Global()
 @Module({
-  imports: [ConfigModule],
+  imports: [],
   controllers: [],
   providers: [
     {
       provide: PUB_SUB,
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) =>
-        new RedisPubSub({
-          connection: {
-            host: configService.get('REDIS_HOST'),
-            port: configService.get('REDIS_PORT'),
-          },
-        }),
+      useValue: new PubSub()
     },
   ],
   exports: [PUB_SUB],
 })
-export class PubsubModule {}
+export class PubSubModule {}

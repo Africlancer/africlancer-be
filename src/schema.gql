@@ -179,6 +179,12 @@ type Bid {
   user: User!
 }
 
+type ProjectNotification {
+  _id: ID!
+  projectId: ID!
+  createdAt: Float
+}
+
 type Query {
   findBookmark(bookmark: QueryBookMarkInput!): [Bookmark!]!
   deleteBookmark(_id: String!): Boolean!
@@ -199,6 +205,8 @@ type Query {
   findOneBid(query: QueryBidInput!): Bid!
   totalBids(projectId: String!): Float!
   averageBids(projectId: String!): Float!
+  findOneProjectNotification(notification: QueryProjectNotificationInput!): ProjectNotification!
+  findProjectNotifications(notification: QueryProjectNotificationInput!): [ProjectNotification!]!
 }
 
 input QueryBookMarkInput {
@@ -266,6 +274,11 @@ input QueryBidInput {
   isAwarded: Boolean
 }
 
+input QueryProjectNotificationInput {
+  _id: ID
+  projectId: ID
+}
+
 type Mutation {
   createBookmark(bookmark: CreateBookmarkInput!): Bookmark!
   updateBookmark(_id: String!, bookmark: QueryBookMarkInput!): Boolean!
@@ -296,6 +309,7 @@ type Mutation {
   deleteBid(id: String!): Boolean!
   awardBid(projectId: String!, bidId: String!): Boolean!
   unawardBid(projectId: String!, bidId: String!): Boolean!
+  createProjectNotification(notification: CreateProjectNotificationInput!): ProjectNotification!
 }
 
 input CreateBookmarkInput {
@@ -395,4 +409,12 @@ input CreateBidInput {
   budget: Float
   hourlyRate: Float
   deliveredIn: Float!
+}
+
+input CreateProjectNotificationInput {
+  projectId: ID!
+}
+
+type Subscription {
+  newProjectCreated: ProjectNotification!
 }
