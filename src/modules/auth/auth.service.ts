@@ -19,6 +19,7 @@ import { Types } from 'mongoose';
 import { ProfileService } from '../profile/profile.service';
 import { MailService } from '../mail/mail.service';
 import * as uiavatars from 'ui-avatars';
+import JwtPayload from './JwtPayload.interface';
 
 @Injectable()
 export class AuthService {
@@ -43,6 +44,20 @@ export class AuthService {
       return checkUser;
     } else {
       throw new ForbiddenException('Invalid Username Or Password');
+    }
+  }
+
+  public async getUserFromAuthenticationToken(token: string) {
+    const payload: JwtPayload = this.jwt.verify(token, {
+      secret: process.env.ACCESS_TOKEN_SECRET,
+    });
+
+    const userId = payload.sub;
+
+    if (userId) {
+      return this.userService.findOne({
+        _id: new Types.ObjectId(userId),
+      });
     }
   }
 

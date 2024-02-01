@@ -19,13 +19,15 @@ import { APP_GUARD } from '@nestjs/core';
 import { GqlRolesGuard } from './modules/auth/guards/gql.roles.guard';
 import { MailModule } from './modules/mail/mail.module';
 import { BidModule } from './modules/bid/bid.module';
-import { MessagesModule } from './modules/messages/messages.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { FileUploadModule } from './modules/upload/upload.module';
+import { ChatsModule } from './modules/chats/chats.module';
+import { ChatsController } from './modules/chats/chats.controller';
+import { ChatsService } from './modules/chats/chats.service';
 
 @Module({
   imports: [
-    BookmarkModule, 
+    BookmarkModule,
     PubSubModule,
     //MessagesModule,
     ConfigModule.forRoot(),
@@ -54,9 +56,13 @@ import { FileUploadModule } from './modules/upload/upload.module';
     MailModule,
     BidModule,
     NotificationModule,
-    FileUploadModule
+    ChatsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, { provide: APP_GUARD, useClass: GqlRolesGuard }],
+  controllers: [AppController, ChatsController],
+  providers: [
+    AppService,
+    { provide: APP_GUARD, useClass: GqlRolesGuard },
+    ChatsService,
+  ],
 })
 export class AppModule {}

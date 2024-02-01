@@ -35,8 +35,9 @@
     "@nestjs/mongoose": "^9.2.1",
     "@nestjs/passport": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
-    "@nestjs/platform-socket.io": "^9.3.12",
-    "@nestjs/websockets": "^9.3.12",
+    "@nestjs/platform-socket.io": "^9.4.3",
+    "@nestjs/websockets": "^9.4.3",
+    "@types/socket.io": "^3.0.2",
     "apollo-server-express": "^3.11.1",
     "argon2": "^0.30.3",
     "class-transformer": "^0.5.1",
@@ -50,6 +51,7 @@
     "graphql-subscriptions": "^2.0.0",
     "graphql-upload-ts": "^2.1.0",
     "graphql-ws": "^5.14.3",
+    "helmet": "^7.1.0",
     "mongoose": "^6.8.3",
     "nestjs-onesignal": "^2.0.0",
     "nodemailer": "^6.9.1",
@@ -91,6 +93,10 @@
     "ts-node": "^10.0.0",
     "tsconfig-paths": "4.1.0",
     "typescript": "^4.7.4"
+  },
+  "resolutions": {
+    "wrap-ansi": "7.0.0",
+    "string-width": "4.2.3"
   },
   "jest": {
     "moduleFileExtensions": [

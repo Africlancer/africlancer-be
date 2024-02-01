@@ -16,6 +16,6 @@ import { ProfileModule } from '../profile/profile.module';
   imports:[UserModule, ProfileModule, PassportModule, JwtModule.register({})],
   providers: [AuthService, AuthResolver, LocalStrategy, JwtStrategy, GoogleStrategy, FacebookStrategy , GetContext],
   controllers:[AuthController],
-  exports: [GetContext]
+  exports: [GetContext, AuthService]
 })
 export class AuthModule {}
