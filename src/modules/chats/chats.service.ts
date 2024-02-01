@@ -6,12 +6,13 @@ import { WsException } from '@nestjs/websockets';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MessageDto } from './dto/message.dto';
+import { ChatsRepository } from './chats.repository';
 
 @Injectable()
 export class ChatsService {
   constructor(
     private authService: AuthService,
-    @InjectModel(Message.name) private messageModel: Model<MessageDocument>,
+    private chatsRepo: ChatsRepository
   ) {}
 
   async getUserFromSocket(socket: Socket) {
@@ -29,12 +30,10 @@ export class ChatsService {
   }
 
   async createMessage(message: MessageDto, userId: string) {
-    const newMessage = new this.messageModel({ ...message, userId });
-    await newMessage.save;
-    return newMessage;
+    return this.chatsRepo.create(message as any, userId);
   }
 
   async getAllMessages() {
-    return this.messageModel.find().populate('user');
+    return this.chatsRepo.getAllMessages();
   }
 }
