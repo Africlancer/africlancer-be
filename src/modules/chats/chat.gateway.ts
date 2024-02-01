@@ -27,7 +27,7 @@ export class ChatGateway implements OnGatewayConnection {
     @ConnectedSocket() socket: Socket,
   ) {
     const user = await this.chatsService.getUserFromSocket(socket);
-    const newmessage = await this.chatsService.createMessage(message, user._id);
+    const newmessage = await this.chatsService.createMessage(message, user._id.toString());
 
     this.server.sockets.emit('receive_message', newmessage);
 
