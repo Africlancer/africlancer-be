@@ -21,6 +21,7 @@ import { MailModule } from './modules/mail/mail.module';
 import { BidModule } from './modules/bid/bid.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { FileUploadModule } from './modules/upload/upload.module';
 
 @Module({
   imports: [
@@ -52,7 +53,8 @@ import { NotificationModule } from './modules/notification/notification.module';
     AuthModule,
     MailModule,
     BidModule,
-    NotificationModule
+    NotificationModule,
+    FileUploadModule
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: GqlRolesGuard }],
