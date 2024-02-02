@@ -29,7 +29,6 @@ import { ChatsService } from './modules/chats/chats.service';
   imports: [
     BookmarkModule,
     PubSubModule,
-    //MessagesModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -57,6 +56,7 @@ import { ChatsService } from './modules/chats/chats.service';
     BidModule,
     NotificationModule,
     ChatsModule,
+    FileUploadModule
   ],
   controllers: [AppController, ChatsController],
   providers: [

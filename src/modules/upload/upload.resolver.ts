@@ -1,7 +1,6 @@
 import { Args, Mutation, Resolver } from "@nestjs/graphql";
-import { FileUploadObject, UploadFileInput } from "./upload.model";
+import { UploadFileInput } from "./upload.model";
 import { FileUploadService } from "./upload.service";
-import { FileUploadType } from "./upload.interface";
 
 @Resolver()
 export class FileUploadResolver{

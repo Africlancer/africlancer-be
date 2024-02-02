@@ -23,3 +23,11 @@ export interface ICloudinaryUploadConfig{
     resource_type?: string,
     folder?: string
 }
+
+export interface IFileStream{
+    fieldName: string,
+    filename: string,
+    mimetype: string,
+    encoding: string,
+    createReadStream: Function
+}
