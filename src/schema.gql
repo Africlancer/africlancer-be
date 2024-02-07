@@ -8,6 +8,11 @@ type Bookmark {
   projectID: String!
 }
 
+type BookmarkPageResult {
+  totalRecords: Float!
+  data: [Bookmark!]!
+}
+
 type User {
   _id: String!
   profileID: String
@@ -19,39 +24,43 @@ type User {
   roles: [String!]
 }
 
-type Project {
-  _id: String!
-  userId: String
-  title: String!
-  minBudget: Float!
-  maxBudget: Float!
-  summary: String!
-  details: String!
-  startDate: DateTime
-  endDate: DateTime
-  projectId: String
-  status: ProjectStatus
-  type: ProjectType!
-  totalBids: Float
-  averageBid: Float
-  skills: [String!]!
-  user: User!
+type Details {
+  _id: String
+  profileID: String
+  firstName: String
+  lastName: String
+  email: String
+  username: String
+  refreshToken: [String!]
+  roles: [String!]
+  name: String!
 }
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-enum ProjectStatus {
-  BIDDING_OPEN
-  BIDDING_CLOSE
-  COMPLETED
+type LoginResponse {
+  access_token: String!
+  refresh_token: String!
+  details: Details!
 }
 
-enum ProjectType {
-  FIXED_PRICE
-  HOURLY_RATE
+type Tokens {
+  access_token: String!
+  refresh_token: String!
+}
+
+type FileUploadObject {
+  _id: ID
+  public_id: String
+  format: String
+  resource_type: FileUploadType
+  bytes: Float
+  url: String!
+  secure_url: String!
+}
+
+enum FileUploadType {
+  IMAGE
+  VIDEO
+  RAW
 }
 
 type Qualification {
@@ -112,8 +121,8 @@ enum ReviewType {
 type Profile {
   _id: String!
   userID: String!
-  avatar: String
-  banner: String
+  avatar: FileUploadObject
+  banner: FileUploadObject
   location: String
   hourlyRate: Float
   professionalHeadline: String
@@ -136,6 +145,53 @@ type Profile {
   user: User!
 }
 
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type ProfilePageResult {
+  totalRecords: Float!
+  data: [Profile!]!
+}
+
+type Project {
+  _id: String!
+  userId: String
+  title: String!
+  minBudget: Float!
+  maxBudget: Float!
+  summary: String!
+  details: String!
+  startDate: DateTime
+  endDate: DateTime
+  projectId: String
+  status: ProjectStatus
+  type: ProjectType!
+  totalBids: Float
+  averageBid: Float
+  skills: [String!]!
+  files: [FileUploadObject!]!
+  user: User!
+}
+
+enum ProjectStatus {
+  BIDDING_OPEN
+  BIDDING_CLOSE
+  COMPLETED
+  ONGOING
+}
+
+enum ProjectType {
+  FIXED_PRICE
+  HOURLY_RATE
+}
+
+type ProjectPageResult {
+  totalRecords: Float!
+  data: [Project!]!
+}
+
 type Portfolio {
   _id: String!
   title: String!
@@ -144,27 +200,9 @@ type Portfolio {
   stack: String!
 }
 
-type Details {
-  _id: String
-  profileID: String
-  firstName: String
-  lastName: String
-  email: String
-  username: String
-  refreshToken: [String!]
-  roles: [String!]
-  name: String!
-}
-
-type LoginResponse {
-  access_token: String!
-  refresh_token: String!
-  details: Details!
-}
-
-type Tokens {
-  access_token: String!
-  refresh_token: String!
+type PortfolioPageResult {
+  totalRecords: Float!
+  data: [Portfolio!]!
 }
 
 type Bid {
@@ -177,6 +215,12 @@ type Bid {
   hourlyRate: Float
   deliveredIn: Float!
   user: User!
+  profile: Profile!
+}
+
+type BidPageResult {
+  totalRecords: Float!
+  data: [Bid!]!
 }
 
 type ProjectNotification {
@@ -185,33 +229,51 @@ type ProjectNotification {
   createdAt: Float
 }
 
+type ProjectNotificationPageResult {
+  totalRecords: Float!
+  data: [ProjectNotification!]!
+}
+
 type Query {
   findBookmark(bookmark: QueryBookMarkInput!): [Bookmark!]!
   deleteBookmark(_id: String!): Boolean!
+  bookmarkPage(query: QueryBookMarkInput!, page: BookmarkPageInput!): BookmarkPageResult!
+  deleteUser: Boolean!
   findOneUser: User!
   findUsers(query: QueryUserInput!): [User!]!
+  findOneProfile: Profile!
+  findProfiles(query: QueryProfileInput!): [Profile!]!
+  findProfilesFilter(query: QueryProfileInput!, fullSearch: Boolean!): [Profile!]!
+  profilePage(query: QueryProfileInput!, fullSearch: Boolean!, page: ProfilePageInput!): ProfilePageResult!
   findOneProject(query: QueryProjectInput!): Project!
   findProjectsFilter(query: QueryProjectInput!, fullSearch: Boolean!): [Project!]!
   findProjects(query: QueryProjectInput!): [Project!]!
   deleteProject: Boolean!
-  findOneProfile: Profile!
-  findProfiles(query: QueryProfileInput!): [Profile!]!
-  findProfilesFilter(query: QueryProfileInput!, fullSearch: Boolean!): [Profile!]!
+  deleteProjectFile(projectId: String!, fileId: String!, publicId: String!): Boolean!
+  projectPage(query: QueryProjectInput!, fullSearch: Boolean!, page: ProjectPageInput!): ProjectPageResult!
   findOnePortfolio(query: QueryPortfolioInput!): Portfolio!
   findPortfolios(query: QueryPortfolioInput!): [Portfolio!]!
   deletePortfolio(_id: String!): Boolean!
-  deleteUser: Boolean!
+  portfolioPage(query: QueryPortfolioInput!, page: PortfolioPageInput!): PortfolioPageResult!
   findBids(query: QueryBidInput!): [Bid!]!
   findOneBid(query: QueryBidInput!): Bid!
   totalBids(projectId: String!): Float!
   averageBids(projectId: String!): Float!
+  bidPage(query: QueryBidInput!, page: BidPageInput!): BidPageResult!
   findOneProjectNotification(notification: QueryProjectNotificationInput!): ProjectNotification!
   findProjectNotifications(notification: QueryProjectNotificationInput!): [ProjectNotification!]!
+  projectNotificationPage(query: QueryProjectNotificationInput!, page: ProjectNotificationPageInput!): ProjectNotificationPageResult!
 }
 
 input QueryBookMarkInput {
   userID: String
   projectID: String
+}
+
+input BookmarkPageInput {
+  skip: Float!
+  limit: Float!
+  keyword: String
 }
 
 input QueryUserInput {
@@ -220,6 +282,34 @@ input QueryUserInput {
   lastName: String
   email: String
   username: String
+}
+
+input QueryProfileInput {
+  _id: String
+  userID: String
+  avatar: Upload
+  banner: Upload
+  location: String
+  hourlyRate: Float
+  professionalHeadline: String
+  summary: String
+  recommendations: Float
+  skills: [String!]
+  fullName: String
+  clientRating: Float
+  freelancerRating: Float
+  flagURL: String
+  minRate: Float
+  maxRate: Float
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+input ProfilePageInput {
+  skip: Float!
+  limit: Float!
+  keyword: String
 }
 
 input QueryProjectInput {
@@ -235,26 +325,14 @@ input QueryProjectInput {
   totalBids: Float
   averageBid: Float
   skills: [String!]
+  files: [Upload!]
   _id: String
 }
 
-input QueryProfileInput {
-  _id: String
-  userID: String
-  avatar: String
-  banner: String
-  location: String
-  hourlyRate: Float
-  professionalHeadline: String
-  summary: String
-  recommendations: Float
-  skills: [String!]
-  fullName: String
-  clientRating: Float
-  freelancerRating: Float
-  flagURL: String
-  minRate: Float
-  maxRate: Float
+input ProjectPageInput {
+  skip: Float!
+  limit: Float!
+  keyword: String
 }
 
 input QueryPortfolioInput {
@@ -262,6 +340,12 @@ input QueryPortfolioInput {
   summary: String
   url: String
   stack: String
+}
+
+input PortfolioPageInput {
+  skip: Float!
+  limit: Float!
+  keyword: String
 }
 
 input QueryBidInput {
@@ -274,17 +358,33 @@ input QueryBidInput {
   isAwarded: Boolean
 }
 
+input BidPageInput {
+  skip: Float!
+  limit: Float!
+  keyword: String
+}
+
 input QueryProjectNotificationInput {
   _id: ID
   projectId: ID
 }
 
+input ProjectNotificationPageInput {
+  skip: Float!
+  limit: Float!
+  keyword: String
+}
+
 type Mutation {
   createBookmark(bookmark: CreateBookmarkInput!): Bookmark!
   updateBookmark(_id: String!, bookmark: QueryBookMarkInput!): Boolean!
+  userSignUp(user: UserSignUp!): User!
+  userSignIn(user: UserSignIn!): LoginResponse!
+  userSignOut: Boolean!
+  userChangePassword(resetData: UserChangePassword!): Boolean!
+  getNewTokens: Tokens!
+  userResetPassword(email: String!): Boolean!
   updateUser(user: QueryUserInput!): Boolean!
-  createProject(project: CreateProjectInput!): Project!
-  updateProject(id: String!, project: QueryProjectInput!): Boolean!
   updateProfile(profile: QueryProfileInput!): Boolean!
   addOrUpdateEducation(education: EducationInput!): Boolean!
   deleteEducation(educationID: String!): Boolean!
@@ -296,21 +396,18 @@ type Mutation {
   deletePublication(publicationID: String!): Boolean!
   reviewProfile(revieweeID: String!, projectID: String!, review: ReviewInput!): Boolean!
   deleteReview(reviewID: String!, revieweeID: String!): Boolean!
+  createProject(project: CreateProjectInput!): Project!
+  updateProject(id: String!, project: QueryProjectInput!): Boolean!
+  uploadFile(upload: UploadFileInput!): Boolean!
+  uploadFiles(upload: UploadFileInput!): [FileUploadObject!]!
   createPortfolio(portfolio: CreatePortfolioInput!): Portfolio!
   updatePortfolio(_id: String!, portfolio: QueryPortfolioInput!): Boolean!
-  userSignUp(user: UserSignUp!): User!
-  userSignIn(user: UserSignIn!): LoginResponse!
-  userSignOut: Boolean!
-  userChangePassword(resetData: UserChangePassword!): Boolean!
-  getNewTokens: Tokens!
-  userResetPassword(email: String!): Boolean!
   createBid(bid: CreateBidInput!): Bid!
   updateBid(id: String!, bid: QueryBidInput!): Boolean!
   deleteBid(id: String!): Boolean!
   awardBid(projectId: String!, bidId: String!): Boolean!
   unawardBid(projectId: String!, bidId: String!): Boolean!
   createProjectNotification(notification: CreateProjectNotificationInput!): ProjectNotification!
-  uploadFile(upload: UploadFileInput!): Boolean!
 }
 
 input CreateBookmarkInput {
@@ -318,17 +415,23 @@ input CreateBookmarkInput {
   projectID: String!
 }
 
-input CreateProjectInput {
-  userId: String
-  title: String!
-  minBudget: Float!
-  maxBudget: Float!
-  summary: String!
-  details: String!
-  startDate: DateTime
-  endDate: DateTime
-  type: ProjectType!
-  skills: [String!]!
+input UserSignUp {
+  firstName: String!
+  lastName: String!
+  email: String!
+  username: String
+  password: String!
+  roles: [String!]
+}
+
+input UserSignIn {
+  username: String!
+  password: String!
+}
+
+input UserChangePassword {
+  oldPassword: String!
+  newPassword: String!
 }
 
 input EducationInput {
@@ -377,30 +480,30 @@ input ReviewInput {
   projectId: String
 }
 
+input CreateProjectInput {
+  userId: String
+  title: String!
+  minBudget: Float!
+  maxBudget: Float!
+  summary: String!
+  details: String!
+  startDate: DateTime
+  endDate: DateTime
+  type: ProjectType!
+  skills: [String!]!
+  files: [Upload!]
+}
+
+input UploadFileInput {
+  upload: Upload
+  uploads: [Upload!]
+}
+
 input CreatePortfolioInput {
   title: String!
   summary: String!
   url: String!
   stack: String!
-}
-
-input UserSignUp {
-  firstName: String!
-  lastName: String!
-  email: String!
-  username: String
-  password: String!
-  roles: [String!]
-}
-
-input UserSignIn {
-  username: String!
-  password: String!
-}
-
-input UserChangePassword {
-  oldPassword: String!
-  newPassword: String!
 }
 
 input CreateBidInput {
@@ -415,13 +518,6 @@ input CreateBidInput {
 input CreateProjectNotificationInput {
   projectId: ID!
 }
-
-input UploadFileInput {
-  upload: Upload
-}
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
 
 type Subscription {
   newProjectCreated: ProjectNotification!

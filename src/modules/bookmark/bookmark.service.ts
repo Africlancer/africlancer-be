@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BookmarkRepository } from './bookmark.repository';
-import { BookMark } from './bookmark.schema';
+import { BookMark, PageParams, PageResult } from './bookmark.schema';
 
 @Injectable()
 export class BookmarkService {
@@ -21,9 +21,10 @@ export class BookmarkService {
   public async delete(_id: string): Promise<void> {
     await this.BookmarkRepo.delete(_id);
   }
-}
-function useParams<T>(): { digits: any; } {
-  throw new Error('Function not implemented.');
+
+  async page(project: Partial<BookMark>, page: PageParams): Promise<PageResult<BookMark>>{
+    return this.BookmarkRepo.page(project, page);
+  }
 }
 
 

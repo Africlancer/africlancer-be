@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { ProjectStatus } from './project.enum';
-import { Project, ProjectDocument } from './project.schema';
+import { PageParams, PageResult, Project, ProjectDocument, handlePageFacet, handlePageResult } from './project.schema';
 
 @Injectable()
 export class ProjectRepository {
@@ -61,6 +61,85 @@ export class ProjectRepository {
 
   public async delete(_id: string): Promise<void> {
     await this.projectModel.deleteOne({ _id: new Types.ObjectId(_id) });
+  }
+
+  // public async page(page: PageParams): Promise<PageResult<Project>> {
+  //   let query = {
+  //     $match: {},
+  //   } as any;
+
+  //   if (page.keyword) {
+  //     query.$match.$and = query.$match.$and || [];
+  //     query.$match.$and.push({
+  //       $or: [
+  //         {
+  //           name: new RegExp(`^${page.keyword}`, "i"),
+  //         },
+  //       ],
+  //     });
+  //   }
+
+  //   return this.projectModel.aggregate([
+  //     query,
+  //     { $sort: { createdAt: -1 } },
+  //     { ...handlePageFacet(page) },
+  //   ])
+  //   .then(handlePageResult)
+  //   .then((rs) => {
+  //     return rs;
+  //   });
+  // }
+
+  public async page(project: Partial<Project>, fullSearch:Boolean, page: PageParams): Promise<PageResult<Project>> {
+    if(project.userId) project.userId = new Types.ObjectId(project.userId);
+    if(project.title && !fullSearch){
+      const title = project.title.split(" ");
+      delete project.title;
+      for (let i in title){
+        let query:any; 
+        if(project.skills){
+          const skills:String[] = project.skills;
+          delete project.skills;
+          query = await this.projectModel.aggregate([
+            {$match: {"$and":[project, {status:ProjectStatus.BIDDING_OPEN}, {title: {"$regex":title[i], "$options":"i"}}, {skills: { $in: skills }}]}},
+            { $sort: { createdAt: -1 } },
+            { ...handlePageFacet(page) },
+          ]);
+        }else{
+          query = await this.projectModel.aggregate([
+            {$match: {"$and":[project, {status:ProjectStatus.BIDDING_OPEN}, {title: {"$regex":title[i], "$options":"i"}}]}},
+            { $sort: { createdAt: -1 } },
+            { ...handlePageFacet(page) },
+          ]);
+        }
+        if(query){
+          return handlePageResult(query);
+        }
+      }
+    }
+    if(project.skills){
+      let query:any; 
+      const skills = project.skills.map(skill => new RegExp(skill as any, 'i'));
+      delete project.skills;
+      query = await this.projectModel.aggregate([
+        {$match: {"$and":[project, {status:ProjectStatus.BIDDING_OPEN}, {skills: { $in: skills }}]}},
+        { $sort: { createdAt: -1 } },
+        { ...handlePageFacet(page) },
+      ]);
+      if(query){
+        return handlePageResult(query);
+      }
+    }
+
+    return this.projectModel.aggregate([
+      {$match: {"$and":[project, {status:ProjectStatus.BIDDING_OPEN}]}},
+      { $sort: { createdAt: -1 } },
+      { ...handlePageFacet(page) },
+    ])
+    .then(handlePageResult)
+    .then((rs) => {
+      return rs;
+    });
   }
 
 }

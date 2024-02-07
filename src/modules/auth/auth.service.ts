@@ -70,7 +70,7 @@ export class AuthService {
       throw new ForbiddenException('User Already Exists');
     }
 
-    const avatar = uiavatars.generateAvatar({
+    const avatarUrl = uiavatars.generateAvatar({
       uppercase: true,
       name: `${user.firstName}+${user.lastName}`,
       //background: "990000",
@@ -87,7 +87,11 @@ export class AuthService {
       _id: newUser._id,
       userID: newUser._id,
       fullName: `${newUser.firstName} ${newUser.lastName}`,
-      avatar,
+      avatar:{
+        _id: new Types.ObjectId(),
+        url: avatarUrl,
+        secure_url: avatarUrl
+      },
     } as any);
     await this.userService.update(newUser._id.toString(), {
       profileID: newProfile._id,

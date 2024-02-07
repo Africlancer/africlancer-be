@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { ProjectNotificationDocument, ProjectNotification } from "./project.schema";
+import { ProjectNotificationDocument, ProjectNotification, PageParams, PageResult, handlePageFacet, handlePageResult } from "./project.schema";
 
 @Injectable()
 export class ProjectNotificationRepository{
@@ -35,5 +35,17 @@ export class ProjectNotificationRepository{
 
         return model;
     }
+
+    public async page(query: Partial<ProjectNotification>, page: PageParams): Promise<PageResult<ProjectNotification>> {
+        return this.notificationModel.aggregate([
+          {$match: query},
+          { $sort: { createdAt: -1 } },
+          { ...handlePageFacet(page) },
+        ])
+        .then(handlePageResult)
+        .then((rs) => {
+          return rs;
+        });
+      }
 
 }

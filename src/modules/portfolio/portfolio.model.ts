@@ -74,3 +74,25 @@ export class PortfolioQueryInput extends CommonPortfolioInput {}
 
 @InputType()
 export class QueryPortfolioInput extends CommonPortfolioInput {}
+
+
+@InputType()
+export class PortfolioPageInput {
+  @Field((type) => Number, { nullable: false })
+  skip: number;
+  @Field((type) => Number, { nullable: false })
+  limit: number;
+  @Field((type) => String, { nullable: true })
+  keyword: string;
+}
+
+@ObjectType()
+export class PortfolioPageResult {
+  @Field((type) => Number, { nullable: false })
+  totalRecords: number;
+  @Field((type) => [Portfolio])
+  data: [Portfolio];
+}
+
+
+

@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, now, Types } from "mongoose";
 import defaultValue from "./defaults"
 import { ReviewType } from "./profile.enum";
+import { FileUploadObject } from "../upload/upload.schema";
 
 export type ProfileDocument = HydratedDocument<Profile>
 
@@ -17,11 +18,11 @@ export class Profile{
 
     @AutoMap()
     @Prop()
-    avatar:string;
+    avatar: FileUploadObject;
 
     @AutoMap()
     @Prop({default:defaultValue().banner})
-    banner:string;
+    banner: FileUploadObject;
 
     @AutoMap()
     @Prop({required:true,default:defaultValue().location})
@@ -240,3 +241,32 @@ export const ProfileSchema = SchemaFactory.createForClass(Profile)
 ProfileSchema.pre("save", function(){
     this.updatedAt = now()
 })
+
+export class PageResult<T> {
+    totalRecords: number;
+    data: Array<T>;
+  }
+  
+  export class PageParams {
+    skip?: number;
+    limit?: number;
+    keyword?: string;
+  }
+  
+  export const handlePageFacet = (page: PageParams) => {
+    return {
+      $facet: {
+        data: [{ $skip: Number(page.skip) }, { $limit: Number(page.limit) }],
+        totalRecords: [{ $count: "count" }],
+      },
+    };
+  };
+  
+  export const handlePageResult = (res: any) => {
+    let rs = res[0] as any;
+    if (rs.totalRecords.length)
+      rs = { ...rs, totalRecords: rs.totalRecords[0].count };
+    else rs = { ...rs, totalRecords: 0 };
+  
+    return rs;
+  };

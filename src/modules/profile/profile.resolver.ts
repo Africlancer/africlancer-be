@@ -1,7 +1,7 @@
 import { Args, Mutation, Parent, Query, Resolver, ResolveField } from "@nestjs/graphql";
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
-import { EducationInput, ExperienceInput, Profile, PublicationInput, QualificationInput, QueryProfileInput, Review, ReviewInput } from "./profile.model";
+import { EducationInput, ExperienceInput, Profile, ProfilePageInput, ProfilePageResult, PublicationInput, QualificationInput, QueryProfileInput, Review, ReviewInput } from "./profile.model";
 import { ProfileService } from "./profile.service";
 import { Education as EducationSchema, Profile as ProfileSchema } from "./profile.schema";
 import { GqlCurrentUser } from "../auth/decorators/gql.user.decorator";
@@ -10,11 +10,17 @@ import { UseGuards } from "@nestjs/common";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { Role } from "../auth/roles.enum";
 import { User } from "../user/user.model";
+import { FileUploadService } from "../upload/upload.service";
 
 
 @Resolver(of => Profile)
 export class ProfileResolver{
-    constructor(private profileService:ProfileService, @InjectMapper() private readonly classMapper: Mapper){}
+    constructor(
+        private profileService:ProfileService, 
+        @InjectMapper() private readonly classMapper: Mapper,
+        private fileUploadService:FileUploadService, 
+        
+    ){}
 
 
     @Query(returns => Profile, {name:"findOneProfile"})
@@ -38,6 +44,12 @@ export class ProfileResolver{
     ){
         //const queryMap = await this.classMapper.mapAsync(profile, QueryProfileInput, ProfileSchema);
         //console.log(queryMap);
+        if(profile.avatar){
+            profile.avatar = await this.fileUploadService.uploadFile(profile.avatar) as any;
+        }
+        if(profile.banner){
+            profile.banner = await this.fileUploadService.uploadFile(profile.banner) as any;
+        }
         await this.profileService.updateOne(profileID.sub, profile as unknown as ProfileSchema);
         return true;
     }
@@ -130,5 +142,12 @@ export class ProfileResolver{
     async deleteReview(@Args("reviewID") reviewID:string, @Args("revieweeID") revieweeID:string){
         await this.profileService.deleteReview(reviewID , revieweeID);
         return true;
+    }
+
+    @Query((returns) => ProfilePageResult, { name: 'profilePage' })
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    public async page(@Args('query') query: QueryProfileInput, @Args('fullSearch') fullSearch: Boolean, @Args("page") page: ProfilePageInput) {
+      return this.profileService.page(query as any, fullSearch, page);
     }
 }

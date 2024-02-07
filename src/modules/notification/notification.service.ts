@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { NotificationRepository } from "./notification.repository";
-import { Notification } from "./notification.schema";
+import { Notification, PageParams, PageResult } from "./notification.schema";
 import { UserService } from "../user/user.service";
 
 @Injectable()
@@ -30,4 +30,8 @@ export class NotificationService{
     public async delete(userId: string): Promise<void> {
         await this.notificationRepository.delete(userId);
     }
+
+    async page(project: Partial<Notification>, page: PageParams): Promise<PageResult<Notification>>{
+        return this.notificationRepository.page(project, page);
+      }
 }

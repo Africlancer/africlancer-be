@@ -75,4 +75,25 @@ export class CommonBidInput{
 @InputType()
 export class QueryBidInput extends PartialType(CommonBidInput){}
 
+@InputType()
+export class BidPageInput {
+    @Field((type) => Number, { nullable: false })
+    skip: number;
+    @Field((type) => Number, { nullable: false })
+    limit: number;
+    @Field((type) => String, { nullable: true })
+    keyword: string;
+  }
+  
+  @ObjectType()
+  export class BidPageResult {
+    @Field((type) => Number, { nullable: false })
+    totalRecords: number;
+    @Field((type) => [Bid])
+    data: [Bid];
+  }
+  
+  
+  
+
 

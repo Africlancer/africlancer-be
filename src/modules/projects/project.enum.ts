@@ -1,7 +1,8 @@
 export enum ProjectStatus{
     BIDDING_OPEN = "OPEN",
     BIDDING_CLOSE = "CLOSE",
-    COMPLETED = "COMPLETED"
+    COMPLETED = "COMPLETED",
+    ONGOING = "ONGOING"
 }
 
 export enum ProjectType{

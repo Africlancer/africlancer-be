@@ -1,6 +1,6 @@
 import { ForbiddenException, Inject, Injectable } from "@nestjs/common";
 import { ProjectNotificationRepository } from "./project.repository";
-import { ProjectNotification } from "./project.schema";
+import { PageParams, PageResult, ProjectNotification } from "./project.schema";
 import { ProjectService } from "src/modules/projects/project.service";
 import { PUB_SUB } from "src/modules/pubsub/pubsub.module";
 import { PubSub } from "graphql-subscriptions";
@@ -37,5 +37,9 @@ export class ProjectNotificationService{
 
     public async delete(projectId: string): Promise<void> {
         await this.notificationRepository.delete(projectId);
+    }
+    
+    async page(project: Partial<ProjectNotification>, page: PageParams): Promise<PageResult<ProjectNotification>>{
+        return this.notificationRepository.page(project, page);
     }
 }

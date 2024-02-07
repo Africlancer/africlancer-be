@@ -1,7 +1,7 @@
 import { Args, Mutation, Resolver } from "@nestjs/graphql";
 import { UseGuards } from "@nestjs/common";
 import { Query } from "@nestjs/graphql";
-import { CreateSaveProjectNotificationInput, QuerySaveProjectNotificationInput, SaveProjectNotification } from "./save.model";
+import { CreateSaveProjectNotificationInput, QuerySaveProjectNotificationInput, SaveProjectNotification, SaveProjectNotificationPageInput, SaveProjectNotificationPageResult } from "./save.model";
 import { GqlJwtGuard } from "src/modules/auth/guards/gql.jwt.guard";
 import { Roles } from "src/modules/auth/decorators/roles.decorator";
 import { Role } from "src/modules/auth/roles.enum";
@@ -42,5 +42,12 @@ export class SaveProjectNotificationResolver{
     async delete(@Args("userId") userId:string):Promise<Boolean>{
         await this.notificationService.delete(userId);
         return true;
+    }
+
+    @Query((returns) => SaveProjectNotificationPageResult, { name: 'bookmarkPage' })
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    public async page(@Args('query') query: QuerySaveProjectNotificationInput, @Args("page") page: SaveProjectNotificationPageInput) {
+      return this.notificationService.page(query as any, page);
     }
 }

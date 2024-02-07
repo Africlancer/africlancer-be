@@ -7,11 +7,13 @@ import { Project, ProjectSchema } from './project.schema';
 import { ProjectService } from './project.service';
 import { ProjectMapper } from './project.mapper';
 import { UserModule } from '../user/user.module';
+import { FileUploadModule } from '../upload/upload.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }]),
-    UserModule
+    UserModule,
+    FileUploadModule
   ],
   controllers: [ProjectController],
   providers: [ProjectResolver, ProjectService, ProjectRepository, ProjectMapper],

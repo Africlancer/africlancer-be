@@ -2,6 +2,7 @@ import { AutoMap } from '@automapper/classes';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { ProjectStatus, ProjectType } from './project.enum';
+import { FileUploadObject } from '../upload/upload.schema';
 
 export type ProjectDocument = HydratedDocument<Project>;
 
@@ -65,11 +66,42 @@ export class Project {
   @AutoMap()
   @Prop()
   skills: Array<String>;
+
+  @Prop()
+  files?: Array<FileUploadObject>;
 }
 
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
 
+export class PageResult<T> {
+  totalRecords: number;
+  data: Array<T>;
+}
+
+export class PageParams {
+  skip?: number;
+  limit?: number;
+  keyword?: string;
+}
+
+export const handlePageFacet = (page: PageParams) => {
+  return {
+    $facet: {
+      data: [{ $skip: Number(page.skip) }, { $limit: Number(page.limit) }],
+      totalRecords: [{ $count: "count" }],
+    },
+  };
+};
+
+export const handlePageResult = (res: any) => {
+  let rs = res[0] as any;
+  if (rs.totalRecords.length)
+    rs = { ...rs, totalRecords: rs.totalRecords[0].count };
+  else rs = { ...rs, totalRecords: 0 };
+
+  return rs;
+};
 /// how the schema is supposed to be
 //  @Prop({ required: true, minlength:300, maxlength:2000 })
 // details: string;

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PortfolioRepository } from './portfolio.repository';
-import { Portfolio } from './portfolio.schema';
+import { PageParams, PageResult, Portfolio } from './portfolio.schema';
 
 @Injectable()
 export class PortfolioService {
@@ -25,8 +25,8 @@ export class PortfolioService {
   public async delete(_id: string): Promise<void> {
     await this.PortfolioRepo.delete(_id);
   }
-}
-function useParams<T>(): { digits: any; } {
-  throw new Error('Function not implemented.');
-}
 
+  async page(project: Partial<Portfolio>, page: PageParams): Promise<PageResult<Portfolio>>{
+    return this.PortfolioRepo.page(project, page);
+  }
+}

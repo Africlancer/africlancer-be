@@ -7,9 +7,10 @@ import { Profile, ProfileSchema } from "./profile.schema";
 import { ProfileService } from "./profile.service";
 import { UserModule } from "../user/user.module";
 import { ProjectModule } from "../projects/project.module";
+import { FileUploadModule } from "../upload/upload.module";
 
 @Module({
-    imports:[MongooseModule.forFeature([{name:Profile.name, schema:ProfileSchema}]), UserModule, ProjectModule],
+    imports:[MongooseModule.forFeature([{name:Profile.name, schema:ProfileSchema}]), UserModule, ProjectModule, FileUploadModule],
     providers:[ProfileService,ProfileResolver,ProfileRepository, ProfileMapper],
     exports:[ProfileService, ProfileRepository]
 })

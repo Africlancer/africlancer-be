@@ -1,6 +1,8 @@
 import { AutoMap } from '@automapper/classes';
 import { Field, InputType, Mutation, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { ProjectStatus, ProjectType } from './project.enum';
+import { FileUploadObject } from '../upload/upload.model';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 
 registerEnumType(ProjectStatus, {
   name:"ProjectStatus"
@@ -71,6 +73,10 @@ export class Project {
   @AutoMap()
   @Field(type => [String])
   skills: String[];
+
+  @Field(type => [FileUploadObject])
+  files: FileUploadObject[];
+
 }
 
 @InputType()
@@ -122,6 +128,9 @@ export class CommonProjectInput {
   @AutoMap()
   @Field(type => [String], { nullable: true })
   skills?: String[];
+
+  @Field(type => [GraphQLUpload], { nullable: true })
+  files?: FileUpload[];
 }
 
 @InputType()
@@ -166,6 +175,9 @@ export class CreateProjectInput {
   @AutoMap()
   @Field(type => [String])
   skills: String[];
+
+  @Field(type => [GraphQLUpload], { nullable: true })
+  files?: FileUpload[];
 }
 
 @InputType()
@@ -175,9 +187,20 @@ export class QueryProjectInput extends CommonProjectInput {
   _id?: string;
 }
 
+@InputType()
+export class ProjectPageInput {
+  @Field((type) => Number, { nullable: false })
+  skip: number;
+  @Field((type) => Number, { nullable: false })
+  limit: number;
+  @Field((type) => String, { nullable: true })
+  keyword: string;
+}
+
 @ObjectType()
-export class Subscription{
-  @AutoMap()
-  @Field(type => [String])
-  newProject: Project[];
+export class ProjectPageResult {
+  @Field((type) => Number, { nullable: false })
+  totalRecords: number;
+  @Field((type) => [Project])
+  data: [Project];
 }

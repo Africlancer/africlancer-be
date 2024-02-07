@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { NotificationDocument, Notification } from "./notification.schema";
+import { NotificationDocument, Notification, PageParams, PageResult, handlePageFacet, handlePageResult } from "./notification.schema";
 
 @Injectable()
 export class NotificationRepository{
@@ -29,12 +29,24 @@ export class NotificationRepository{
         await this.notificationModel.deleteMany({ userId: new Types.ObjectId(userId) });
     }
 
-    private mapIds(model: Partial<Notification>):  Partial<Notification>{
+    private mapIds(model: Partial<Notification>): Partial<Notification>{
         if(model._id) model._id = new Types.ObjectId(model._id);
         if(model.userId) model.userId = new Types.ObjectId(model.userId);
         if(model.refId) model.refId = new Types.ObjectId(model.refId);
 
         return model;
     }
+
+    public async page(query: Partial<Notification>, page: PageParams): Promise<PageResult<Notification>> {
+        return this.notificationModel.aggregate([
+          {$match: query},
+          { $sort: { createdAt: -1 } },
+          { ...handlePageFacet(page) },
+        ])
+        .then(handlePageResult)
+        .then((rs) => {
+          return rs;
+        });
+      }
 
 }

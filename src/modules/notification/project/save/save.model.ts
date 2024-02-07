@@ -38,3 +38,21 @@ export class CreateSaveProjectNotificationInput{
 
 @InputType()
 export class QuerySaveProjectNotificationInput extends CommonSaveProjectNotificationInput{}
+
+@InputType()
+export class SaveProjectNotificationPageInput {
+  @Field((type) => Number, { nullable: false })
+  skip: number;
+  @Field((type) => Number, { nullable: false })
+  limit: number;
+  @Field((type) => String, { nullable: true })
+  keyword: string;
+}
+
+@ObjectType()
+export class SaveProjectNotificationPageResult {
+  @Field((type) => Number, { nullable: false })
+  totalRecords: number;
+  @Field((type) => [SaveProjectNotification])
+  data: [SaveProjectNotification];
+}

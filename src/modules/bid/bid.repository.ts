@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { Bid, BidDocument } from "./bid.schema";
+import { Bid, BidDocument, PageParams, PageResult, handlePageFacet, handlePageResult } from "./bid.schema";
 
 @Injectable()
 export class BidRepository{
@@ -32,4 +32,16 @@ export class BidRepository{
     async delete(id:string):Promise<void>{
         await this.bidModel.deleteOne({_id: new Types.ObjectId(id)});
     }
+
+    public async page(query: Partial<Bid>, page: PageParams): Promise<PageResult<Bid>> {
+        return this.bidModel.aggregate([
+          {$match: query},
+          { $sort: { createdAt: -1 } },
+          { ...handlePageFacet(page) },
+        ])
+        .then(handlePageResult)
+        .then((rs) => {
+          return rs;
+        });
+      }
 }

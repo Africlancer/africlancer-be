@@ -1,5 +1,5 @@
 import { Args, Query, Mutation, Resolver } from "@nestjs/graphql";
-import { Notification, QueryNotificationInput } from "./notification.model";
+import { Notification, NotificationPageInput, NotificationPageResult, QueryNotificationInput } from "./notification.model";
 import { NotificationService } from "./notification.service";
 import { UseGuards } from "@nestjs/common";
 import { GqlJwtGuard } from "../auth/guards/gql.jwt.guard";
@@ -32,5 +32,12 @@ export class NotificationResolver{
     async delete(@Args("userId") userId:string):Promise<Boolean>{
         await this.notificationService.delete(userId);
         return true;
+    }
+
+    @Query((returns) => NotificationPageResult, { name: 'notificationPage' })
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    public async page(@Args('query') query: QueryNotificationInput, @Args("page") page: NotificationPageInput) {
+      return this.notificationService.page(query as any, page);
     }
 }

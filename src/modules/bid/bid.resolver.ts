@@ -4,9 +4,10 @@ import { GqlCurrentUser } from '../auth/decorators/gql.user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { GqlJwtGuard } from '../auth/guards/gql.jwt.guard';
 import { Role } from '../auth/roles.enum';
-import { Bid, CreateBidInput, QueryBidInput } from './bid.model';
+import { Bid, BidPageInput, BidPageResult, CreateBidInput, QueryBidInput } from './bid.model';
 import { BidService } from './bid.service';
 import { User } from '../user/user.model';
+import { Profile } from '../profile/profile.model';
 
 @Resolver(of=>Bid)
 export class BidResolver {
@@ -79,5 +80,17 @@ export class BidResolver {
     @ResolveField(returns => User)
     async user(@Parent() bid:Bid):Promise<any>{
         return this.bidSvc.finduser(bid.userID);
+    }
+
+    @ResolveField(returns => Profile)
+    async profile(@Parent() bid:Bid):Promise<any>{
+        return this.bidSvc.findProfile(bid.userID);
+    }
+
+    @Query((returns) => BidPageResult, { name: 'bidPage' })
+    @UseGuards(GqlJwtGuard)
+    @Roles(Role.USER)
+    public async page(@Args('query') query: QueryBidInput, @Args("page") page: BidPageInput) {
+      return this.bidSvc.page(query as any, page);
     }
 }

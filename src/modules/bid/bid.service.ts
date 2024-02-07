@@ -3,13 +3,19 @@ import { Types } from 'mongoose';
 import { ProjectStatus } from '../projects/project.enum';
 import { ProjectService } from '../projects/project.service';
 import { BidRepository } from './bid.repository';
-import { Bid } from './bid.schema';
+import { Bid, PageParams, PageResult } from './bid.schema';
 import { User } from '../user/user.schema';
 import { UserService } from '../user/user.service';
+import { ProfileService } from '../profile/profile.service';
+import { Profile } from '../profile/profile.schema';
 
 @Injectable()
 export class BidService {
-    constructor(private readonly bidRepo:BidRepository, private readonly projectService:ProjectService, private readonly userService:UserService){}
+    constructor(private readonly bidRepo:BidRepository, 
+        private readonly projectService:ProjectService, 
+        private readonly userService:UserService,
+        private readonly profileService:ProfileService
+    ){}
 
     async find(bid:Partial<Bid>):Promise<Bid[]>{
         return this.bidRepo.find(bid);
@@ -97,6 +103,14 @@ export class BidService {
 
     async finduser(userId:string):Promise<User>{
         return this.userService.findOne({_id: new Types.ObjectId(userId)});
+    }
+
+    async findProfile(userId:string):Promise<Profile>{
+        return this.profileService.findOne({userID: new Types.ObjectId(userId)});
+    }
+
+    async page(project: Partial<Bid>, page: PageParams): Promise<PageResult<Bid>>{
+        return this.bidRepo.page(project, page);
     }
 
     //TODO: Team project bidding(more than 1 accepted bidder)

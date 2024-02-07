@@ -6,9 +6,15 @@ import { BidService } from './bid.service';
 import { BidResolver } from './bid.resolver';
 import { ProjectModule } from "../projects/project.module";
 import { UserModule } from "../user/user.module";
+import { ProfileModule } from "../profile/profile.module";
 
 @Module({
-    imports:[MongooseModule.forFeature([{name:Bid.name, schema:BidSchema}]), ProjectModule, UserModule],
+    imports:[
+        MongooseModule.forFeature([{name:Bid.name, schema:BidSchema}]), 
+        ProjectModule, 
+        UserModule, 
+        ProfileModule
+    ],
     providers:[BidService, BidRepository, BidResolver],
     exports:[]
 })

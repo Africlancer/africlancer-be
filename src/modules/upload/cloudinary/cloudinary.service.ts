@@ -28,28 +28,31 @@ export class CloudinaryService{
         }else{
             config.folder = FileUploadFolders.FILES
         }
-
-        let uploadRes: IUploadResponse;
-        const upload = cloudinary.uploader.upload_stream({...config as any}, (err, callResult)=>{
-            if(err){
-                console.log(err.message);
-            }else{
-                const {bytes, format, public_id, resource_type, secure_url, url} = callResult;
-                uploadRes = {
-                    bytes,
-                    format,
-                    public_id,
-                    resource_type: resource_type as any,
-                    secure_url,
-                    url
+        
+        const uploadRes:Promise<IUploadResponse> = new Promise((resolve, reject)=>{
+            const upload = cloudinary.uploader.upload_stream({...config as any}, (err, callResult)=>{
+                if(err){
+                    reject(err.message);
+                }else{
+                    const {bytes, format, public_id, resource_type, secure_url, url} = callResult;
+                    resolve({
+                        bytes,
+                        format,
+                        public_id,
+                        resource_type: resource_type as any,
+                        secure_url,
+                        url
+                    });
                 }
-            }
+            });
+            uploadedFileStream.pipe(upload);
         });
-        await uploadedFileStream.pipe(upload);
+
         return uploadRes;
     }
 
-    public async deleteFile():Promise<boolean>{
+    public async deleteFile(public_id: string, resource_type: FileUploadType):Promise<boolean>{
+        await cloudinary.api.delete_resources([public_id], { type: 'upload', resource_type});
         return true;
     }
 

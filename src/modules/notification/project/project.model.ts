@@ -29,3 +29,21 @@ export class CreateProjectNotificationInput{
 
 @InputType()
 export class QueryProjectNotificationInput extends CommonProjectNotificationInput{}
+
+@InputType()
+export class ProjectNotificationPageInput {
+  @Field((type) => Number, { nullable: false })
+  skip: number;
+  @Field((type) => Number, { nullable: false })
+  limit: number;
+  @Field((type) => String, { nullable: true })
+  keyword: string;
+}
+
+@ObjectType()
+export class ProjectNotificationPageResult {
+  @Field((type) => Number, { nullable: false })
+  totalRecords: number;
+  @Field((type) => [ProjectNotification])
+  data: [ProjectNotification];
+}

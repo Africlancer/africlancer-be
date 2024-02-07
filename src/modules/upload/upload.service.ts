@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { IUploadResponse } from "./upload.interface";
+import { FileUploadType, IUploadResponse } from "./upload.interface";
 import { CloudinaryService } from "./cloudinary/cloudinary.service";
 
 @Injectable()
@@ -18,5 +18,9 @@ export class FileUploadService{
             uploadedFiles.push(await this.cloudinaryService.uploadFile(files[file]));
         }
         return uploadedFiles;
+    }
+
+    public async deleteFiles(public_id: string, resource_type: FileUploadType): Promise<boolean>{
+        return this.cloudinaryService.deleteFile(public_id, resource_type);
     }
 }

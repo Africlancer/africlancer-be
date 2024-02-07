@@ -1,6 +1,6 @@
 import { ForbiddenException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ProfileRepository } from "./profile.repository";
-import { Education, Experience, Publication, Qualification, Profile, Review } from "./profile.schema";
+import { Education, Experience, Publication, Qualification, Profile, Review, PageParams, PageResult } from "./profile.schema";
 import { Types } from "mongoose";
 import { UserService } from "../user/user.service";
 import { User } from "../user/user.schema";
@@ -298,5 +298,9 @@ export class ProfileService{
         averageClient = averageClient + 1;
 
         return averageRating/averageClient;
+    }
+
+    async page(project: Partial<Profile>, fullSearch:Boolean, page: PageParams): Promise<PageResult<Profile>>{
+        return this.profileRepository.page(project, fullSearch, page);
     }
 }

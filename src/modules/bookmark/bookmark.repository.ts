@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { BookMark, BookMarkDocument } from './bookmark.schema';
+import { BookMark, BookMarkDocument, PageParams, PageResult, handlePageFacet, handlePageResult } from './bookmark.schema';
 
 @Injectable()
 export class BookmarkRepository {
@@ -26,5 +26,18 @@ export class BookmarkRepository {
   public async delete(_id: string): Promise<void> {
     await this.bookMarkModel.deleteOne({ _id: new Types.ObjectId(_id) });
   }
+
+  public async page(query: Partial<BookMark>, page: PageParams): Promise<PageResult<BookMark>> {
+    return this.bookMarkModel.aggregate([
+      {$match: query},
+      { $sort: { createdAt: -1 } },
+      { ...handlePageFacet(page) },
+    ])
+    .then(handlePageResult)
+    .then((rs) => {
+      return rs;
+    });
+  }
+
 
 }

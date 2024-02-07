@@ -1,6 +1,6 @@
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
-import { Param } from '@nestjs/common';
+import { Param, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   CreatePortfolioInput,
@@ -8,16 +8,23 @@ import {
   Portfolio,
   PortfolioQueryInput,
   QueryPortfolioInput,
+  PortfolioPageResult,
+  PortfolioPageInput,
 } from './portfolio.model';
 import { Portfolio as PortfolioSchema } from './portfolio.schema';
 
 import { PortfolioService } from './portfolio.service';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { GqlJwtGuard } from '../auth/guards/gql.jwt.guard';
+import { Role } from '../auth/roles.enum';
 
 @Resolver((of) => Portfolio)
 export class PortfolioResolver {
   constructor(private readonly portfolioService: PortfolioService, @InjectMapper() private readonly classMapper: Mapper) {}
 
   @Mutation((returns) => Portfolio, { name: 'createPortfolio' })
+  @UseGuards(GqlJwtGuard)
+  @Roles(Role.USER)
   public async create(@Args('portfolio') portfolio: CreatePortfolioInput): Promise<Portfolio> {
     const queryMap = await this.classMapper.mapAsync(portfolio, CreatePortfolioInput, PortfolioSchema);
     return this.classMapper.mapAsync(await this.portfolioService.create(queryMap), PortfolioSchema, Portfolio);
@@ -25,6 +32,8 @@ export class PortfolioResolver {
   }
 
   @Mutation((returns) => Boolean, { name: 'updatePortfolio' })
+  @UseGuards(GqlJwtGuard)
+  @Roles(Role.USER)
   public async update(
     @Args('_id') _id: string,
     @Args('portfolio') portfolio: QueryPortfolioInput,
@@ -37,6 +46,8 @@ export class PortfolioResolver {
   }
 
   @Query((returns) => Portfolio, { name: 'findOnePortfolio' })
+  @UseGuards(GqlJwtGuard)
+  @Roles(Role.USER)
   //BEFORE MAPPING: public async findOne(@Args('query') query: PortfolioQueryInput): Promise<Portfolio> {
   public async findOne(@Args('query') query: QueryPortfolioInput): Promise<Portfolio> {
     //const queryMap = await this.classMapper.mapAsync(query, QueryPortfolioInput, PortfolioSchema);
@@ -45,6 +56,8 @@ export class PortfolioResolver {
   }
 
   @Query((returns) => [Portfolio], { name: 'findPortfolios' })
+  @UseGuards(GqlJwtGuard)
+  @Roles(Role.USER)
   //BEFORE MAPPING: public async find(@Args('query') query: PortfolioQueryInput): Promise<Portfolio[]> {
   public async find(@Args('query') query: QueryPortfolioInput): Promise<Portfolio[]> {
     return this.classMapper.mapArrayAsync(await this.portfolioService.find(query as unknown), PortfolioSchema, Portfolio);
@@ -52,8 +65,17 @@ export class PortfolioResolver {
   }
 
   @Query((returns) => Boolean, { name: 'deletePortfolio' })
+  @UseGuards(GqlJwtGuard)
+  @Roles(Role.USER)
   public async delete(@Args('_id') _id: string): Promise<true> {
     await this.portfolioService.delete(_id);
     return true;
+  }
+
+  @Query((returns) => PortfolioPageResult, { name: 'portfolioPage' })
+  @UseGuards(GqlJwtGuard)
+  @Roles(Role.USER)
+  public async page(@Args('query') query: QueryPortfolioInput, @Args("page") page: PortfolioPageInput) {
+    return this.portfolioService.page(query as any, page);
   }
 }

@@ -1,6 +1,8 @@
 import { Field, InputType, ObjectType, registerEnumType } from "@nestjs/graphql";
 import { AutoMap } from "@automapper/classes";
 import { ReviewType } from "./profile.enum";
+import { FileUploadObject } from "../upload/upload.model";
+import { FileUpload, GraphQLUpload } from "graphql-upload-ts";
 
 registerEnumType(ReviewType, {
     name:"ReviewType"
@@ -313,11 +315,11 @@ export class Profile{
 
     @AutoMap()
     @Field({ nullable: true })
-    avatar?:string;
+    avatar?:FileUploadObject;
 
     @AutoMap()
     @Field({ nullable: true })
-    banner?:string;
+    banner?:FileUploadObject;
 
     @AutoMap()
     @Field({ nullable: true })
@@ -402,12 +404,12 @@ export class CreateProfileInput{
     userID:string;
 
     @AutoMap()
-    @Field({ nullable: true })
-    avatar?:string;
+    @Field((type)=>GraphQLUpload, { nullable: true })
+    avatar?:FileUpload;
 
     @AutoMap()
-    @Field({ nullable: true })
-    banner?:string;
+    @Field((type)=>GraphQLUpload, { nullable: true })
+    banner?:FileUpload;
 
     @AutoMap()
     @Field({ nullable: true })
@@ -454,12 +456,12 @@ export class CommonProfileInput{
     userID?:string;
 
     @AutoMap()
-    @Field({ nullable: true })
-    avatar?:string;
+    @Field((type)=>GraphQLUpload, { nullable: true })
+    avatar?:FileUpload;
 
     @AutoMap()
-    @Field({ nullable: true })
-    banner?:string;
+    @Field((type)=>GraphQLUpload, { nullable: true })
+    banner?:FileUpload;
 
     @AutoMap()
     @Field({ nullable: true })
@@ -514,3 +516,21 @@ export class CommonProfileInput{
 
 @InputType()
 export class QueryProfileInput extends CommonProfileInput{}
+
+@InputType()
+export class ProfilePageInput {
+  @Field((type) => Number, { nullable: false })
+  skip: number;
+  @Field((type) => Number, { nullable: false })
+  limit: number;
+  @Field((type) => String, { nullable: true })
+  keyword: string;
+}
+
+@ObjectType()
+export class ProfilePageResult {
+  @Field((type) => Number, { nullable: false })
+  totalRecords: number;
+  @Field((type) => [Profile])
+  data: [Profile];
+}
