@@ -15,7 +15,7 @@ async function bootstrap() {
   }));
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  app.use(helmet());
+  app.use(helmet({ contentSecurityPolicy: (process.env.NODE_ENV === 'production') ? undefined : false }));
   app.use(graphqlUploadExpress());
   await app.listen(process.env.port);
   console.log(`app started at http://localhost:${process.env.port}`)
