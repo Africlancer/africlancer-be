@@ -12,6 +12,10 @@ export class User {
   profileID: string;
 
   @AutoMap()
+  @Field({nullable:true})
+  walletID: string;
+
+  @AutoMap()
   @Field()
   firstName: string;
 
@@ -39,6 +43,10 @@ export class CreateUserInput {
   @AutoMap()
   @Field({nullable:true})
   profileID: string;
+
+  @AutoMap()
+  @Field({nullable:true})
+  walletID: string;
 
   @AutoMap()
   @Field()
@@ -72,6 +80,10 @@ class UserInput {
   @AutoMap()
   @Field({nullable: true})
   profileID: string;
+
+  @AutoMap()
+  @Field({nullable: true})
+  walletID: string;
   
   @AutoMap()
   @Field({nullable: true})

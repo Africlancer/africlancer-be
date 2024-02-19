@@ -20,12 +20,14 @@ import { ProfileService } from '../profile/profile.service';
 import { MailService } from '../mail/mail.service';
 import * as uiavatars from 'ui-avatars';
 import JwtPayload from './JwtPayload.interface';
+import { WalletService } from '../wallet/wallet.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly profileService: ProfileService,
+    private readonly walletService: WalletService,
     private jwt: JwtService,
     private readonly mailService: MailService,
   ) {}
@@ -93,10 +95,15 @@ export class AuthService {
         secure_url: avatarUrl
       },
     } as any);
+    const newWallet = await this.walletService.create({
+      userId: newUser._id,
+    });
     await this.userService.update(newUser._id.toString(), {
       profileID: newProfile._id,
+      walletID: newWallet._id
     });
     newUser.profileID = newProfile._id;
+    newUser.walletID = newWallet._id;
 
     const confirmation_token = await this.jwt.signAsync(
       { email: user.email },

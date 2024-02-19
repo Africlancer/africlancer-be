@@ -16,6 +16,10 @@ export class User {
 
   @AutoMap()
   @Prop()
+  walletID: Types.ObjectId;
+
+  @AutoMap()
+  @Prop()
   firstName: string;
 
   @AutoMap()

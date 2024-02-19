@@ -16,6 +16,7 @@ type BookmarkPageResult {
 type User {
   _id: String!
   profileID: String
+  walletID: String
   firstName: String!
   lastName: String!
   email: String!
@@ -27,6 +28,7 @@ type User {
 type Details {
   _id: String
   profileID: String
+  walletID: String
   firstName: String
   lastName: String
   email: String
@@ -192,6 +194,45 @@ type ProjectPageResult {
   data: [Project!]!
 }
 
+type Wallet {
+  _id: ID!
+  userId: ID!
+  balance: Float
+  total_amount_spent: Float
+  total_amount_topup: Float
+  createdAt: Float
+  updatedAt: Float
+  user: User!
+  profile: Profile!
+}
+
+type WalletTransaction {
+  _id: ID!
+  userId: String!
+  walletId: String!
+  transactionId: String
+  amount: Float
+  balanceBefore: Float
+  balanceAfter: Float
+  status: WalletTransactionStatusType
+  createdAt: Float
+  updatedAt: Float
+  user: User!
+  profile: Profile!
+  wallet: Wallet!
+}
+
+enum WalletTransactionStatusType {
+  PENDING
+  PAID
+  WITHDRAW
+}
+
+type WalletTransactionPageResult {
+  totalRecords: Float!
+  data: [WalletTransaction!]!
+}
+
 type Portfolio {
   _id: String!
   title: String!
@@ -251,6 +292,11 @@ type Query {
   deleteProject: Boolean!
   deleteProjectFile(projectId: String!, fileId: String!, publicId: String!): Boolean!
   projectPage(query: QueryProjectInput!, fullSearch: Boolean!, page: ProjectPageInput!): ProjectPageResult!
+  findWallet(query: QueryWalletInput!): [Wallet!]!
+  findWalletById(id: String!): Wallet!
+  findWalletTransaction(query: QueryWalletTransactionInput!): [WalletTransaction!]!
+  findWalletTransactionById(id: String!): WalletTransaction!
+  walletTransactionPage(query: WalletTransactionInput!, page: WalletTransactionPageInput!): WalletTransactionPageResult!
   findOnePortfolio(query: QueryPortfolioInput!): Portfolio!
   findPortfolios(query: QueryPortfolioInput!): [Portfolio!]!
   deletePortfolio(_id: String!): Boolean!
@@ -278,6 +324,7 @@ input BookmarkPageInput {
 
 input QueryUserInput {
   profileID: String
+  walletID: String
   firstName: String
   lastName: String
   email: String
@@ -332,6 +379,38 @@ input QueryProjectInput {
 input ProjectPageInput {
   skip: Float!
   limit: Float!
+  keyword: String
+}
+
+input QueryWalletInput {
+  _id: ID
+  userId: ID
+  balance: Float
+  total_amount_spent: Float
+  total_amount_topup: Float
+}
+
+input QueryWalletTransactionInput {
+  userId: String
+  walletId: String
+  transactionId: String
+  balance: Float
+  amount: Float
+  balanceBefore: Float
+  balanceAfter: Float
+  status: WalletTransactionStatusType
+}
+
+input WalletTransactionInput {
+  amount: Float!
+  walletId: String!
+}
+
+input WalletTransactionPageInput {
+  skip: Float!
+  take: Float!
+  userId: String
+  walletId: String
   keyword: String
 }
 
@@ -400,6 +479,14 @@ type Mutation {
   updateProject(id: String!, project: QueryProjectInput!): Boolean!
   uploadFile(upload: UploadFileInput!): Boolean!
   uploadFiles(upload: UploadFileInput!): [FileUploadObject!]!
+  createWallet(wallet: CreateWalletInput!): Wallet!
+  updateWallet(id: String!, wallet: UpdateWalletInput!): Wallet!
+  deleteWallet(query: QueryWalletInput!): Boolean!
+  createWalletTransaction(wallet: CreateWalletTransactionInput!): WalletTransaction!
+  updateWalletTransaction(id: String!, wallet: UpdateWalletTransactionInput!): WalletTransaction!
+  deleteWalletTransaction(query: QueryWalletTransactionInput!): Boolean!
+  walletTopup(transaction: WalletTransactionInput!): WalletTransaction!
+  walletWithdraw(transaction: WalletTransactionInput!): WalletTransaction!
   createPortfolio(portfolio: CreatePortfolioInput!): Portfolio!
   updatePortfolio(_id: String!, portfolio: QueryPortfolioInput!): Boolean!
   createBid(bid: CreateBidInput!): Bid!
@@ -497,6 +584,36 @@ input CreateProjectInput {
 input UploadFileInput {
   upload: Upload
   uploads: [Upload!]
+}
+
+input CreateWalletInput {
+  userId: String!
+}
+
+input UpdateWalletInput {
+  _id: ID
+  userId: ID
+  balance: Float
+  total_amount_spent: Float
+  total_amount_topup: Float
+}
+
+input CreateWalletTransactionInput {
+  userId: String!
+  walletId: String!
+  transactionId: String
+  amount: Float!
+}
+
+input UpdateWalletTransactionInput {
+  userId: String
+  walletId: String
+  transactionId: String
+  balance: Float
+  amount: Float
+  balanceBefore: Float
+  balanceAfter: Float
+  status: WalletTransactionStatusType
 }
 
 input CreatePortfolioInput {
