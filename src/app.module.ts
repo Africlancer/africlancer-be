@@ -24,6 +24,7 @@ import { FileUploadModule } from './modules/upload/upload.module';
 import { ChatsModule } from './modules/chats/chats.module';
 import { ChatsController } from './modules/chats/chats.controller';
 import { ChatsService } from './modules/chats/chats.service';
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
   imports: [
@@ -56,7 +57,8 @@ import { ChatsService } from './modules/chats/chats.service';
     BidModule,
     NotificationModule,
     ChatsModule,
-    FileUploadModule
+    FileUploadModule,
+    PaymentModule
   ],
   controllers: [AppController, ChatsController],
   providers: [
